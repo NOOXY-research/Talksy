@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import logo from './logo.svg';
+import logo from './logo.png';
 import './App.css';
 
 class SplitComp extends Component {
@@ -155,7 +155,7 @@ class HeaderPage extends Component {
     let msglistroot = "/messeges/";
     this.state = {
       msglistroot: msglistroot,
-      headertitle: "NOOXY Talk",
+      headertitle: "NoTalk",
       headerbuttons: [
         ['messeges', msglistroot, 'chat'],
         ['friends', '/friends/', 'people'],
@@ -198,7 +198,7 @@ class HeaderPage extends Component {
     return (
       <div className="HeaderPage">
         <header className="HeaderPage-header">
-          <h1 className="HeaderPage-title">{this.state.headertitle} <i className="material-icons">chat_bubble</i></h1>
+          <h1 className="HeaderPage-title"><img height="32px" src={logo}/> {this.state.headertitle} </h1>
           <div className="HeaderPage-header-bar">
             {this.renderHeaderBar()}
           </div>
