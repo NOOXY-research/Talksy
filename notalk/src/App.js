@@ -35,27 +35,66 @@ class SplitLeft extends Component {
 }
 
 class ChPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      messeges: props.messeges
+    };
+  }
 
   render() {
-    console.log(this.props.match.params.id);
-    return(
-      <div className="ChPage">
-        <div className="ChPage-Header">
-          {"ChannelID: " + (this.props.match.params.id?this.props.match.params.id:"NO ID")}
-        </div>
-        <div>
-          {"Messeges"}
-        </div>
-        <div className="ChPage-Sender">
-          <input placeholder="input text...." className="ChPage-Sender-Input"></input>
-          <div className="ChPage-Sender-Buttons">
-            <div className="ChPage-Sender-Button"><i className="material-icons">send</i></div>
+    if(this.props.show) {
+      return(
+        <div className="ChPage">
+          <div className="ChPage-Header">
+            {"ChannelID: " + (this.props.match.params.id?this.props.match.params.id:"Not selected")}
+          </div>
+          <div>
+          </div>
+          <div className="ChPage-Sender">
+            <input placeholder="input text...." className="ChPage-Sender-Input"></input>
+            <div className="ChPage-Sender-Buttons">
+              <div className="ChPage-Sender-Button"><i className="material-icons">send</i></div>
+            </div>
           </div>
         </div>
+      );
+    }
+    else {
+      return null;
+    }
+  }
+}
+
+class FriendPage extends Component {
+  render() {
+    return(
+      <div className="">
+        {"friends"}
       </div>
     );
   }
-}
+};
+
+class SettingsPage extends Component {
+  render() {
+    return(
+      <div className="">
+        {"settings"}
+      </div>
+    );
+  }
+};
+
+class AccountPage extends Component {
+  render() {
+    return(
+      <div className="">
+        {"account"}
+      </div>
+    );
+  }
+};
 
 class ChList extends Component {
   constructor (props) {
@@ -63,16 +102,16 @@ class ChList extends Component {
     this.rootpath = props.rootpath;
     this.state = {
       channels: {
-        'ch1': ['Channel1', 'lastmsg', 23],
-        'ch2': ['Channel1', 'lastmsg', 23],
-        'ch3': ['Channel1', 'lastmsg', 23],
-        'ch4': ['Channel1', 'lastmsg', 23],
-        'ch5': ['Channel1', 'lastmsg', 23],
-        'ch6': ['Channel1', 'lastmsg', 23],
-        'ch7': ['Channel1', 'lastmsg', 23],
-        'ch8': ['Channel1', 'lastmsg', 23],
-        'ch9': ['Channel1', 'lastmsg', 23],
-        'ch10': ['Chanel2', 'yves: lastmsg', 1]
+        'ch1': ['Channel1', 'lastmsg', 23, {1: ['text', 'hello', 0]}],
+        'ch2': ['Channel2', 'lastmsg', 23],
+        'ch3': ['Channel3', 'lastmsg', 23],
+        'ch4': ['Channel4', 'lastmsg', 23],
+        'ch5': ['Channel5', 'lastmsg', 23],
+        'ch6': ['Channel6', 'lastmsg', 23],
+        'ch7': ['Channel7', 'lastmsg', 23],
+        'ch8': ['Channel8', 'lastmsg', 23],
+        'ch9': ['Channel9', 'lastmsg', 23],
+        'ch10': ['Chanel10', 'yves: lastmsg', 1]
       }
 
     }
@@ -82,8 +121,7 @@ class ChList extends Component {
     let elems = [];
     for(let key in this.state.channels) {
       elems.push(
-        <a href={this.rootpath+key}>
-          <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"}>
+          <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.history.push(this.rootpath+key)}}>
             <div className="ChList-Row-ChName">
               {this.state.channels[key][0]}
             </div>
@@ -94,24 +132,24 @@ class ChList extends Component {
               {this.state.channels[key][2]}
             </div>
           </div>
-        </a>
       );
     }
-    return(
-      elems
-    );
+    return elems;
   };
 
   render() {
     return(
       <div className="ChList-Rows">
+        <div className="ChList-Header">
+          <span>new messeges </span><i className="material-icons">add_circle</i>
+        </div>
         {this.renderRows()}
       </div>
     );
   }
 }
 
-class HomePage extends Component {
+class HeaderPage extends Component {
   constructor (props) {
     super(props);
     let msglistroot = "/messeges/";
@@ -132,22 +170,36 @@ class HomePage extends Component {
     return(
       this.state.headerbuttons.map((button)=>{
         return(
-          <a key={button[0]} href={button[1]}>
-            <div className={button[0]===this.state.selectedheaderbuttons?"Home-header-bar-button-selected":"Home-header-bar-button"} onClick={null}>
+            <div key={button[0]}
+              className={button[0]===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button"}
+              onClick={()=>{
+                this.setState({selectedheaderbuttons: button[0]});
+                this.props.history.push(button[1]);
+              }}
+            >
               <i className="material-icons">{button[2]}</i>
             </div>
-          </a>
         );
       })
     );
   };
 
+  renderChannels() {
+    let elems = [];
+    for(let key in this.state.channels) {
+      elems.push(
+
+      );
+    }
+    return elems;
+  };
+
   render() {
     return (
-      <div className="Home">
-        <header className="Home-header">
-          <h1 className="Home-title">{this.state.headertitle}</h1>
-          <div className="Home-header-bar">
+      <div className="HeaderPage">
+        <header className="HeaderPage-header">
+          <h1 className="HeaderPage-title">{this.state.headertitle} <i className="material-icons">chat_bubble</i></h1>
+          <div className="HeaderPage-header-bar">
             {this.renderHeaderBar()}
           </div>
         </header>
@@ -156,15 +208,18 @@ class HomePage extends Component {
           return(
             <SplitComp>
               <SplitLeft>
-                <ChList selected={props.match.params.id} rootpath={this.state.msglistroot}/>
+                <ChList history={props.history} selected={props.match.params.id} rootpath={this.state.msglistroot}/>
               </SplitLeft>
               <SplitRight>
+                <ChPage show={true} match={props.match} />
                 <ChPage  match={props.match} />
               </SplitRight>
             </SplitComp>
           )
         }}/>
-        <Route exact path='/friends' component={ChList}/>
+        <Route exact path='/friends' component={FriendPage}/>
+        <Route exact path='/settings' component={SettingsPage}/>
+        <Route exact path='/account' component={AccountPage}/>
       </div>
     );
   }
@@ -173,13 +228,13 @@ class HomePage extends Component {
 class App extends Component {
 
   render() {
-    // let HomePageReg = '/:page([^/]*)';
+    // let HeaderPageReg = '/:page([^/]*)';
     // let ChPageReg = '/messeges/:id([0-9]+)';
-    let HomePageReg = '/:page(.*)';
+    let HeaderPageReg = '/:page(.*)';
     return (
       <Router>
         <div>
-          <Route exact path={HomePageReg} component={HomePage}/>
+          <Route exact path={HeaderPageReg} component={HeaderPage}/>
         </div>
       </Router>
     );
