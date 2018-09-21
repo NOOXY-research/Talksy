@@ -1,0 +1,165 @@
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.material-icons {
+  font-size: inherit;
+}
+
+.Home {
+  text-align: center;
+}
+
+.Home-logo {
+  animation: Home-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.Home-header {
+  position: relative;
+  background-color: #263238;
+  height: auto;
+  padding: 20px 0 0 0;
+  color: white;
+  box-sizing: border-box;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  z-index: 999;
+}
+
+.Home-header-bar {
+  display: inline-block;
+  height: 50px;
+  line-height:  50px;
+  width: auto;
+  margin: 0 10px;
+  color: white;
+  font-size: 28px;
+}
+
+.Home-header-bar-button {
+  display: inline-block;
+  height: inherit;
+  width: 80px;
+  margin: 0;
+  cursor: pointer;
+  border-bottom: 3px solid;
+  border-color: rgba(0, 0, 0, 0.0);
+  box-sizing: border-box;
+}
+
+.Home-header-bar-button-selected {
+  display: inline-block;
+  height: inherit;
+  width: 80px;
+  margin: 0;
+  cursor: pointer;
+  border-bottom: 3px solid;
+  box-sizing: border-box;
+}
+
+.Home-title {
+  font-size: 22px;
+}
+
+.Home-intro {
+  font-size: large;
+}
+
+.ChList-Row {
+  position: relative;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: left;
+  height: 70px;
+  border-bottom: 1px solid #ECEFF1;
+  background: inherit;
+  color: #37474F;
+
+}
+
+.ChList-Row-selected {
+  position: relative;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: left;
+  height: 70px;
+  border-bottom: 1px solid #ECEFF1;
+  color: white;
+  background: #37474F;
+}
+
+.ChList-Row-ChName {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ChList-Row-ChMore {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.ChList-Rows > *:nth-child(odd) {
+  background: #eee;
+}
+
+.ChList-Rows {
+  position: relative;
+}
+
+.ChList-Row-ChUnread{
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+  margin-right: 5px;
+  font-size: 15px;
+  height: 20px;
+  width: auto;
+  background-color: #F50057;
+  border-radius: 20px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  color: white;
+}
+
+.SplitComp {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.SplitLeft{
+  position: relative;
+  height: 100%;
+  float: left;
+  order: 0;
+  flex-grow: 1;
+  box-sizing: border-box;
+  max-width: 350px;
+  border-right: 1px solid #ECEFF1;
+}
+
+.SplitRight{
+  position: relative;
+  height: 100%;
+  float: left;
+  order: 1;
+  flex-grow: 3;
+}
+
+.ChPage-Header {
+  height: 50px;
+  line-height: 50px;
+  border-bottom: 1px solid #ECEFF1;
+  box-sizing: border-box;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.04), 0 3px 1px -2px rgba(0,0,0,0.01), 0 1px 5px 0 rgba(0,0,0,0.005);
+  position: relative;
+}
+
+
+@keyframes Home-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
