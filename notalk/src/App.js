@@ -46,6 +46,12 @@ class ChPage extends Component {
         <div>
           {"Messeges"}
         </div>
+        <div className="ChPage-Sender">
+          <input placeholder="input text...." className="ChPage-Sender-Input"></input>
+          <div className="ChPage-Sender-Buttons">
+            <div className="ChPage-Sender-Button"><i className="material-icons">send</i></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -58,9 +64,15 @@ class ChList extends Component {
     this.state = {
       channels: {
         'ch1': ['Channel1', 'lastmsg', 23],
-        'ch5': ['Channel1', 'lastmsg', 23],
+        'ch2': ['Channel1', 'lastmsg', 23],
         'ch3': ['Channel1', 'lastmsg', 23],
-        'ch2': ['Chanel2', 'yves: lastmsg', 1]
+        'ch4': ['Channel1', 'lastmsg', 23],
+        'ch5': ['Channel1', 'lastmsg', 23],
+        'ch6': ['Channel1', 'lastmsg', 23],
+        'ch7': ['Channel1', 'lastmsg', 23],
+        'ch8': ['Channel1', 'lastmsg', 23],
+        'ch9': ['Channel1', 'lastmsg', 23],
+        'ch10': ['Chanel2', 'yves: lastmsg', 1]
       }
 
     }
@@ -92,10 +104,8 @@ class ChList extends Component {
 
   render() {
     return(
-      <div className="Messeges">
-        <div className="ChList-Rows">
-          {this.renderRows()}
-        </div>
+      <div className="ChList-Rows">
+        {this.renderRows()}
       </div>
     );
   }
