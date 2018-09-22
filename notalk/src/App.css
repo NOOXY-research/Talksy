@@ -6,6 +6,11 @@ img {
   display: inline-flex;
   vertical-align: middle;
 }
+@media only screen and (max-width: 500px) {
+    .SplitLeft {
+        display: none;
+    }
+}
 .material-icons {
   font-size: inherit;
   display: inline-flex;
@@ -54,8 +59,7 @@ img {
   width: 80px;
   margin: 0;
   cursor: pointer;
-  border-bottom: 3px solid;
-  border-color: rgba(0, 0, 0, 0.0);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.0);
   box-sizing: border-box;
 }
 
@@ -71,6 +75,7 @@ img {
 
 .HeaderPage-title {
   font-size: 22px;
+  margin: 0;
 }
 
 .HeaderPage-intro {
@@ -200,6 +205,83 @@ img {
   position: relative;
   z-index: 999;
   background: white;
+  user-select: none;
+}
+.ChPage-Header-left-Button {
+  left: 0;
+  position: absolute;
+  height: inherit;
+  padding: 0;
+  width: 50px;
+  box-sizing: border-box;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.ChPage-Header-right-Button {
+  right: 0;
+  position: absolute;
+  height: inherit;
+  padding: 0;
+  width: 50px;
+  box-sizing: border-box;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.ChPage-Messeges{
+  position: absolute;
+  height: calc(100% - 100px);
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ChPage-Messege{
+  position: relative;
+  margin-top: 5px ;
+  display: inline-block;
+  width: 100%;
+
+}
+
+.ChPage-Bubble{
+  margin: 0 10px;
+  position: relative;
+  vertical-align: middle;
+  background-color: #263238;
+  border-radius: 15px;
+  min-height: 30px;
+  color: white;
+  padding: 8px;
+  box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  max-width: 300px;
+}
+.ChPage-Bubble-Title {
+  position: relative;
+  font-size: 13px;
+  margin-bottom: 3px;
+  font-weight: 400;
+}
+.ChPage-Bubble-Text {
+  position: relative;
+  font-size: 15px;
+  margin-bottom: 3px;
+  font-weight: 100;
+}
+.ChPage-Bubble-Date {
+  position: relative;
+  width: 100%;
+  text-align: right!important;
+  font-size: 8px;
+  font-weight: 100;
+  user-select: none;
+}
+.ChPage-Bubble > div{
+  text-align: left;
+  display: block;
+  vertical-align: middle;
 }
 
 .ChPage-Sender {
@@ -230,6 +312,7 @@ img {
   display: inline-block;
   flex-grow: auto;
   cursor: pointer;
+  user-select: none;
 }
 
 .ChPage-Sender-Button {

@@ -37,9 +37,45 @@ class SplitLeft extends Component {
 class ChPage extends Component {
   constructor(props) {
     super(props);
+    // this.state = {
+    //   messeges: props.messeges
+    // };
     this.state = {
-      messeges: props.messeges
+      messeges: {
+        1: ['NOOXY', 'text', 'hellohellohellohellohellohellohell ohellohellohellohellohello hellohellohellohellohello', '12:00'],
+        2: ['NOOXY', 'text', 'hellohel', '12:00'],
+        3: ['NOOXY', 'text', 'hellohel', '12:00'],
+        4: ['NOOXY', 'text', 'helloasdfasdfhel', '12:00'],
+        5: ['NOOXY', 'text', 'hellohel', '12:00'],
+        6: ['NOOXY', 'text', 'helloasdfhel', '12:00'],
+        7: ['Yves', 'text', 'hellohasdfadsel', '12:00'],
+        8: ['NOOXY', 'text', 'hellohel', '12:00'],
+        9: ['NOOXY', 'text', 'hellohel', '12:00'],
+        10: ['NOOXY', 'text', 'hellohel', '12:00'],
+        11: ['NOOXY', 'text', 'hellasdfsadfdohel', '12:00'],
+      },
+      user: 'NOOXY'
     };
+  }
+
+  renderMesseges() {
+    let elems = [];
+    for(let key in this.state.messeges) {
+      let align = 'left';
+      if(this.state.messeges[key][0]==this.state.user) {
+        align = 'right';
+      }
+      elems.push(
+        <div className="ChPage-Messege" style={{'textAlign': align}}>
+          <div className="ChPage-Bubble" >
+            <div className="ChPage-Bubble-Title">{this.state.messeges[key][0]}</div>
+            <div className="ChPage-Bubble-Text">{this.state.messeges[key][2]}</div>
+            <div className="ChPage-Bubble-Date">{this.state.messeges[key][3]}</div>
+          </div>
+        </div>
+      );
+    }
+    return elems;
   }
 
   render() {
@@ -47,9 +83,17 @@ class ChPage extends Component {
       return(
         <div className="ChPage">
           <div className="ChPage-Header">
-            {"ChannelID: " + (this.props.match.params.id?this.props.match.params.id:"Not selected")}
+          <div className="ChPage-Header-left-Button"
+          onClick={()=>{this.props.history.push(this.props.rootpath)}}>
+            <i class="material-icons">arrow_back</i>
           </div>
-          <div>
+          <div className="ChPage-Header-right-Button">
+            <i class="material-icons">expand_more</i>
+          </div>
+            {"Channel_ID: " + (this.props.match.params.id?this.props.match.params.id:"Not selected")}
+          </div>
+          <div className="ChPage-Messeges">
+            {this.renderMesseges()}
           </div>
           <div className="ChPage-Sender">
             <input placeholder="input text...." className="ChPage-Sender-Input"></input>
@@ -102,7 +146,7 @@ class ChList extends Component {
     this.rootpath = props.rootpath;
     this.state = {
       channels: {
-        'ch1': ['Channel1', 'lastmsg', 23, {1: ['text', 'hello', 0]}],
+        'ch1': ['Channel1', 'lastmsg', 23, {1: ['NOOXY', 'text', 'hello', 0]}],
         'ch2': ['Channel2', 'lastmsg', 23],
         'ch3': ['Channel3', 'lastmsg', 23],
         'ch4': ['Channel4', 'lastmsg', 23],
@@ -203,15 +247,17 @@ class HeaderPage extends Component {
             {this.renderHeaderBar()}
           </div>
         </header>
-        <Route exact path="/" component={ChList}/>
-        <Route exact path={this.state.msglistroot+':id(.*)'} render={(props)=>{
+        <Route exact path=":path(/|/messeges/)" render={(props)=>{
+          return <ChList history={props.history} selected={props.match.params.id} rootpath={this.state.msglistroot}/>
+        }}/>
+        <Route exact path={this.state.msglistroot+':id(.+)'} render={(props)=>{
           return(
             <SplitComp>
               <SplitLeft>
                 <ChList history={props.history} selected={props.match.params.id} rootpath={this.state.msglistroot}/>
               </SplitLeft>
               <SplitRight>
-                <ChPage show={true} match={props.match} />
+                <ChPage show={true} match={props.match} history={props.history} rootpath={this.state.msglistroot}/>
                 <ChPage  match={props.match} />
               </SplitRight>
             </SplitComp>
