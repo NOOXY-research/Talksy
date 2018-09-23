@@ -69,13 +69,14 @@ img {
   width: 80px;
   margin: 0;
   cursor: pointer;
-  border-bottom: 3px solid;
+  border-bottom: 2px solid;
   box-sizing: border-box;
 }
 
 .HeaderPage-title {
   font-size: 22px;
   margin: 0;
+  font-weight: 400;
 }
 
 .HeaderPage-intro {
@@ -333,6 +334,60 @@ img {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
 
+.AccountPage {
+  display: inline-block;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background-color: #eceff1;
+}
+
+.AccountPage-block {
+  background-color: white;
+  position: relative;
+  box-sizing: border-box;
+  text-align: left;
+  height: auto;
+  width: 100%;
+  display: inline-block;
+  padding: 0px;
+  border-top: 1px solid #eceff1;
+  user-select: none;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  cursor: pointer;
+  margin-bottom: 3px;
+  color: #263238;
+}
+
+.AccountPage-Row {
+  padding: 10px;
+  position: relative;
+  box-sizing: border-box;
+  text-align: left;
+  min-height: 50px;
+  border-bottom: 1px solid #eceff1;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+}
+
+.AccountPage-Profile-Head {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  border: 1px solid #263238;
+  margin: 0;
+}
+
+.AccountPage-Profile-Text {
+  display: flex;
+  flex-grow: 1;
+  padding-left: 10px;
+  line-height: 50px;
+  vertical-align: middle;
+}
 @keyframes HeaderPage-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

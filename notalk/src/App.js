@@ -133,8 +133,26 @@ class SettingsPage extends Component {
 class AccountPage extends Component {
   render() {
     return(
-      <div className="">
-        {"account"}
+      <div className="AccountPage">
+        <div className="AccountPage-block">
+          <div className="AccountPage-Row">
+            <figure className="AccountPage-Profile-Head">
+
+            </figure>
+            <div className="AccountPage-Profile-Text">
+              {"123"}
+            </div>
+          </div>
+          <div className="AccountPage-Row">
+          {"123"}
+          </div>
+
+        </div>
+        <div className="AccountPage-block">
+          <div className="AccountPage-Row">
+          {"123"}
+          </div>
+        </div>
       </div>
     );
   }
@@ -203,8 +221,7 @@ class HeaderPage extends Component {
       headerbuttons: [
         ['messeges', msglistroot, 'chat'],
         ['friends', '/friends/', 'people'],
-        ['account', '/account/', 'account_circle'],
-        ['settings', '/settings/', 'settings']
+        ['account', '/account/', 'account_circle']
       ],
       selectedheaderbuttons: props.match.params.page.split('/')[0]
     }
