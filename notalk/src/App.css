@@ -111,8 +111,12 @@ img {
   color: #37474F;
   user-select: none;
   cursor: pointer;
+  transition: .3s;
 }
 
+.ChList-Row:hover {
+  background: #ECEFF1!important;
+}
 .ChList-Row-selected {
   position: relative;
   padding: 10px;
@@ -137,7 +141,7 @@ img {
 }
 
 .ChList-Rows > *:nth-child(odd) {
-  background: #ECEFF1;
+  background: #FAFAFA;
 }
 
 .ChList-Rows {
@@ -334,15 +338,16 @@ img {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
 
-.AccountPage {
+.Page {
   display: inline-block;
   position: relative;
   height: 100%;
   width: 100%;
   background-color: #eceff1;
+  overflow-y: auto;
 }
 
-.AccountPage-block {
+.Page-Block {
   background-color: white;
   position: relative;
   box-sizing: border-box;
@@ -352,14 +357,21 @@ img {
   display: inline-block;
   padding: 0px;
   border-top: 1px solid #eceff1;
-  user-select: none;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
-  cursor: pointer;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.07), 0 3px 1px -2px rgba(0,0,0,0.06), 0 1px 5px 0 rgba(0,0,0,0.1);
   margin-bottom: 3px;
   color: #263238;
+  transition: .3s;
 }
 
-.AccountPage-Row {
+.Page-Block > *:nth-child(even) {
+  background: #FAFAFA;
+}
+
+.Page-Block:hover {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}
+
+.Page-Row {
   padding: 10px;
   position: relative;
   box-sizing: border-box;
@@ -370,9 +382,24 @@ img {
   cursor: pointer;
   display: flex;
   flex-direction: row;
+  transition: .3s;
 }
 
-.AccountPage-Profile-Head {
+.Page-Row:hover {
+  background: #ECEFF1;
+}
+
+.Page-Row-Text h2 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
+}
+.Page-Row-Text p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.User-Head {
   display: inline-block;
   width: 50px;
   height: 50px;
@@ -381,13 +408,30 @@ img {
   margin: 0;
 }
 
-.AccountPage-Profile-Text {
+.User-Text {
   display: flex;
   flex-grow: 1;
   padding-left: 10px;
-  line-height: 50px;
   vertical-align: middle;
+  flex-direction: column;
 }
+
+.User-Text h2 {
+  display: flex;
+  margin: 0;
+  width: 100%;
+  height: auto;
+  font-size: 20px;
+}
+
+.User-Text p {
+  display: flex;
+  margin: 0;
+  width: 100%;
+  height: auto;
+  font-size: 16px;
+}
+
 @keyframes HeaderPage-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
