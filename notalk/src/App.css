@@ -1,16 +1,18 @@
 a {
   color: inherit;
   text-decoration: none;
+  background-color: inherit;
 }
 img {
   display: inline-flex;
   vertical-align: middle;
 }
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
     .SplitLeft {
         display: none;
     }
 }
+
 .material-icons {
   font-size: inherit;
   display: inline-flex;
@@ -45,12 +47,12 @@ img {
 
 .HeaderPage-header-bar {
   display: inline-block;
-  height: 40px;
-  line-height: 37px;
+  height: 43px;
+  line-height: 40px;
   width: auto;
   margin: 0 10px;
   color: white;
-  font-size: 25px;
+  font-size: 28px;
 }
 
 .HeaderPage-header-bar-button {
@@ -60,7 +62,14 @@ img {
   margin: 0;
   cursor: pointer;
   border-bottom: 3px solid rgba(0, 0, 0, 0.0);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
   box-sizing: border-box;
+  transition: .3s;
+}
+
+.HeaderPage-header-bar-button:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .HeaderPage-header-bar-button-selected {
@@ -68,15 +77,22 @@ img {
   height: inherit;
   width: 80px;
   margin: 0;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
   cursor: pointer;
-  border-bottom: 2px solid;
+  border-bottom: 3px solid;
   box-sizing: border-box;
+  transition: .3s;
+}
+
+.HeaderPage-header-bar-button-selected:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .HeaderPage-title {
   font-size: 22px;
   margin: 0;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .HeaderPage-intro {
@@ -112,6 +128,16 @@ img {
   user-select: none;
   cursor: pointer;
   transition: .3s;
+  display: flex;
+  flex-direction: row;
+}
+.ChList-Row-ChPhoto {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  border: 1px solid #263238;
+  margin: 0;
 }
 
 .ChList-Row:hover {
@@ -128,6 +154,8 @@ img {
   background: #37474F !important;
   user-select: none;
   cursor: pointer;
+  display: flex;
+  flex-direction: row;
 }
 
 .ChList-Row-ChName {
@@ -148,6 +176,7 @@ img {
   height: 100%;
   overflow-y: auto;
   position: relative;
+  min-width: 250px;
 }
 
 .ChList-Row-ChUnread{
@@ -155,12 +184,12 @@ img {
   right: 0;
   top: 50%;
   transform: translate(0, -50%);
-  margin-right: 5px;
-  font-size: 14px;
+  margin-right: 10px;
+  font-size: 12px;
   line-height: 20px;
   height: 20px;
   width: auto;
-  background-color: #F50057;
+  background-color: #FF4081;
   border-radius: 20px;
   box-sizing: border-box;
   padding: 0 5px;
@@ -198,8 +227,8 @@ img {
 @-webkit-keyframes animateright {
   0% {
     opacity: .6;
-    width: calc(100% - 30px);
-    transform: translate(15px, 0);
+    width: calc(100% - 16px);
+    transform: translate(8px, 0);
   }
   100% {
     opacity: 1;
@@ -359,6 +388,7 @@ img {
   width: 100%;
   background-color: #eceff1;
   overflow-y: auto;
+  animation: animateright .3s;
 }
 
 .Page-Block {
@@ -378,7 +408,7 @@ img {
 }
 
 .Page-Block > *:nth-child(even) {
-  background: #FAFAFA;
+  background-color: #FAFAFA;
 }
 
 .Page-Block:hover {
@@ -390,30 +420,57 @@ img {
   position: relative;
   box-sizing: border-box;
   text-align: left;
-  min-height: 50px;
+  min-height: 30px;
   border-bottom: 1px solid #eceff1;
   user-select: none;
   cursor: pointer;
   display: flex;
   flex-direction: row;
   transition: .3s;
+  background-color: inherit;
 }
 
+.Page-Row-Button {
+  box-sizing: border-box;
+  user-select: none;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  font-size: 16px;
+  line-height: 30px;
+  height: 30px;
+  vertical-align: middle;
+}
 .Page-Row:hover {
   background: #ECEFF1;
 }
-
+.Page-Row-Text h1 {
+  font-size: 25px;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
 .Page-Row-Text h2 {
   font-size: 16px;
   margin: 0;
   font-weight: 500;
 }
+.Page-Row-Text input {
+  outline: none;
+  font-size: 12px;
+  border: none;
+  background: none;
+  padding: 0;
+  width: 100%;
+}
 .Page-Row-Text p {
   font-size: 14px;
   margin: 0;
-}
 
-.User-Head {
+}
+.Page-Row-Text {
+  width: 100%;
+}
+.Page-Row-ThumbnailText-Head {
   display: inline-block;
   width: 50px;
   height: 50px;
@@ -422,7 +479,7 @@ img {
   margin: 0;
 }
 
-.User-Text {
+.Page-Row-ThumbnailText-Text {
   display: flex;
   flex-grow: 1;
   padding-left: 10px;
@@ -430,7 +487,7 @@ img {
   flex-direction: column;
 }
 
-.User-Text h2 {
+.Page-Row-ThumbnailText-Text h2 {
   display: flex;
   margin: 0;
   width: 100%;
@@ -438,15 +495,10 @@ img {
   font-size: 20px;
 }
 
-.User-Text p {
+.Page-Row-ThumbnailText-Text p {
   display: flex;
   margin: 0;
   width: 100%;
   height: auto;
   font-size: 16px;
-}
-
-@keyframes HeaderPage-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
