@@ -197,7 +197,7 @@ img {
 }
 @-webkit-keyframes animateright {
   0% {
-    opacity: .2;
+    opacity: .6;
     width: calc(100% - 30px);
     transform: translate(15px, 0);
   }
@@ -223,7 +223,6 @@ img {
   border-bottom: 1px solid #ECEFF1;
   box-sizing: border-box;
   position: relative;
-  z-index: 999;
   background: white;
   user-select: none;
 }

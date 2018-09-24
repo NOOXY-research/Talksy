@@ -155,6 +155,12 @@ class NewChannelPage extends Component {
                 <p> {"create this channel"}</p>
               </div>
             </div>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Cancel"}</h2>
+                <p> {"Do not create this channel"}</p>
+              </div>
+            </div>
           </div>
         </div>
       );
