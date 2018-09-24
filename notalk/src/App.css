@@ -185,12 +185,27 @@ img {
   border-right: 1px solid #ECEFF1;
 }
 
-.SplitRight{
+.SplitRight {
   position: relative;
   height: 100%;
   float: left;
   order: 1;
   flex-grow: 3;
+}
+.SplitRight >div {
+  animation: animateright .3s;
+}
+@-webkit-keyframes animateright {
+  0% {
+    opacity: .2;
+    width: calc(100% - 30px);
+    transform: translate(15px, 0);
+  }
+  100% {
+    opacity: 1;
+    width: 100%;
+    transform: translate(0, 0);
+  }
 }
 .ChPage {
   display: inline-block;

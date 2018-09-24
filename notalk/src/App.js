@@ -102,6 +102,69 @@ class ChPage extends Component {
   }
 }
 
+class NewChannelPage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  renderMesseges() {
+
+  }
+
+  render() {
+    if(this.props.show) {
+      return(
+        <div className="Page">
+          <div className="Page-Block">
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"ChannelName"}</h2>
+                <p> {"NewChannel"}</p>
+              </div>
+            </div>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Description"}</h2>
+                <p> {"a new notalk channel."}</p>
+              </div>
+            </div>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Visability"}</h2>
+                <p> {"Public"}</p>
+              </div>
+            </div>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Type"}</h2>
+                <p> {"Live Chat"}</p>
+              </div>
+            </div>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Users"}</h2>
+                <p> {"click to edit."}</p>
+              </div>
+            </div>
+
+          </div>
+          <div className="Page-Block">
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Create"}</h2>
+                <p> {"create this channel"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    else {
+      return null;
+    }
+  }
+}
+
 class FriendPage extends Component {
   constructor(props) {
     super(props);
@@ -243,8 +306,8 @@ class ChList extends Component {
 
   render() {
     return(
-      <div className="ChList-Rows">
-        <div className="ChList-Header">
+      <div className="ChList-Rows" >
+        <div className="ChList-Header" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
           <span>new messeges </span><i className="material-icons">add_circle</i>
         </div>
         {this.renderRows()}
@@ -343,10 +406,18 @@ class App extends Component {
 
     this.onSelectCh = (chid, history)=> {
       this.setState((prevState) => {
-        let messeges_state = prevState.messeges;
-        messeges_state.channelnow = chid;
-        history.push(msglistroot+chid);
-        return { messeges: messeges_state}
+        // if(chid!='new') {
+          let messeges_state = prevState.messeges;
+          messeges_state.channelnow = chid;
+          history.push(msglistroot+chid);
+          return { messeges: messeges_state}
+        // }
+        // else {
+        //   let messeges_state = prevState.messeges;
+        //   messeges_state.channelnow = null;
+        //   history.push('/newmessege');
+        //   return { messeges: messeges_state}
+        // }
       })
     }
   }
@@ -401,6 +472,7 @@ class App extends Component {
                         rootpath={this.state.msglistroot}/>
                       </SplitLeft>
                       <SplitRight>
+                        <NewChannelPage show={this.state.messeges.channelnow=='new'} />
                         {this.renderChannels(props)}
                       </SplitRight>
                     </SplitComp>
