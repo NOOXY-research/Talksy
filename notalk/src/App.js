@@ -169,6 +169,12 @@ class NewChannelPage extends Component {
             </div>
             <div className="Page-Row">
               <div className="Page-Row-Text">
+                <h2>{"Channel's photo"}</h2>
+                <input type="file" name="pic" accept="image/*"/>
+              </div>
+            </div>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
                 <h2>{"Description"}</h2>
                 <input placeholder="Enter your description" className="ChPage-Sender-Input"></input>
               </div>
@@ -373,6 +379,48 @@ class TrendingPage extends Component {
             </div>
           </div>
         </div>
+
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{"Global"}</h1>
+              <p> {"Knowing what's people are taking about."}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"#Whatever"}</h2>
+              <p> {"some talk."}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"#Whatever"}</h2>
+              <p> {"some talk."}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{"Your Contacts"}</h1>
+              <p> {"Knowing what's people are taking about."}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"#Whatever"}</h2>
+              <p> {"some talk."}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"#Whatever"}</h2>
+              <p> {"some talk."}</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -420,10 +468,22 @@ class ChList extends Component {
   render() {
     return(
       <div className="ChList-Rows" >
-        <div className="ChList-Header" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
-          <span>new channel </span><i className="material-icons">add_circle</i>
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{"Your channels"}</h1>
+              <p> {"Here are all of your channels."}</p>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
+            <div className="Page-Row-Button">
+              <span>new channel </span><i className="material-icons">add_circle</i>
+            </div>
+          </div>
         </div>
-        {this.renderRows()}
+        <div className="Page-Block">
+          {this.renderRows()}
+        </div>
       </div>
     );
   }
