@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import logo from './logo.png';
 import './App.css';
 
+// EditListPage
+
 class SplitComp extends Component {
   render() {
     if(this.props.show) {
@@ -45,24 +47,25 @@ class ChPage extends Component {
       user: 'NOOXY'
     };
     if(props.data) {
-      this.state.channels = props.data.channels;
+      this.state.messeges = props.data.messeges;
       this.state.id = props.data.id;
+      this.state.displayname = props.data.displayname;
     }
   }
 
   renderchannels() {
     let elems = [];
-    for(let key in this.state.channels) {
+    for(let key in this.state.messeges) {
       let align = 'left';
-      if(this.state.channels[key][0]==this.state.user) {
+      if(this.state.messeges[key][0]==this.state.user) {
         align = 'right';
       }
       elems.push(
         <div key={key} className="ChPage-Messege" style={{'textAlign': align}}>
           <div className="ChPage-Bubble" >
-            <div className="ChPage-Bubble-Title">{this.state.channels[key][0]}</div>
-            <div className="ChPage-Bubble-Text">{this.state.channels[key][2]}</div>
-            <div className="ChPage-Bubble-Date">{this.state.channels[key][3]}</div>
+            <div className="ChPage-Bubble-Title">{this.state.messeges[key][0]}</div>
+            <div className="ChPage-Bubble-Text">{this.state.messeges[key][2]}</div>
+            <div className="ChPage-Bubble-Date">{this.state.messeges[key][3]}</div>
           </div>
         </div>
       );
@@ -80,9 +83,9 @@ class ChPage extends Component {
             <i className="material-icons">arrow_back</i>
           </div>
           <div className="ChPage-Header-right-Button">
-            <i className="material-icons">expand_more</i>
+            <i className="material-icons">settings</i>
           </div>
-            {"Channel_ID: " + (this.state.id)}
+            {(this.state.displayname)}
           </div>
           <div className="ChPage-Messeges">
             {this.renderchannels()}
@@ -105,10 +108,42 @@ class ChPage extends Component {
 class NewChannelPage extends Component {
   constructor(props) {
     super(props);
+    this.state= {
+      status: 'create a new Notalk channel.',
+      levels: {
+        0: "Admin can access, member can view",
+        1: "Member can access and view",
+        2: "Member can access, nooxy user can view",
+        3: "Member can access, public can view",
+        4: "Nooxy user can access and view",
+        5: "Nooxy user can access, public can view",
+        6: "public can access, public can view"
+      },
+      types: {
+        0: "A normal talk",
+        1: "A live talk",
+      }
+    };
   }
 
-  renderchannels() {
+  renderTypes() {
+    let elems = [];
+    for(let key in this.state.types) {
+      elems.push(
+          <option value={key}>{this.state.types[key]}</option>
+      );
+    }
+    return (<select>{elems}</select>);
+  }
 
+  renderLevels() {
+    let elems = [];
+    for(let key in this.state.levels) {
+      elems.push(
+          <option value={key}>{this.state.levels[key]}</option>
+      );
+    }
+    return (<select>{elems}</select>);
   }
 
   render() {
@@ -120,7 +155,7 @@ class NewChannelPage extends Component {
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h1>{"Create a new channel"}</h1>
-                <p> {"create a new Notalk channel."}</p>
+                <p> {this.state.status}</p>
               </div>
             </div>
           </div>
@@ -140,14 +175,14 @@ class NewChannelPage extends Component {
             </div>
             <div className="Page-Row">
               <div className="Page-Row-Text">
-                <h2>{"Visability"}</h2>
-                <p> {"Public"}</p>
+                <h2>{"Level"}</h2>
+                <p> {this.renderLevels()}</p>
               </div>
             </div>
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h2>{"Type"}</h2>
-                <p> {"Live Chat"}</p>
+                <p> {this.renderTypes()}</p>
               </div>
             </div>
             <div className="Page-Row">
@@ -159,13 +194,22 @@ class NewChannelPage extends Component {
           </div>
 
           <div className="Page-Block">
-            <div className="Page-Row">
+            <div className="Page-Row"  onClick={()=>{
+              let status = this.props.onChCreate()
+              if(status=='') {
+                this.props.history.push('/');
+              }
+              else {
+                this.setState({'status':status});
+              }
+
+            }}>
               <div className="Page-Row-Text">
                 <h2>{"Create"}</h2>
                 <p> {"create this channel"}</p>
               </div>
             </div>
-            <div className="Page-Row">
+            <div className="Page-Row" onClick={()=>{this.props.history.push('/');}}>
               <div className="Page-Row-Text">
                 <h2>{"Cancel"}</h2>
                 <p> {"Do not create this channel"}</p>
@@ -317,6 +361,23 @@ class AccountPage extends Component {
   }
 };
 
+class TrendingPage extends Component {
+  render() {
+    return(
+      <div className="Page">
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{"Trending"}</h1>
+              <p> {"Knowing what's people are taking about."}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+};
+
 class ChList extends Component {
   constructor (props) {
     super(props);
@@ -373,10 +434,11 @@ class HeaderPage extends Component {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
-      headertitle: "NoTalk",
+      headertitle: "NOTalk",
       headerbuttons: [
         ['channels', '/channels/', 'chat'],
         ['contacts', '/contacts/', 'people'],
+        ['trending', '/trending/', 'trending_up'],
         ['account', '/account/', 'account_circle']
       ],
       selectedheaderbuttons: regex_result?regex_result[3]:'channels'
@@ -425,9 +487,9 @@ class App extends Component {
       channels: {
         channelnow: window.location.href.split(channelroot)[1],
         chlist: {
-          'ch1': ['Channel1', 'lastmsg', 23, {1: ['NOOXY', 'text', 'hello', 0]}],
-          'ch2': ['Channel2', 'lastmsg', 23],
-          'ch3': ['Channel3', 'lastmsg', 23],
+          'ch1': ['A Channel', 'hello?', 23, {1: ['NOOXY', 'text', 'hello', 0]}],
+          'ch2': ['B Channel', 'ok', 2],
+          'ch3': ['C Channel', 'hahaha', 23],
           'ch4': ['Channel4', 'lastmsg', 23],
           'ch5': ['Channel5', 'lastmsg', null],
           'ch6': ['Channel6', 'lastmsg', 23],
@@ -438,7 +500,7 @@ class App extends Component {
         },
         chsdata: {
           'ch1': {
-            channels: {
+            messeges: {
               1: ['NOOXY', 'text', 'hellohellohellohellohellohellohell ohellohellohellohellohello hellohellohellohellohello', '12:00'],
               2: ['NOOXY', 'text', 'hellohel', '12:00'],
               3: ['NOOXY', 'text', 'hellohel', '12:00'],
@@ -451,7 +513,8 @@ class App extends Component {
               10: ['NOOXY', 'text', 'hellohel', '12:00'],
               11: ['NOOXY', 'text', 'hellasdfsadfdohel', '12:00'],
             },
-            id: 'ch1'
+            id: 'ch1',
+            displayname: 'A Channel'
           }
         }
       }
@@ -490,7 +553,10 @@ class App extends Component {
     return elems;
   }
 
-
+  onChCreate(meta) {
+    // return status
+    return ""
+  }
 
   render() {
     // let HeaderPageReg = '/:page([^/]*)';
@@ -525,7 +591,7 @@ class App extends Component {
                         rootpath={this.state.channelroot}/>
                       </SplitLeft>
                       <SplitRight>
-                        <NewChannelPage show={this.state.channels.channelnow=='new'} />
+                        <NewChannelPage show={this.state.channels.channelnow=='new'} onChCreate={this.onChCreate} history={props.history} />
                         {this.renderChannels(props)}
                       </SplitRight>
                     </SplitComp>
@@ -533,7 +599,9 @@ class App extends Component {
                 }}/>
                 <Route exact path='/contacts' component={ContactsPage}/>
                 <Route exact path='/settings' component={SettingsPage}/>
+                <Route exact path='/trending' component={TrendingPage}/>
                 <Route exact path='/account' component={AccountPage}/>
+
               </HeaderPage>
             );
           }}/>

@@ -35,7 +35,7 @@ img {
 
 .HeaderPage-header {
   position: relative;
-  background-color: #263238;
+  background-color: #00838F;
   height: auto;
   padding: 18px 0 0 0;
   color: white;
@@ -69,7 +69,7 @@ img {
 }
 
 .HeaderPage-header-bar-button:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .HeaderPage-header-bar-button-selected {
@@ -86,7 +86,7 @@ img {
 }
 
 .HeaderPage-header-bar-button-selected:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .HeaderPage-title {
@@ -151,7 +151,7 @@ img {
   height: 70px;
   border-bottom: 1px solid #ECEFF1;
   color: white;
-  background: #37474F !important;
+  background: #00838F !important;
   user-select: none;
   cursor: pointer;
   display: flex;
@@ -245,14 +245,14 @@ img {
 }
 
 .ChPage-Header {
-  color: #37474F;
+  color: white;
   top: 0;
   height: 50px;
   line-height: 50px;
   border-bottom: 1px solid #ECEFF1;
   box-sizing: border-box;
   position: relative;
-  background: white;
+  background: #37474F;
   user-select: none;
 }
 .ChPage-Header-left-Button {
@@ -296,7 +296,7 @@ img {
   margin: 0 10px;
   position: relative;
   vertical-align: middle;
-  background-color: #263238;
+  background-color: #006064;
   border-radius: 15px;
   min-height: 30px;
   color: white;
@@ -456,7 +456,7 @@ img {
 }
 .Page-Row-Text input {
   outline: none;
-  font-size: 12px;
+  font-size: 16px;
   border: none;
   background: none;
   padding: 0;
