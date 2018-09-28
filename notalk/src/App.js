@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
-
+const NSc = new NSClient();
 // EditListPage
 
 class SplitComp extends Component {
@@ -19,6 +20,81 @@ class SplitComp extends Component {
     }
   }
 }
+
+class BackPage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+      return(
+        <div className="BackPage">
+          <div className="BackPage-Header">
+            <div className="BackPage-Back-Button"
+            onClick={()=>{
+              console.log(this.props.history);
+              this.props.history.goBack()
+            }}>
+              <i className="material-icons">arrow_back</i>
+            </div>
+            {(this.props.title)}
+          </div>
+
+          <div className="BackPage-Contain">
+            {this.props.children}
+          </div>
+        </div>
+      );
+    }
+}
+
+class AddToListPage extends Component {
+  constructor(props) {
+    super(props);
+    // this.state = {
+    //   channels: props.channels
+    // };
+    this.state = {
+      list: []
+    };
+  }
+
+  render() {
+    return(
+      <div className="Page">
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{this.props.title}</h1>
+              <p> {this.props.description}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"Add item"}</h2>
+              <input placeholder="input here" className="ChPage-Sender-Input"></input>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Button">
+              <span>Add </span><i className="material-icons">add_circle</i>
+            </div>
+          </div>
+        </div>
+
+        <div className="Page-Block">
+        <div className="Page-Row">
+          <div className="Page-Row-Text">
+            <h1>{"Items"}</h1>
+            <p> {"All your items are below."}</p>
+          </div>
+        </div>
+        </div>
+
+      </div>
+    );
+  }
+};
 
 class SplitRight extends Component {
   render() {
@@ -150,78 +226,91 @@ class NewChannelPage extends Component {
     if(this.props.show) {
       return(
         <div className="Page">
+          <Route exact path="/channels/new" render={(props)=>{
+            return(
+              <div className="Page">
+                <div className="Page-Block">
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h1>{"Create a new channel"}</h1>
+                      <p> {this.state.status}</p>
+                    </div>
+                  </div>
+                </div>
 
-          <div className="Page-Block">
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h1>{"Create a new channel"}</h1>
-                <p> {this.state.status}</p>
-              </div>
-            </div>
-          </div>
+                <div className="Page-Block">
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{"Channel's Name"}</h2>
+                      <input placeholder="Enter your channel's name" className="ChPage-Sender-Input"></input>
+                    </div>
+                  </div>
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{"Channel's photo"}</h2>
+                      <input type="file" name="pic" accept="image/*"/>
+                    </div>
+                  </div>
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{"Description"}</h2>
+                      <input placeholder="Enter your description" className="ChPage-Sender-Input"></input>
+                    </div>
+                  </div>
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{"Level"}</h2>
+                      <p> {this.renderLevels()}</p>
+                    </div>
+                  </div>
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{"Type"}</h2>
+                      <p> {this.renderTypes()}</p>
+                    </div>
+                  </div>
+                  <div className="Page-Row"  onClick={()=>{this.props.history.push('/channels/new/users');}}>
+                    <div className="Page-Row-Text">
+                      <h2>{"Users"}</h2>
+                      <p> {"click to edit."}</p>
+                    </div>
+                  </div>
+                </div>
 
-          <div className="Page-Block">
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Channel's Name"}</h2>
-                <input placeholder="Enter your channel's name" className="ChPage-Sender-Input"></input>
-              </div>
-            </div>
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Channel's photo"}</h2>
-                <input type="file" name="pic" accept="image/*"/>
-              </div>
-            </div>
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Description"}</h2>
-                <input placeholder="Enter your description" className="ChPage-Sender-Input"></input>
-              </div>
-            </div>
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Level"}</h2>
-                <p> {this.renderLevels()}</p>
-              </div>
-            </div>
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Type"}</h2>
-                <p> {this.renderTypes()}</p>
-              </div>
-            </div>
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Users"}</h2>
-                <p> {"click to edit."}</p>
-              </div>
-            </div>
-          </div>
+                <div className="Page-Block">
+                  <div className="Page-Row"  onClick={()=>{
+                    let status = this.props.onChCreate()
+                    if(status=='') {
+                      this.props.history.push('/');
+                    }
+                    else {
+                      this.setState({'status':status});
+                    }
 
-          <div className="Page-Block">
-            <div className="Page-Row"  onClick={()=>{
-              let status = this.props.onChCreate()
-              if(status=='') {
-                this.props.history.push('/');
-              }
-              else {
-                this.setState({'status':status});
-              }
+                  }}>
+                    <div className="Page-Row-Text">
+                      <h2>{"Create"}</h2>
+                      <p> {"create this channel"}</p>
+                    </div>
+                  </div>
+                  <div className="Page-Row" onClick={()=>{this.props.history.push('/');}}>
+                    <div className="Page-Row-Text">
+                      <h2>{"Cancel"}</h2>
+                      <p> {"Do not create this channel"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
 
-            }}>
-              <div className="Page-Row-Text">
-                <h2>{"Create"}</h2>
-                <p> {"create this channel"}</p>
-              </div>
-            </div>
-            <div className="Page-Row" onClick={()=>{this.props.history.push('/');}}>
-              <div className="Page-Row-Text">
-                <h2>{"Cancel"}</h2>
-                <p> {"Do not create this channel"}</p>
-              </div>
-            </div>
-          </div>
+          }}/>
+          <Route exact path="/channels/new/users" render={(props)=>{
+            return(
+              <BackPage history={props.history} title="add users">
+                <AddToListPage title="Add users" description="Add users for your channels." list={this.state.userlist}/>
+              </BackPage>
+            )
+          }}/>
         </div>
       );
     }
@@ -271,22 +360,36 @@ class ContactsPage extends Component {
   render() {
     return(
       <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{"Contacts"}</h1>
-              <p> {"Start a new Notalk channel by your contacts."}</p>
+        <Route exact path="/contacts/" render={(props)=>{
+          return(
+            <div className="Page">
+              <div className="Page-Block">
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h1>{"Contacts"}</h1>
+                    <p> {"Start a new Notalk channel by your contacts."}</p>
+                  </div>
+                </div>
+                <div className="Page-Row" onClick={()=>{
+                  props.history.push('/contacts/new');
+                }}>
+                  <div className="Page-Row-Button">
+                    <span>add contact </span><i className="material-icons">add_circle</i>
+                  </div>
+                </div>
+              </div>
+              <div className="Page-Block">
+                {this.renderUsers()}
+              </div>
             </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Button">
-              <span>add contact </span><i className="material-icons">add_circle</i>
-            </div>
-          </div>
-        </div>
-        <div className="Page-Block">
-          {this.renderUsers()}
-        </div>
+          )
+        }}/>
+
+        <Route exact path="/contacts/new" render={(props)=>{
+          return(
+            <BackPage title="New Contact" history={props.history}/>
+          )
+        }}/>
       </div>
     );
   }
@@ -426,6 +529,47 @@ class TrendingPage extends Component {
   }
 };
 
+class DebugPage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  renderLogs() {
+    let elems = [];
+    for(let key in this.props.logs) {
+      console.log(this.props.logs);
+      elems.push(
+          <div key={key} className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{'ln['+key+'] '+(this.props.logs[key])[0]}</h2>
+              <p>{(this.props.logs[key])[1]}</p>
+            </div>
+          </div>
+      );
+    }
+    return (elems);
+  }
+
+  render() {
+    return(
+      <div className="Page">
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{"Debug"}</h1>
+              <p> {"here are the debug logs."}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="Page-Block">
+        {this.renderLogs()}
+        </div>
+      </div>
+    );
+  }
+};
+
 class ChList extends Component {
   constructor (props) {
     super(props);
@@ -494,12 +638,13 @@ class HeaderPage extends Component {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
-      headertitle: "NOTalk",
+      headertitle: "NOTalk alpha",
       headerbuttons: [
         ['channels', '/channels/', 'chat'],
         ['contacts', '/contacts/', 'people'],
         ['trending', '/trending/', 'trending_up'],
-        ['account', '/account/', 'account_circle']
+        ['account', '/account/', 'account_circle'],
+        ['debug', '/debug/', 'bug_report']
       ],
       selectedheaderbuttons: regex_result?regex_result[3]:'channels'
     }
@@ -543,9 +688,10 @@ class App extends Component {
     let channelroot = "/channels/";
     super(props);
     this.state = {
+      debuglogs: [['debug', 'debug']],
       channelroot: channelroot,
       channels: {
-        channelnow: window.location.href.split(channelroot)[1],
+        channelnow: window.location.href.split(channelroot)[1]?window.location.href.split(channelroot)[1].split('/')[0]: null,
         chlist: {
           'ch1': ['A Channel', 'hello?', 23, {1: ['NOOXY', 'text', 'hello', 0]}],
           'ch2': ['B Channel', 'ok', 2],
@@ -596,6 +742,24 @@ class App extends Component {
         // }
       })
     }
+  }
+
+  log(title, contain) {
+    this.setState((prevState) => {
+      return prevState.debuglogs.push([title, contain]);
+    });
+  }
+
+  componentDidMount() {
+    NSc.connect('0.0.0.06', '1487');
+    this.log('NSF', 'Connected to NSF.');
+    NSc.createActivitySocket('NoTalk', (err, as)=>{
+    this.log('NSF', 'Connected to the Service.');
+    as.onData = (data) => {
+      this.log('NSClient onData', data);
+      // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
+    }
+  });
   }
 
   renderChannels(props) {
@@ -657,10 +821,15 @@ class App extends Component {
                     </SplitComp>
                   )
                 }}/>
-                <Route exact path='/contacts' component={ContactsPage}/>
+                <Route exact path='/contacts:path(/|/.*)' component={ContactsPage}/>
                 <Route exact path='/settings' component={SettingsPage}/>
                 <Route exact path='/trending' component={TrendingPage}/>
                 <Route exact path='/account' component={AccountPage}/>
+                <Route exact path='/debug' render={(props)=>{
+                  return(
+                    <DebugPage logs={this.state.debuglogs}/>
+                  );
+                }}/>
 
               </HeaderPage>
             );

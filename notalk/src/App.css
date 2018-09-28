@@ -13,6 +13,7 @@ img {
     }
 }
 
+
 .material-icons {
   font-size: inherit;
   display: inline-flex;
@@ -58,7 +59,7 @@ img {
 .HeaderPage-header-bar-button {
   display: inline-block;
   height: inherit;
-  width: 80px;
+  width: 60px;
   margin: 0;
   cursor: pointer;
   border-bottom: 3px solid rgba(0, 0, 0, 0.0);
@@ -452,7 +453,7 @@ img {
 .Page-Row-Text h2 {
   font-size: 16px;
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
 }
 .Page-Row-Text input {
   outline: none;
@@ -508,4 +509,41 @@ img {
   width: 100%;
   height: auto;
   font-size: 16px;
+}
+
+.BackPage {
+  display: inline-block;
+  position: relative;
+  background: #ECEFF1;
+  height: 100%;
+  width: 100%;
+  animation: animateright .3s;
+}
+
+.BackPage-Header {
+  color: white;
+  top: 0;
+  height: 50px;
+  line-height: 50px;
+  border-bottom: 1px solid #ECEFF1;
+  box-sizing: border-box;
+  position: relative;
+  background: #37474F;
+  user-select: none;
+}
+.BackPage-Back-Button {
+  left: 0;
+  position: absolute;
+  height: inherit;
+  padding: 0;
+  width: 50px;
+  box-sizing: border-box;
+  font-size: 25px;
+  cursor: pointer;
+}
+.BackPage-Contain{
+  position: absolute;
+  height: calc(100% - 50px);
+  width: 100%;
+  overflow-x: auto;
 }
