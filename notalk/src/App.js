@@ -1,9 +1,21 @@
+// APP.js
+// Description:
+// "APP.js" is a NOOXY NoTalk Service client.
+// Copyright 2018 NOOXY. All Rights Reserved.
+
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { SigninPage, PasswordPage } from "./NScReact.js";
 import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
 const NSc = new NSClient();
+
+const nshost = 'nooxy.org';
+const nsdebug = false;
+const nsport = 1487;
+
+NSc.setDebug(nsdebug);
 // EditListPage
 
 class SplitComp extends Component {
@@ -216,7 +228,7 @@ class NewChannelPage extends Component {
     let elems = [];
     for(let key in this.state.levels) {
       elems.push(
-          <option value={key}>{this.state.levels[key]}</option>
+        <option value={key}>{this.state.levels[key]}</option>
       );
     }
     return (<select>{elems}</select>);
@@ -423,8 +435,8 @@ class AccountPage extends Component {
 
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{"NOOXY User"}</h2>
-              <p> {"Simple Clear Elegent"}</p>
+              <h2>{this.props.username?this.props.username:'Guest'}</h2>
+              <p> {"User's bio"}</p>
             </div>
           </div>
           <div className="Page-Row">
@@ -537,7 +549,6 @@ class DebugPage extends Component {
   renderLogs() {
     let elems = [];
     for(let key in this.props.logs) {
-      console.log(this.props.logs);
       elems.push(
           <div key={key} className="Page-Row">
             <div className="Page-Row-Text">
@@ -557,9 +568,32 @@ class DebugPage extends Component {
           <div className="Page-Row">
             <div className="Page-Row-Text">
               <h1>{"Debug"}</h1>
-              <p> {"here are the debug logs."}</p>
+              <p> {"here are the debug components."}</p>
             </div>
           </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"NSF Daemon"}</h2>
+              <p> {'Host: '+nshost+':'+nsport+', Debug: '+nsdebug}</p>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{
+            this.props.history.push('/nsf/signin');
+          }}>
+            <div className="Page-Row-Text">
+              <h2>{"NSF signin"}</h2>
+              <p> {"NOOXY service SigninPage"}</p>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{
+            this.props.history.push('/nsf/password');
+          }}>
+            <div className="Page-Row-Text">
+              <h2>{"NSF Password"}</h2>
+              <p> {"NOOXY service auth by password"}</p>
+            </div>
+          </div>
+
         </div>
 
         <div className="Page-Block">
@@ -688,6 +722,7 @@ class App extends Component {
     let channelroot = "/channels/";
     super(props);
     this.state = {
+      username: null,
       debuglogs: [['debug', 'debug']],
       channelroot: channelroot,
       channels: {
@@ -751,14 +786,30 @@ class App extends Component {
   }
 
   componentDidMount() {
-    NSc.connect('0.0.0.06', '1487');
-    this.log('NSF', 'Connected to NSF.');
-    NSc.createActivitySocket('NoTalk', (err, as)=>{
-    this.log('NSF', 'Connected to the Service.');
-    as.onData = (data) => {
-      this.log('NSClient onData', data);
-      // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
-    }
+    this.log('NSF', 'Setting up NOOXY service implementations.');
+    NSc.getImplement((err, NSimplementation)=>{
+      NSc.connect(nshost, nsport);
+      this.log('NSF', 'Connecting to NOOXY service.');
+      NSimplementation.setImplement('signin', (connprofile, data, data_sender)=>{
+        this.log('NSF Auth', 'NOOXY service signin emitted.');
+        this.history.push('/nsf/signin');
+      });
+      NSimplementation.setImplement('AuthbyPassword', (connprofile, data, data_sender) => {
+        this.log('NSF Auth', 'NOOXY service Authby Password emitted.');
+        this.history.push('/nsf/password?authtoken='+data.d.t);
+      });
+      this.setState({username: NSc.returnUserName()});
+      this.log('NSF', 'Have set up NOOXY service implementations.');
+      NSc.createActivitySocket('NoTalk', (err, as)=>{
+      this.log('NSF', 'Connected to the Service.');
+      as.onData = (data) => {
+        this.log('NSActivity onData', data);
+        // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
+      }
+      as.onClose = ()=> {
+        this.log('NSActivity onClose', 'Activity closed.');
+      }
+    });
   });
   }
 
@@ -790,7 +841,7 @@ class App extends Component {
       <Router>
         <div>
           <Route exact path={HeaderPageReg} render={(props)=>{
-
+            this.history = props.history;
             return(
               <HeaderPage history={props.history}>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
@@ -824,10 +875,24 @@ class App extends Component {
                 <Route exact path='/contacts:path(/|/.*)' component={ContactsPage}/>
                 <Route exact path='/settings' component={SettingsPage}/>
                 <Route exact path='/trending' component={TrendingPage}/>
-                <Route exact path='/account' component={AccountPage}/>
+                <Route exact path='/account' render={(props)=>{
+                  return(
+                    <AccountPage history={props.history} username={this.state.username}/>
+                  );
+                }}/>
                 <Route exact path='/debug' render={(props)=>{
                   return(
-                    <DebugPage logs={this.state.debuglogs}/>
+                    <DebugPage history={props.history} logs={this.state.debuglogs}/>
+                  );
+                }}/>
+                <Route exact path='/nsf/signin' render={(props)=>{
+                  return(
+                    <SigninPage NSc={NSc} onFinish={window.location.reload}/>
+                  );
+                }}/>
+                <Route exact path='/nsf/password' render={(props)=>{
+                  return(
+                    <PasswordPage NSc={NSc} onFinish={props.history.goBack}/>
                   );
                 }}/>
 

@@ -1,0 +1,140 @@
+@-webkit-keyframes animateright {
+  0% {
+    opacity: .6;
+    width: calc(100% - 8px);
+    transform: translate(8px, 0);
+  }
+  100% {
+    opacity: 1;
+    width: 100%;
+    transform: translate(0, 0);
+  }
+}
+.Page {
+  display: inline-block;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background-color: #eceff1;
+  overflow-y: auto;
+  animation: animateright .3s;
+}
+
+.Page-Block {
+  background-color: white;
+  position: relative;
+  box-sizing: border-box;
+  text-align: left;
+  height: auto;
+  width: 100%;
+  display: inline-block;
+  padding: 0px;
+  border-top: 1px solid #eceff1;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.07), 0 3px 1px -2px rgba(0,0,0,0.06), 0 1px 5px 0 rgba(0,0,0,0.1);
+  margin-bottom: 3px;
+  color: #263238;
+  transition: .3s;
+}
+
+.Page-Block > *:nth-child(even) {
+  background-color: #FAFAFA;
+}
+
+.Page-Block:hover {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}
+
+.Page-Row {
+  padding: 10px;
+  position: relative;
+  box-sizing: border-box;
+  text-align: left;
+  min-height: 30px;
+  border-bottom: 1px solid #eceff1;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  transition: .3s;
+  background-color: inherit;
+}
+
+.Page-Row-Button {
+  box-sizing: border-box;
+  user-select: none;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  font-size: 16px;
+  line-height: 30px;
+  height: 30px;
+  vertical-align: middle;
+}
+.Page-Row:hover {
+  background: #ECEFF1;
+}
+.Page-Row-Text h1 {
+  font-size: 25px;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+.Page-Row-Text h2 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 600;
+}
+.Page-Row-Text input {
+  outline: none;
+  font-size: 16px;
+  border: none;
+  background: none;
+  padding: 0;
+  width: 100%;
+}
+.Page-Row-Text p {
+  font-size: 14px;
+  margin: 0;
+
+}
+.Page-Row-Text {
+  width: 100%;
+}
+.Page-Row-ThumbnailText-Head {
+  display: inline-block;
+  width: 45px;
+  height: 45px;
+  border-radius: 30px;
+  border: 3px solid #263238;
+  margin: 0;
+  box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3), inset 3px 3px 0 rgba(38, 50, 56, 0.3);
+  background-color: white;
+  transition: .3s;
+}
+
+.Page-Row-ThumbnailText-Head:hover {
+  box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.5), inset 3px 3px 0 rgba(38, 50, 56, 0.3);
+}
+
+.Page-Row-ThumbnailText-Text {
+  display: flex;
+  flex-grow: 1;
+  padding-left: 10px;
+  vertical-align: middle;
+  flex-direction: column;
+}
+
+.Page-Row-ThumbnailText-Text h2 {
+  display: flex;
+  margin: 0;
+  width: 100%;
+  height: auto;
+  font-size: 20px;
+}
+
+.Page-Row-ThumbnailText-Text p {
+  display: flex;
+  margin: 0;
+  width: 100%;
+  height: auto;
+  font-size: 16px;
+}
