@@ -672,7 +672,7 @@ class HeaderPage extends Component {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
-      headertitle: "NOTalk alpha",
+      headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
       headerbuttons: [
         ['channels', '/channels/', 'chat'],
         ['contacts', '/contacts/', 'people'],
@@ -839,7 +839,7 @@ class App extends Component {
     let HeaderPageReg = ':page(.*)';
     return (
       <Router>
-        <div>
+        <div className="App">
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
             return(
