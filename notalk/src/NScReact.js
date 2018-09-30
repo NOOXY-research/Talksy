@@ -29,7 +29,8 @@ export class SigninPage extends Component {
     super(props);
     this.state = {
       password: null,
-      username: null
+      username: null,
+      status: "In order to access this service. You must signin into your account."
     },
     this.onFinish = props.onFinish;
   }
@@ -57,7 +58,7 @@ export class SigninPage extends Component {
           <div className="Page-Row">
             <div className="Page-Row-Text">
               <h1>{"Signing in"}</h1>
-              <p> {"In order to access this service. You must signin into your account."}</p>
+              <p> {this.state.status}</p>
             </div>
           </div>
         </div>
@@ -88,9 +89,14 @@ export class SigninPage extends Component {
                   }
                   implement_module.returnImplement('setUser')(false, _data.u);
                   implement_module.setImplement('onToken', (err, token)=>{
-                    setCookie('NSToken', token, 7);
-                    window.location.replace('/');
-                    setTimeout(()=>{window.location.reload();}, 500);
+                    if(token) {
+                      setCookie('NSToken', token, 7);
+                      window.location.replace('/');
+                      setTimeout(()=>{window.location.reload();}, 500);
+                    }
+                    else {
+                      this.setState({status:'Wrong username or password!'});
+                    }
                   });
                   implement_module.emitRouter(connprofile, 'GT', _data);
 
