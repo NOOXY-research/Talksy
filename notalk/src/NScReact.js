@@ -17,6 +17,13 @@ const getQueryVariable = (variable)=>
        return(false);
 }
 
+const setCookie = (cname, cvalue, exdays)=> {
+  let d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  let expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
 export class SigninPage extends Component {
   constructor(props) {
     super(props);
@@ -80,9 +87,13 @@ export class SigninPage extends Component {
                     p: this.state.password
                   }
                   implement_module.returnImplement('setUser')(false, _data.u);
+                  implement_module.setImplement('onToken', (err, token)=>{
+                    setCookie('NSToken', token, 7);
+                    window.location.replace('/');
+                    setTimeout(()=>{window.location.reload();}, 500);
+                  });
                   implement_module.emitRouter(connprofile, 'GT', _data);
-                  window.location.replace('/');
-                  setTimeout(()=>{window.location.reload();}, 500);
+
                 });
               });
             }
