@@ -17,6 +17,71 @@ const nsport = 1487;
 
 NSc.setDebug(nsdebug);
 // EditListPage
+class MainCtrlComp extends Component {
+  constructor (props) {
+    super(props);
+    let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
+    this.state = {
+      headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
+      buttons: [
+        ['channels', '/channels/', 'chat'],
+        ['contacts', '/contacts/', 'people'],
+        ['trending', '/trending/', 'trending_up'],
+        ['account', '/account/', 'account_circle'],
+        ['debug', '/debug/', 'bug_report']
+      ],
+      selectedbutton: regex_result?regex_result[3]:'channels'
+    }
+  };
+
+  renderButton() {
+    return(
+      this.state.buttons.map((button)=>{
+        return(
+            <div key={button[0]}
+              className={button[0]===this.state.selectedbutton?"MainCtrlComp-button-selected":"MainCtrlComp-button"}
+              onClick={()=>{
+                this.setState({selectedbutton: button[0]});
+                this.props.history.push(button[1]);
+              }}
+            >
+              <i className="material-icons">{button[2]}</i>
+            </div>
+        );
+      })
+    );
+  };
+
+  render() {
+    return (
+      <div className="MainCtrlComp">
+          <div className="MainCtrlComp-buttons">
+
+            {this.renderButton()}
+            <div className="MainCtrlComp-button">
+              <i className="material-icons">unfold_more</i>
+            </div>
+          </div>
+      </div>
+    );
+  }
+}
+
+class BoxComp extends Component {
+  render() {
+      return(
+        <div className="BoxComp">
+          <div className="BoxComp-Back" onClick={()=>{
+            this.props.history.goBack()
+          }}>
+          </div>
+          <div className="BoxComp-Box">
+            {this.props.children}
+          </div>
+        </div>
+      );
+  }
+};
 
 class SplitComp extends Component {
   render() {
@@ -228,7 +293,7 @@ class NewChannelPage extends Component {
     let elems = [];
     for(let key in this.state.levels) {
       elems.push(
-        <option value={key}>{this.state.levels[key]}</option>
+        <option key={key} value={key}>{this.state.levels[key]}</option>
       );
     }
     return (<select>{elems}</select>);
@@ -238,7 +303,7 @@ class NewChannelPage extends Component {
     if(this.props.show) {
       return(
         <div className="Page">
-          <Route exact path="/channels/new" render={(props)=>{
+          <Route exact path="/channels/new:path(.*)" render={(props)=>{
             return(
               <div className="Page">
                 <div className="Page-Block">
@@ -316,12 +381,15 @@ class NewChannelPage extends Component {
             )
 
           }}/>
+
           <Route exact path="/channels/new/users" render={(props)=>{
             return(
-              <BackPage history={props.history} title="add users">
-                <AddToListPage title="Add users" description="Add users for your channels." list={this.state.userlist}/>
-              </BackPage>
-            )
+              <BoxComp history={props.history}>
+                <BackPage history={props.history} title="add users">
+                  <AddToListPage title="Add users" description="Add users for your channels." list={this.state.userlist}/>
+                </BackPage>
+              </BoxComp>
+            );
           }}/>
         </div>
       );
@@ -372,7 +440,7 @@ class ContactsPage extends Component {
   render() {
     return(
       <div className="Page">
-        <Route exact path="/contacts/" render={(props)=>{
+        <Route exact path="/contacts/:path(.*)" render={(props)=>{
           return(
             <div className="Page">
               <div className="Page-Block">
@@ -399,7 +467,9 @@ class ContactsPage extends Component {
 
         <Route exact path="/contacts/new" render={(props)=>{
           return(
-            <BackPage title="New Contact" history={props.history}/>
+            <BoxComp history={props.history}>
+            < BackPage title="New Contact" history={props.history}/>
+            </BoxComp>
           )
         }}/>
       </div>
@@ -672,7 +742,7 @@ class HeaderPage extends Component {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
-      headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
+      headertitle: "Talksy(DEV)",
       headerbuttons: [
         ['channels', '/channels/', 'chat'],
         ['contacts', '/contacts/', 'people'],
@@ -844,6 +914,7 @@ class App extends Component {
             this.history = props.history;
             return(
               <HeaderPage history={props.history}>
+                <MainCtrlComp history={props.history}/>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChList

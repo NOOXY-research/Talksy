@@ -30,6 +30,7 @@ img {
   height: 100%;
   background-color: #eceff1;
   width: 100%;
+  overflow-y:hidden;
 }
 
 .HeaderPage-logo {
@@ -41,7 +42,7 @@ img {
   position: relative;
   background-color: #00838F;
   height: auto;
-  padding: 18px 0 0 0;
+  padding: 18px 0 0  0;
   color: white;
   box-sizing: border-box;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
@@ -57,6 +58,7 @@ img {
   margin: 0 10px;
   color: white;
   font-size: 28px;
+  /* display: none; */
 }
 
 .HeaderPage-header-bar-button {
@@ -388,11 +390,18 @@ img {
 .Page {
   display: inline-block;
   position: relative;
-  height: auto;
+  height: 100%;
   width: 100%;
   background-color: #eceff1;
   overflow-y: auto;
   animation: animateright .3s;
+}
+
+.Page .Page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: inherit;
 }
 
 .Page-Block {
@@ -516,10 +525,13 @@ img {
 
 .BackPage {
   display: inline-block;
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
   background: #ECEFF1;
   height: 100%;
   width: 100%;
+  font-size: 24px;
   animation: animateright .3s;
 }
 
@@ -549,4 +561,130 @@ img {
   height: calc(100% - 50px);
   width: 100%;
   overflow-x: auto;
+}
+
+.BoxComp {
+  display: flex;
+  top: 0;
+  left: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 999;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.75);
+  animation: turnblack .2s;
+}
+@keyframes turnblack {
+  0% {
+    background: rgba(0, 0, 0, 0.0);
+  }
+  100% {
+    background: rgba(0, 0, 0, 0.75);
+  }
+}
+.BoxComp:before {
+  flex-grow: 1;
+    content: '';
+    display: block;
+    height: 24px;
+}
+.BoxComp:after {
+  flex-grow: 1;
+    content: '';
+    display: block;
+    height: 24px;
+}
+.BoxComp-Box {
+  overflow: hidden;
+  background: white;
+  display: inline-block;
+  position: relative;
+  height: calc(100% - 50px);
+  width: 70%;
+  min-height: 400px;
+  max-height: 700px;
+  min-width: 300px;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  animation-name: animatebottom;
+  animation-duration: .2s;
+}
+.BoxComp-Box * {
+  animation: none;
+}
+.BoxComp-Back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+@keyframes animatebottom {
+  0% {
+    opacity: .6;
+    transform: translate(0, 30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+.MainCtrlComp{
+  font-size: 24px;
+  z-index: 9999;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #00838F;
+  margin: 10px 20px;
+  color: white;
+  padding: 15px 5px 15px 5px;
+  width: 50px;
+  border-radius: 30px;
+  box-sizing: border-box;
+  user-select: none;
+  transform: translate(0, calc(-100% + 50px));
+  transition: .2s;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  display: none;
+}
+.MainCtrlComp:hover {
+  transform: translate(0, 0);
+}
+
+.MainCtrlComp-button {
+  padding: 3px;
+  display: inline-block;
+  height:  34px;
+  width: 34px;
+  margin: 3px 0;
+  cursor: pointer;
+  /* border-right: 3px solid rgba(0, 0, 0, 0.0); */
+  border-radius: 100px;
+  box-sizing: border-box;
+  transition: .3s;
+}
+
+.MainCtrlComp-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.MainCtrlComp-button-selected {
+  padding: 3px;
+  display: inline-block;
+  height:  34px;
+  width: 34px;
+  margin: 3px 0;
+  border-radius: 100px;
+  cursor: pointer;
+  /* border-right: 3px solid; */
+  box-sizing: border-box;
+  color: #263238;
+  background-color: white;
+  transition: .3s;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
