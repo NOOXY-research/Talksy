@@ -4,7 +4,7 @@
 // Copyright 2018 NOOXY. All Rights Reserved.
 'use strict';
 
-export default function NSc() {
+function NSc() {
 
   let settings = {
     verbose: true,
@@ -80,6 +80,7 @@ export default function NSc() {
       console.log('')
     },
     setCookie: (cname, cvalue, exdays)=> {
+      console.log(cname, cvalue, exdays);
       let d = new Date();
       d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
       let expires = "expires="+d.toUTCString();
@@ -193,6 +194,7 @@ export default function NSc() {
       this.returnGUID = () => {return _GUID};
 
       this.destroy= () => {
+        // delete this;
         delete _clients[_GUID];
       };
       // this.onConnectionDropout = () => {
@@ -714,7 +716,7 @@ export default function NSc() {
         }
       };
 
-      _coregateway.Service.emitRouter = this.emit;
+      _coregateway.Service.setEmitRouter(this.emit);
       _coregateway.Implementation.emitRouter = this.emit;
       _coregateway.Implementation.sendRouterData = _senddata;
       _coregateway.NSPS.emitRouter = this.emit;
@@ -733,6 +735,7 @@ export default function NSc() {
     let _debug = false;
     let _local_services;
     let _entity_module;
+    let _emitRouter;
 
     this.setDebug = (boolean) => {
       _debug = boolean;
@@ -744,12 +747,11 @@ export default function NSc() {
 
     this.spwanClient = () => {Utils.tagLog('*ERR*', 'spwanClient not implemented');};
 
-    this.emitRouter = () => {Utils.tagLog('*ERR*', 'emitRouter not implemented');};
+    this.setEmitRouter = (emitRouter) => {_emitRouter = emitRouter};
 
     this.onConnectionClose = (connprofile, callback) => {
 
       let _entitiesID = connprofile.returnBundle('bundle_entities');
-      console.log(_entitiesID);
       if(_entitiesID == null) {
         callback(true);
       }
@@ -820,10 +822,10 @@ export default function NSc() {
               }
             };
 
-            this.emitRouter(connprofile, 'CS', _data);
+            _emitRouter(connprofile, 'CS', _data);
           }
           else {
-            delete   _ActivityRsCEcallbacks[data.d.t];
+            delete  _ActivityRsCEcallbacks[data.d.t];
           }
         }
       }
@@ -849,6 +851,10 @@ export default function NSc() {
           };
           response_emit(connprofile, 'CA', 'rs', _data);
         },
+        // nooxy service protocol implementation of "Call Activity: Close ActivitySocket"
+        CS: () => {
+          _ASockets[data.d.i].close();
+        }
       }
       // call the callback.
       methods[data.m](connprofile, data.d, response_emit);
@@ -867,7 +873,44 @@ export default function NSc() {
       methods[data.m](connprofile, data.d);
     };
 
-    function ActivitySocket(conn_profile, Datacallback, JFCallback) {
+    function ActivitySocket(conn_profile) {
+
+      // Service Socket callback
+      let _emitdata = (i, d) => {
+        let _data2 = {
+          "m": "SS",
+          "d": {
+            "i": i,
+            "d": d,
+          }
+        };
+        _emitRouter(conn_profile, 'CS', _data2);
+      }
+
+      // Service Socket callback
+      let _emitclose = (i) => {
+        let _data2 = {
+          "m": "CS",
+          "d": {
+            "i": i
+          }
+        };
+        _emitRouter(conn_profile, 'CS', _data2);
+      }
+
+      let _emitjfunc = (entity_id, name, tempid, Json)=> {
+        let _data2 = {
+          "m": "JF",
+          "d": {
+            "i": entity_id,
+            "n": name,
+            "j": JSON.stringify(Json),
+            "t": tempid
+          }
+        };
+        _emitRouter(conn_profile, 'CS', _data2);
+      }
+
       let _entity_id = null;
       let _launched = false;
 
@@ -920,7 +963,7 @@ export default function NSc() {
           _jfqueue[tempid] = (err, returnvalue) => {
             callback(err, returnvalue);
           };
-          JFCallback(conn_profile, _entity_id, name, tempid, Json);
+          _emitjfunc(_entity_id, name, tempid, Json);
         };
         exec(op);
       }
@@ -931,7 +974,7 @@ export default function NSc() {
 
       this.sendData = (data) => {
         let op = ()=> {
-          Datacallback(conn_profile, _entity_id, data);
+          _emitdata(_entity_id, data);
         };
         exec(op);
       };
@@ -949,7 +992,9 @@ export default function NSc() {
           let bundle = conn_profile.returnBundle('bundle_entities');
           for (var i=bundle.length-1; i>=0; i--) {
             if (bundle[i] === _entity_id) {
-                bundle.splice(i, 1);
+              _emitclose(_entity_id);
+              this.onClose();
+              bundle.splice(i, 1);
             }
           }
           conn_profile.setBundle('bundle_entities', bundle);
@@ -971,33 +1016,6 @@ export default function NSc() {
       _local_services_owner = username;
     };
 
-    // ss callback
-    let _sscallback = (conn_profile, i, d) => {
-      let _data2 = {
-        "m": "SS",
-        "d": {
-          "i": i,
-          "d": d,
-        }
-      };
-
-      this.emitRouter(conn_profile, 'CS', _data2);
-    }
-    // jf callback
-
-    let _jscallback = (connprofile, entity_id, name, tempid, Json)=> {
-      let _data2 = {
-        "m": "JF",
-        "d": {
-          "i": entity_id,
-          "n": name,
-          "j": JSON.stringify(Json),
-          "t": tempid
-        }
-      };
-      this.emitRouter(connprofile, 'CS', _data2);
-    }
-
     // Service module create activity socket
     this.createActivitySocket = (method, targetip, targetport, service, callback) => {
       let err = false;
@@ -1013,7 +1031,7 @@ export default function NSc() {
       };
 
       this.spwanClient(method, targetip, targetport, (err, connprofile) => {
-        let _as = new ActivitySocket(connprofile, _sscallback ,  _jscallback);
+        let _as = new ActivitySocket(connprofile);
         _ActivityRsCEcallbacks[_data.d.t] = (connprofile, data) => {
           if(data.d.i != "FAIL") {
             _as.setEntityID(data.d.i);
@@ -1025,7 +1043,7 @@ export default function NSc() {
           }
 
         }
-        this.emitRouter(connprofile, 'CS', _data);
+        _emitRouter(connprofile, 'CS', _data);
       });
 
     };
@@ -1220,8 +1238,8 @@ export default function NSc() {
   };
 
   let Vars = {
-    'version': 'aphla2',
-    'NSP_version': 'aphla',
+    'version': 'aphla 0.2.1',
+    'NSP_version': 'aphla 0.2.0',
     'copyright': 'copyright(c)2018 NOOXY inc.',
     'default_user': {
       'username': 'admin',
@@ -1384,7 +1402,7 @@ export default function NSc() {
       });
       // setup NSF Auth implementation
       _implementation.setImplement('signin', (connprofile, data, data_sender)=>{
-        window.location.replace('login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+window.location.href);
+        // top.location.replace('login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+top.window.location.href);
         // window.open('login.html?conn_method='+conn_method+'&remote_ip='+remote_ip+'&port='+port);
       });
 
@@ -1520,6 +1538,7 @@ export default function NSc() {
     if(settings.debug) {
       settings.connmethod = 'WebSocket';
     }
+
     settings.targetip = targetip;
     settings.targetport = targetport;
     settings.user = Utils.getCookie('NSUser');
@@ -1535,3 +1554,5 @@ export default function NSc() {
     }
   };
 }
+
+module.exports = NSc;

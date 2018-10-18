@@ -11,8 +11,8 @@ import logo from './logo.png';
 import './App.css';
 const NSc = new NSClient();
 
-const nshost = 'nooxy.org';
-const nsdebug = false;
+const nshost = '0.0.0.0';
+const nsdebug = true;
 const nsport = 1487;
 
 NSc.setDebug(nsdebug);
@@ -124,6 +124,41 @@ class BackPage extends Component {
       );
     }
 }
+
+class EditTextPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: props.text
+    }
+  }
+
+  render() {
+    return(
+      <div className="Page">
+        <div className="Page-Block">
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h1>{this.props.title}</h1>
+              <p> {this.props.description}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"Enter here"}</h2>
+              <input placeholder={this.props.text} className="ChPage-Sender-Input" onChange={(e) => {this.setState({text: e.target.value})}}></input>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{this.props.onFinish(this.state.text)}}>
+            <div className="Page-Row-Button">
+              <span>OK </span><i className="material-icons">check_circle</i>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+};
 
 class AddToListPage extends Component {
   constructor(props) {
@@ -488,6 +523,16 @@ class SettingsPage extends Component {
 };
 
 class AccountPage extends Component {
+  constructor(props) {
+    super(props);
+  };
+
+  updateBio = (newbio)=> {
+    console.log(newbio);
+    this.props.updateMyMeta({b:newbio})
+    this.props.history.push('/account/');
+  };
+
   render() {
     return(
       <div className="Page">
@@ -505,14 +550,16 @@ class AccountPage extends Component {
 
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.username?this.props.username:'Guest'}</h2>
-              <p> {"User's bio"}</p>
+              <h2>{this.props.mymeta.n?this.props.mymeta.n:'Guest'}</h2>
+              <p> {this.props.mymeta.b?this.props.mymeta.b:'You have no bio.'}</p>
             </div>
           </div>
-          <div className="Page-Row">
+          <div className="Page-Row" onClick={()=>{
+            this.props.history.push('/account/editbio');
+          }}>
             <div className="Page-Row-Text">
               <h2>{"Bio"}</h2>
-              <p> {"Simple Clear Elegent"}</p>
+              <p> {this.props.mymeta.b}</p>
             </div>
           </div>
           <div className="Page-Row">
@@ -547,7 +594,15 @@ class AccountPage extends Component {
             </div>
           </a>
         </div>
+        <Route exact path="/account/editbio" render={(props)=>{
+          return(
+            <BoxComp history={props.history}>
+                <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinkin." text={this.props.mymeta.b} onFinish={this.updateBio}/>
+            </BoxComp>
+          );
+        }}/>
       </div>
+
     );
   }
 };
@@ -792,7 +847,7 @@ class App extends Component {
     let channelroot = "/channels/";
     super(props);
     this.state = {
-      username: null,
+      mymeta: {},
       debuglogs: [['debug', 'debug']],
       channelroot: channelroot,
       channels: {
@@ -868,19 +923,27 @@ class App extends Component {
         this.log('NSF Auth', 'NOOXY service Authby Password emitted.');
         this.history.push('/nsf/password?authtoken='+data.d.t);
       });
-      this.setState({username: NSc.returnUserName()});
       this.log('NSF', 'Have set up NOOXY service implementations.');
       NSc.createActivitySocket('NoTalk', (err, as)=>{
-      this.log('NSF', 'Connected to the Service.');
-      as.onData = (data) => {
-        this.log('NSActivity onData', data);
-        // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
-      }
-      as.onClose = ()=> {
-        this.log('NSActivity onClose', 'Activity closed.');
-      }
+        this.updateMyMeta = (newmeta)=> {
+          as.call('updateMyMeta', newmeta, ()=>{
+            this.log('updateMyMeta', 'OK');
+          })
+        }
+        this.log('NSF', 'Connected to the Service.');
+        as.call('getMyMeta', null, (err, json)=> {
+          this.setState({mymeta: json});
+          this.log('getMyMeta', JSON.stringify(json));
+        });
+        as.onData = (data) => {
+          this.log('NSActivity onData', data);
+          // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
+        }
+        as.onClose = ()=> {
+          this.log('NSActivity onClose', 'Activity closed.');
+        }
+      });
     });
-  });
   }
 
   renderChannels(props) {
@@ -944,11 +1007,11 @@ class App extends Component {
                   )
                 }}/>
                 <Route exact path='/contacts:path(/|/.*)' component={ContactsPage}/>
-                <Route exact path='/settings' component={SettingsPage}/>
-                <Route exact path='/trending' component={TrendingPage}/>
-                <Route exact path='/account' render={(props)=>{
+                <Route exact path='/settings:path(/|/.*)' component={SettingsPage}/>
+                <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
+                <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <AccountPage history={props.history} username={this.state.username}/>
+                    <AccountPage history={props.history} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
