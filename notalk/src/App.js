@@ -597,7 +597,7 @@ class AccountPage extends Component {
         <Route exact path="/account/editbio" render={(props)=>{
           return(
             <BoxComp history={props.history}>
-                <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinkin." text={this.props.mymeta.b} onFinish={this.updateBio}/>
+                <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
             </BoxComp>
           );
         }}/>
