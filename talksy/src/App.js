@@ -913,7 +913,7 @@ class App extends Component {
   componentDidMount() {
     this.log('NSF', 'Setting up NOOXY service implementations.');
     NSc.getImplement((err, NSimplementation)=>{
-      NSc.connect(nshost, nsport);
+      NSc.connect(nshost);
       this.log('NSF', 'Connecting to NOOXY service.');
       NSimplementation.setImplement('signin', (connprofile, data, data_sender)=>{
         this.log('NSF Auth', 'NOOXY service signin emitted.');

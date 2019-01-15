@@ -12,9 +12,9 @@ function NSc() {
     user: null,
     secure: true,
     NSc_files_root: '/',
-    connmethod: 'WebSocket',
+    connmethod: 'WebSocketSecure',
     default_ip: '0.0.0.0',
-    default_port: 1487
+    default_port: 43581
   };
 
   let Vars = {
@@ -38,7 +38,7 @@ function NSc() {
            var vars = query.split("&");
            for (var i=0;i<vars.length;i++) {
                    var pair = vars[i].split("=");
-                   if(pair[0] == variable){return pair[1];}
+                   if(pair[0] === variable){return pair[1];}
            }
            return(false);
     },
@@ -101,10 +101,10 @@ function NSc() {
         let ca = document.cookie.split(';');
         for(let i = 0; i < ca.length; i++) {
           let c = ca[i];
-          while (c.charAt(0) == ' ') {
+          while (c.charAt(0) === ' ') {
             c = c.substring(1);
           }
-          if (c.indexOf(name) == 0) {
+          if (c.indexOf(name) === 0) {
             return c.substring(name.length, c.length);
           }
         }
@@ -173,7 +173,7 @@ function NSc() {
       let _hostport = hostport;
       let _clientip = clientip;
       let _conn = conn; // conn is wrapped!
-      if(Rpos == 'Server') {
+      if(Rpos === 'Server') {
         _clients[_GUID] = this;
       }
 
@@ -314,7 +314,7 @@ function NSc() {
         }
       };
 
-      if(conn_method == 'ws'||conn_method =='WebSocket') {
+      if(conn_method === 'ws'||conn_method =='WebSocket') {
         let serverID = "WebSocket";
         let wsc = new WSClient(_virtnet);
         wsc.onData = onData_wrapped;
@@ -322,7 +322,7 @@ function NSc() {
         wsc.connect(remoteip, port, callback);
       }
 
-      else if(conn_method == 'wss'||conn_method =='WebSocketSecure') {
+      else if(conn_method === 'wss'||conn_method =='WebSocketSecure') {
         let serverID = "WebSocketSecure";
         let wssc = new WSSClient(_virtnet);
         wssc.onData = onData_wrapped;
@@ -445,12 +445,12 @@ function NSc() {
       };
       let json = JSON.stringify(wrapped);
       // finally sent the data through the connection.
-      if(connprofile.returnBundle('NSPS') == true) {
+      if(connprofile.returnBundle('NSPS') === true) {
         _coregateway.NoCrypto.encryptString('AESCBC256', connprofile.returnBundle('aes_256_cbc_key'), json, (err, encrypted)=> {
           _coregateway.Connection.send(connprofile, encrypted);
         });
       }
-      else if (connprofile.returnBundle('NSPS') == 'finalize') {
+      else if (connprofile.returnBundle('NSPS') === 'finalize') {
         connprofile.setBundle('NSPS', true);
         _coregateway.Connection.send(connprofile, json);
 
@@ -479,8 +479,8 @@ function NSc() {
             rs : _coregateway.NSPS.RsRouter
           }
           connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] == pos || rq_rs_pos[session] == 'Both') {
-              if(session == 'rq') {
+            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
+              if(session === 'rq') {
                 actions[session](connprofile, data, _senddata);
               }
               else {
@@ -526,8 +526,8 @@ function NSc() {
             }
           }
           connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] == pos || rq_rs_pos[session] == 'Both') {
-              if(session == 'rq') {
+            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
+              if(session === 'rq') {
                 actions[session](connprofile, data, _senddata);
               }
               else {
@@ -557,8 +557,8 @@ function NSc() {
             rq : _coregateway.AuthorizationHandler.RqRouter,
           }
           connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] == pos || rq_rs_pos[session] == 'Both') {
-              if(session == 'rq') {
+            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
+              if(session === 'rq') {
                 actions[session](connprofile, data, _senddata);
               }
               else {
@@ -589,8 +589,8 @@ function NSc() {
             rs : _coregateway.Service.ServiceRsRouter
           }
           connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] == pos || rq_rs_pos[session] == 'Both') {
-              if(session == 'rq') {
+            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
+              if(session === 'rq') {
                 actions[session](connprofile, data, _senddata);
               }
               else {
@@ -622,8 +622,8 @@ function NSc() {
           }
 
           connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] == pos || rq_rs_pos[session] == 'Both') {
-              if(session == 'rq') {
+            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
+              if(session === 'rq') {
                 actions[session](connprofile, data, _senddata);
               }
               else {
@@ -660,14 +660,14 @@ function NSc() {
       _coregateway.Connection.onData = (connprofile, data) => {
         _tellRAWSniffers(data);
         try {
-          if(_coregateway.Settings.secure == true && connprofile.returnConnMethod() != 'Local' && connprofile.returnConnMethod() != 'local') {
+          if(_coregateway.Settings.secure === true && connprofile.returnConnMethod() != 'Local' && connprofile.returnConnMethod() != 'local') {
             // upgrade protocol
-            if(connprofile.returnBundle('NSPS') == 'pending') {
+            if(connprofile.returnBundle('NSPS') === 'pending') {
               let json = JSON.parse(data);
               _tellJSONSniffers(json);
               methods[json.m].handler(connprofile, json.s, json.d);
             }
-            else if(connprofile.returnBundle('NSPS') != true && connprofile.returnRemotePosition() == 'Client') {
+            else if(connprofile.returnBundle('NSPS') != true && connprofile.returnRemotePosition() === 'Client') {
               _coregateway.NSPS.upgradeConnection(connprofile, (err, succeess)=>{
                 if(succeess) {
                   let json = JSON.parse(data);
@@ -684,7 +684,7 @@ function NSc() {
               _tellJSONSniffers(json);
               methods[json.m].handler(connprofile, json.s, json.d);
             }
-            else if(connprofile.returnBundle('NSPS') == true) {
+            else if(connprofile.returnBundle('NSPS') === true) {
               // true
 
               _coregateway.NoCrypto.decryptString('AESCBC256', connprofile.returnBundle('aes_256_cbc_key'), data, (err, decrypted)=> {
@@ -773,12 +773,12 @@ function NSc() {
     this.onConnectionClose = (connprofile, callback) => {
 
       let _entitiesID = connprofile.returnBundle('bundle_entities');
-      if(_entitiesID == null) {
+      if(_entitiesID === null) {
         callback(true);
       }
       else if(_entitiesID.length) {
         let Rpos = connprofile.returnRemotePosition();
-        if(connprofile.returnRemotePosition() == 'Client') {
+        if(connprofile.returnRemotePosition() === 'Client') {
           let i = 0;
           let loop = () => {
             let theservice = _local_services[_entity_module.returnEntityValue(_entitiesID[i], 'service')];
@@ -812,7 +812,7 @@ function NSc() {
       let methods = {
         // nooxy service protocol implementation of "Call Service: Vertify Connection"
         VE: (connprofile, data) => {
-          if(data.d.s == 'OK') {
+          if(data.d.s === 'OK') {
             _ASockets[data.d.i].launch();
           }
           else {
@@ -825,7 +825,7 @@ function NSc() {
         },
         // nooxy service protocol implementation of "Call Service: JSONfunction"
         JF: (connprofile, data) => {
-          if(data.d.s == 'OK') {
+          if(data.d.s === 'OK') {
             _ASockets[data.d.i].sendJFReturn(false, data.d.t, data.d.r);
           }
           else {
@@ -1062,7 +1062,7 @@ function NSc() {
             }
           }
           conn_profile.setBundle('bundle_entities', bundle);
-          if(bundle.length == 0) {
+          if(bundle.length === 0) {
             conn_profile.closeConnetion();
           }
         }
@@ -1204,7 +1204,7 @@ function NSc() {
     };
 
     this.onToken = (connprofile, status, token)=> {
-      if(status == 'OK') {
+      if(status === 'OK') {
         _implts['onToken'](false, token);
       }
       else {
@@ -1456,7 +1456,7 @@ function NSc() {
       });
       // setup NoService Auth implementation
       _implementation.setImplement('signin', (connprofile, data, data_sender)=>{
-        top.location.replace(settings.NSc_files_root+'login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+top.window.location.href);
+        // top.location.replace(settings.NSc_files_root+'login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+top.window.location.href);
         // window.open('.html.html?conn_method='+conn_method+'&remote_ip='+remote_ip+'&port='+port);
       });
 
@@ -1498,7 +1498,7 @@ function NSc() {
         };
 
         let pass = true;
-        if(Utils.getCookie('NSToken') == null) {
+        if(Utils.getCookie('NSToken') === null) {
           _implementation.returnImplement('signin')(connprofile, data, data_sender, 'token');
         }
         else {
@@ -1587,21 +1587,29 @@ function NSc() {
     return settings.user;
   }
 
-  this.connect = (targetip, targetport, method) => {
+  this.connect = (targetip, method, targetport) => {
     if(targetip) {
       settings.targetip = targetip;
     }
 
-    if(targetport) {
-      settings.targetport = targetport;
-    }
-
     if(settings.debug) {
       settings.connmethod = 'WebSocket';
+      settings.targetport = 43582;
     }
 
     if(method) {
       settings.connmethod = method;
+    }
+
+    if(method=='WebSocketSecure') {
+      settings.targetport = 43581;
+    }
+    else if (method=='WebSocket') {
+      settings.targetport = 43582;
+    }
+
+    if(targetport) {
+      settings.targetport = targetport;
     }
 
     settings.user = Utils.getCookie('NSUser');
@@ -1618,4 +1626,5 @@ function NSc() {
   };
 }
 
-module.exports = NSc;
+// module.exports = NSc;
+export default NSc;
