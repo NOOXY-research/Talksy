@@ -11,16 +11,16 @@ function NSc() {
     debug: true,
     user: null,
     secure: true,
-    NSc_files_root: '/static/nsf',
-    connmethod: 'WebSocketSecure',
-    default_ip: 'localhost',
+    NSc_files_root: '/',
+    connmethod: 'WebSocket',
+    default_ip: '0.0.0.0',
     default_port: 1487
   };
 
   let Vars = {
-    'version': 'aphla 0.2.2',
-    'NSP_version': 'aphla 0.2.0',
-    'copyright': 'copyright(c)2018 NOOXY inc.'
+    'version': 'aphla 0.3.0',
+    'NSP_version': 'aphla 0.4.0',
+    'copyright': 'copyright(c)2018-2019 NOOXY inc.'
   }
 
   this.setDebug = (boo)=>{
@@ -747,6 +747,17 @@ function NSc() {
     let _entity_module;
     let _emitRouter;
 
+    let ActivitySocketDestroyTimeout = 1000;
+
+    let _unbindActivitySocketList = (_entity_id)=> {
+      setTimeout(()=>{
+        // tell worker abort referance
+        if(_ASockets[_entity_id])
+          _ASockets[_entity_id].worker_cancel_refer = true;
+        delete _ASockets[_entity_id];
+      }, ActivitySocketDestroyTimeout);
+    };
+
     this.setDebug = (boolean) => {
       _debug = boolean;
     };
@@ -804,6 +815,9 @@ function NSc() {
           if(data.d.s == 'OK') {
             _ASockets[data.d.i].launch();
           }
+          else {
+            _ASockets[data.d.i]._emitClose();
+          }
         },
         // nooxy service protocol implementation of "Call Service: ServiceSocket"
         SS: (connprofile, data) => {
@@ -815,7 +829,7 @@ function NSc() {
             _ASockets[data.d.i].sendJFReturn(false, data.d.t, data.d.r);
           }
           else {
-            _ASockets[data.d.i].sendJFReturn(data.d.s, data.d.t, data.d.r==null?'{}':JSON.parse(data.d.r));
+            _ASockets[data.d.i].sendJFReturn(true, data.d.t, data.d.r);
           }
         },
         // nooxy service protocol implementation of "Call Activity: createEntity"
@@ -836,6 +850,7 @@ function NSc() {
           }
           else {
             delete  _ActivityRsCEcallbacks[data.d.t];
+            connprofile.closeConnetion();
           }
         }
       }
@@ -844,13 +859,13 @@ function NSc() {
       methods[data.m](connprofile, data);
     };
 
-    // ClientSide implement
+    // Serverside implement
     this.ActivityRqRouter = (connprofile, data, response_emit) => {
 
       let methods = {
         // nooxy service protocol implementation of "Call Activity: ActivitySocket"
         AS: () => {
-          _ASockets[data.d.i].onData(data.d.d);
+          _ASockets[data.d.i]._emitData(data.d.d);
           let _data = {
             "m": "AS",
             "d": {
@@ -861,8 +876,22 @@ function NSc() {
           };
           response_emit(connprofile, 'CA', 'rs', _data);
         },
+        // nooxy service protocol implementation of "Call Activity: Event"
+        EV: () => {
+          _ASockets[data.d.i]._emitEvent(data.d.n, data.d.d);
+          let _data = {
+            "m": "EV",
+            "d": {
+              // status
+              "i": data.d.i,
+              "s": "OK"
+            }
+          };
+          response_emit(connprofile, 'CA', 'rs', _data);
+        },
         // nooxy service protocol implementation of "Call Activity: Close ActivitySocket"
         CS: () => {
+          _ASockets[data.d.i].remoteClosed = true;
           _ASockets[data.d.i].close();
         }
       }
@@ -870,46 +899,33 @@ function NSc() {
       methods[data.m](connprofile, data.d, response_emit);
     }
 
-    // ClientSide
-    this.ActivityRsRouter = (connprofile, data) => {
 
-      let methods = {
-        // nooxy service protocol implementation of "Call Activity: ActivitySocket"
-        AS: (connprofile, data) => {
-          // no need to implement anything
-        }
-      }
-
-      methods[data.m](connprofile, data.d);
-    };
-
-    function ActivitySocket(conn_profile) {
-
+    function ActivitySocket(conn_profile, emitRouter, unbindActivitySocketList, debug) {
       // Service Socket callback
       let _emitdata = (i, d) => {
-        let _data2 = {
+        let _data = {
           "m": "SS",
           "d": {
             "i": i,
             "d": d,
           }
         };
-        _emitRouter(conn_profile, 'CS', _data2);
+        emitRouter(conn_profile, 'CS', _data);
       }
 
       // Service Socket callback
       let _emitclose = (i) => {
-        let _data2 = {
+        let _data = {
           "m": "CS",
           "d": {
             "i": i
           }
         };
-        _emitRouter(conn_profile, 'CS', _data2);
+        emitRouter(conn_profile, 'CS', _data);
       }
 
       let _emitjfunc = (entity_id, name, tempid, Json)=> {
-        let _data2 = {
+        let _data = {
           "m": "JF",
           "d": {
             "i": entity_id,
@@ -918,7 +934,7 @@ function NSc() {
             "t": tempid
           }
         };
-        _emitRouter(conn_profile, 'CS', _data2);
+        emitRouter(conn_profile, 'CS', _data);
       }
 
       let _entity_id = null;
@@ -926,10 +942,27 @@ function NSc() {
 
       let wait_ops = [];
       let wait_launch_ops = [];
-
-      let _conn_profile = conn_profile;
       let _jfqueue = {};
+      let _on_dict = {
+        data: (...args)=> {
+          if(this.onData) {
+            this.onData.apply(null, args);
+          }
+          else if(debug) Utils.TagLog('*WARN*', 'ActivitySocket on "data" not implemented')
+        },
+        close: (...args)=> {
+          if(this.onClose) {
+            this.onClose.apply(null, args);
+          }
+          else if(debug) Utils.TagLog('*WARN*', 'ActivitySocket on "close" not implemented')
+        }
+      };
 
+      let _on_event = {
+
+      };
+
+      // For waiting connection is absolutly established. We need to wrap operations and make it queued.
       let exec = (callback) => {
         if(_launched != false) {
           callback();
@@ -978,8 +1011,8 @@ function NSc() {
         exec(op);
       }
 
-      this.returnEntityID = () => {
-        return _entity_id;
+      this.getEntityID = (callback) => {
+        callback(false, _entity_id);
       };
 
       this.sendData = (data) => {
@@ -989,32 +1022,54 @@ function NSc() {
         exec(op);
       };
 
-      this.onData = (data) => {
-        Utils.tagLog('*ERR*', 'onData not implemented');
+      this.on = (type, callback)=> {
+        _on_dict[type] = callback;
       };
 
-      this.onClose = () => {
-        Utils.tagLog('*ERR*', 'onClose not implemented');
+      this.onEvent = (event, callback)=> {
+        _on_event[event] = callback;
+      };
+
+      this._emitData = (data) => {
+        _on_dict['data'](false, data);
+      };
+
+      this._emitEvent = (event, data)=> {
+        if(_on_event[event])
+          _on_event[event](false, data);
+      };
+
+      this._emitClose = () => {
+        _on_dict['close'](false);
+      };
+
+      this.remoteClosed = false;
+
+      this.unbindActivitySocketList = ()=> {
+        Utils.TagLog('*ERR*', '_aftercloseLaunched not implemented');
       };
 
       this.close = () => {
         let op = ()=> {
+          if(!this.remoteClosed)
+            _emitclose(_entity_id);
+          this._emitClose();
           let bundle = conn_profile.returnBundle('bundle_entities');
-          for (var i=bundle.length-1; i>=0; i--) {
+          for (let i=bundle.length-1; i>=0; i--) {
             if (bundle[i] === _entity_id) {
-              _emitclose(_entity_id);
-              this.onClose();
+              unbindActivitySocketList(_entity_id);
               bundle.splice(i, 1);
             }
           }
           conn_profile.setBundle('bundle_entities', bundle);
           if(bundle.length == 0) {
-            _conn_profile.closeConnetion();
+            conn_profile.closeConnetion();
           }
         }
         exec(op);
       };
     };
+
 
     // Service module launch
     this.launch = () => {
@@ -1041,21 +1096,21 @@ function NSc() {
       };
 
       this.spwanClient(method, targetip, targetport, (err, connprofile) => {
-        let _as = new ActivitySocket(connprofile);
+        let _as = new ActivitySocket(connprofile, _emitRouter, _unbindActivitySocketList, _debug);
         _ActivityRsCEcallbacks[_data.d.t] = (connprofile, data) => {
           if(data.d.i != "FAIL") {
             _as.setEntityID(data.d.i);
+            connprofile.setBundle('entityID', data.d.i);
             _ASockets[data.d.i] = _as;
-            callback(false, _as);
+            callback(false, _ASockets[data.d.i]);
           }
           else{
-            callback(true, _as);
+            callback(true, _ASockets[data.d.i]);
           }
 
         }
         _emitRouter(connprofile, 'CS', _data);
       });
-
     };
   };
 
@@ -1399,10 +1454,10 @@ function NSc() {
       _implementation.setImplement('decryptString', (algo, key, toDecrypt, callback)=>{
         _cry_algo[algo].decryptString(key, toDecrypt, callback);
       });
-      // setup NSF Auth implementation
+      // setup NoService Auth implementation
       _implementation.setImplement('signin', (connprofile, data, data_sender)=>{
-        top.location.replace(settings.NSc_files_root+'/login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+top.window.location.href);
-        // window.open('login.html?conn_method='+conn_method+'&remote_ip='+remote_ip+'&port='+port);
+        top.location.replace(settings.NSc_files_root+'login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+top.window.location.href);
+        // window.open('.html.html?conn_method='+conn_method+'&remote_ip='+remote_ip+'&port='+port);
       });
 
       _implementation.setImplement('onToken', (err, token)=>{
@@ -1429,7 +1484,7 @@ function NSc() {
         _implementation.returnImplement('signin')(connprofile, data, data_sender, 'token');
       });
 
-      // setup NSF Auth implementation
+      // setup NoService Auth implementation
       _implementation.setImplement('AuthbyToken', (connprofile, data, data_sender) => {
         let callback = (err, token)=>{
           let _data = {
@@ -1451,7 +1506,7 @@ function NSc() {
         }
 
       });
-      // setup NSF Auth implementation
+      // setup NoService Auth implementation
 
       _implementation.setImplement('AuthbyPassword', (connprofile, data, data_sender) => {
         window.open(settings.NSc_files_root+'password.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&username='+settings.user+'&authtoken='+data.d.t+'&redirect='+window.location.href);
