@@ -6,16 +6,18 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { SigninPage, PasswordPage } from "./NScReact.js";
+import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import {ChPage, ChList, NewChannelPage} from "./channel";
 import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
 const NSc = new NSClient();
 
 const nshost = '0.0.0.0';
-const nsdebug = true;
-const nsport = 1487;
+const debug = true;
+const nsport = null;
 
-NSc.setDebug(nsdebug);
+NSc.setDebug(debug);
 // EditListPage
 class MainCtrlComp extends Component {
   constructor (props) {
@@ -23,29 +25,29 @@ class MainCtrlComp extends Component {
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
       headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
-      buttons: [
-        ['channels', '/channels/', 'chat'],
-        ['contacts', '/contacts/', 'people'],
-        ['trending', '/trending/', 'trending_up'],
-        ['account', '/account/', 'account_circle'],
-        ['debug', '/debug/', 'bug_report']
-      ],
+      buttons: {
+        'channels': [ '/channels/', 'chat'],
+        'contacts': [ '/contacts/', 'people'],
+        'trending': ['/trending/', 'trending_up'],
+        'account': ['/account/', 'account_circle'],
+        // 'debug': ['/debug/', 'bug_report']
+      },
       selectedbutton: regex_result?regex_result[3]:'channels'
     }
   };
 
   renderButton() {
     return(
-      this.state.buttons.map((button)=>{
+      Object.keys(this.state.buttons).map((key, index)=>{
         return(
-            <div key={button[0]}
-              className={button[0]===this.state.selectedbutton?"MainCtrlComp-button-selected":"MainCtrlComp-button"}
+            <div key={key}
+              className={key===this.state.selectedbutton?"MainCtrlComp-button-selected":"MainCtrlComp-button"}
               onClick={()=>{
-                this.setState({selectedbutton: button[0]});
-                this.props.history.push(button[1]);
+                this.setState({selectedbutton: key});
+                this.props.history.push(this.state.buttons[key][0]);
               }}
             >
-              <i className="material-icons">{button[2]}</i>
+              <i className="material-icons">{this.state.buttons[key][1]}</i>
             </div>
         );
       })
@@ -53,6 +55,12 @@ class MainCtrlComp extends Component {
   };
 
   render() {
+    if(this.props.debug) {
+      this.state.buttons['debug'] = ['/debug/', 'bug_report'];
+    }
+    else {
+      delete this.state.buttons['debug'];
+    }
     return (
       <div className="MainCtrlComp">
           <div className="MainCtrlComp-buttons">
@@ -64,374 +72,6 @@ class MainCtrlComp extends Component {
           </div>
       </div>
     );
-  }
-}
-
-class BoxComp extends Component {
-  render() {
-      return(
-        <div className="BoxComp">
-          <div className="BoxComp-Back" onClick={()=>{
-            this.props.history.goBack()
-          }}>
-          </div>
-          <div className="BoxComp-Box">
-            {this.props.children}
-          </div>
-        </div>
-      );
-  }
-};
-
-class SplitComp extends Component {
-  render() {
-    if(this.props.show) {
-      return(
-        <div className="SplitComp">
-          {this.props.children}
-        </div>
-      );
-    }
-    else {
-      return null;
-    }
-  }
-}
-
-class BackPage extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-      return(
-        <div className="BackPage">
-          <div className="BackPage-Header">
-            <div className="BackPage-Back-Button"
-            onClick={()=>{
-              console.log(this.props.history);
-              this.props.history.goBack()
-            }}>
-              <i className="material-icons">arrow_back</i>
-            </div>
-            {(this.props.title)}
-          </div>
-
-          <div className="BackPage-Contain">
-            {this.props.children}
-          </div>
-        </div>
-      );
-    }
-}
-
-class EditTextPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      text: props.text
-    }
-  }
-
-  render() {
-    return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{this.props.title}</h1>
-              <p> {this.props.description}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"Enter here"}</h2>
-              <input placeholder={this.props.text} className="ChPage-Sender-Input" onChange={(e) => {this.setState({text: e.target.value})}}></input>
-            </div>
-          </div>
-          <div className="Page-Row" onClick={()=>{this.props.onFinish(this.state.text)}}>
-            <div className="Page-Row-Button">
-              <span>OK </span><i className="material-icons">check_circle</i>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-};
-
-class AddToListPage extends Component {
-  constructor(props) {
-    super(props);
-    // this.state = {
-    //   channels: props.channels
-    // };
-    this.state = {
-      list: []
-    };
-  }
-
-  render() {
-    return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{this.props.title}</h1>
-              <p> {this.props.description}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"Add item"}</h2>
-              <input placeholder="input here" className="ChPage-Sender-Input"></input>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Button">
-              <span>Add </span><i className="material-icons">add_circle</i>
-            </div>
-          </div>
-        </div>
-
-        <div className="Page-Block">
-        <div className="Page-Row">
-          <div className="Page-Row-Text">
-            <h1>{"Items"}</h1>
-            <p> {"All your items are below."}</p>
-          </div>
-        </div>
-        </div>
-
-      </div>
-    );
-  }
-};
-
-class SplitRight extends Component {
-  render() {
-    return(
-      <div className="SplitRight">
-        {this.props.children}
-      </div>
-    );
-  }
-}
-
-class SplitLeft extends Component {
-  render() {
-    return(
-      <div className="SplitLeft">
-        {this.props.children}
-      </div>
-    );
-  }
-}
-
-class ChPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: 'NOOXY'
-    };
-    if(props.data) {
-      this.state.messeges = props.data.messeges;
-      this.state.id = props.data.id;
-      this.state.displayname = props.data.displayname;
-    }
-  }
-
-  renderchannels() {
-    let elems = [];
-    for(let key in this.state.messeges) {
-      let align = 'left';
-      if(this.state.messeges[key][0]==this.state.user) {
-        align = 'right';
-      }
-      elems.push(
-        <div key={key} className="ChPage-Messege" style={{'textAlign': align}}>
-          <div className="ChPage-Bubble" >
-            <div className="ChPage-Bubble-Title">{this.state.messeges[key][0]}</div>
-            <div className="ChPage-Bubble-Text">{this.state.messeges[key][2]}</div>
-            <div className="ChPage-Bubble-Date">{this.state.messeges[key][3]}</div>
-          </div>
-        </div>
-      );
-    }
-    return elems;
-  }
-
-  render() {
-    if(this.props.show) {
-      return(
-        <div className="ChPage">
-          <div className="ChPage-Header">
-          <div className="ChPage-Header-left-Button"
-          onClick={()=>{this.props.history.push(this.props.rootpath)}}>
-            <i className="material-icons">arrow_back</i>
-          </div>
-          <div className="ChPage-Header-right-Button">
-            <i className="material-icons">settings</i>
-          </div>
-            {(this.state.displayname)}
-          </div>
-          <div className="ChPage-Messeges">
-            {this.renderchannels()}
-          </div>
-          <div className="ChPage-Sender">
-            <input placeholder="input text...." className="ChPage-Sender-Input"></input>
-            <div className="ChPage-Sender-Buttons">
-              <div className="ChPage-Sender-Button"><i className="material-icons">send</i></div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    else {
-      return null;
-    }
-  }
-}
-
-class NewChannelPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state= {
-      status: 'create a new Notalk channel.',
-      levels: {
-        0: "Admin can access, member can view",
-        1: "Member can access and view",
-        2: "Member can access, nooxy user can view",
-        3: "Member can access, public can view",
-        4: "Nooxy user can access and view",
-        5: "Nooxy user can access, public can view",
-        6: "public can access, public can view"
-      },
-      types: {
-        0: "A normal talk",
-        1: "A live talk",
-      }
-    };
-  }
-
-  renderTypes() {
-    let elems = [];
-    for(let key in this.state.types) {
-      elems.push(
-          <option value={key}>{this.state.types[key]}</option>
-      );
-    }
-    return (<select>{elems}</select>);
-  }
-
-  renderLevels() {
-    let elems = [];
-    for(let key in this.state.levels) {
-      elems.push(
-        <option key={key} value={key}>{this.state.levels[key]}</option>
-      );
-    }
-    return (<select>{elems}</select>);
-  }
-
-  render() {
-    if(this.props.show) {
-      return(
-        <div className="Page">
-          <Route exact path="/channels/new:path(.*)" render={(props)=>{
-            return(
-              <div className="Page">
-                <div className="Page-Block">
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h1>{"Create a new channel"}</h1>
-                      <p> {this.state.status}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="Page-Block">
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{"Channel's Name"}</h2>
-                      <input placeholder="Enter your channel's name" className="ChPage-Sender-Input"></input>
-                    </div>
-                  </div>
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{"Channel's photo"}</h2>
-                      <input type="file" name="pic" accept="image/*"/>
-                    </div>
-                  </div>
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{"Description"}</h2>
-                      <input placeholder="Enter your description" className="ChPage-Sender-Input"></input>
-                    </div>
-                  </div>
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{"Level"}</h2>
-                      <p> {this.renderLevels()}</p>
-                    </div>
-                  </div>
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{"Type"}</h2>
-                      <p> {this.renderTypes()}</p>
-                    </div>
-                  </div>
-                  <div className="Page-Row"  onClick={()=>{this.props.history.push('/channels/new/users');}}>
-                    <div className="Page-Row-Text">
-                      <h2>{"Users"}</h2>
-                      <p> {"click to edit."}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="Page-Block">
-                  <div className="Page-Row"  onClick={()=>{
-                    let status = this.props.onChCreate()
-                    if(status=='') {
-                      this.props.history.push('/');
-                    }
-                    else {
-                      this.setState({'status':status});
-                    }
-
-                  }}>
-                    <div className="Page-Row-Text">
-                      <h2>{"Create"}</h2>
-                      <p> {"create this channel"}</p>
-                    </div>
-                  </div>
-                  <div className="Page-Row" onClick={()=>{this.props.history.push('/');}}>
-                    <div className="Page-Row-Text">
-                      <h2>{"Cancel"}</h2>
-                      <p> {"Do not create this channel"}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-
-          }}/>
-
-          <Route exact path="/channels/new/users" render={(props)=>{
-            return(
-              <BoxComp history={props.history}>
-                <BackPage history={props.history} title="add users">
-                  <AddToListPage title="Add users" description="Add users for your channels." list={this.state.userlist}/>
-                </BackPage>
-              </BoxComp>
-            );
-          }}/>
-        </div>
-      );
-    }
-    else {
-      return null;
-    }
   }
 }
 
@@ -472,6 +112,7 @@ class ContactsPage extends Component {
     }
     return elems;
   }
+
   render() {
     return(
       <div className="Page">
@@ -528,7 +169,6 @@ class AccountPage extends Component {
   };
 
   updateBio = (newbio)=> {
-    console.log(newbio);
     this.props.updateMyMeta({b:newbio})
     this.props.history.push('/account/');
   };
@@ -545,7 +185,9 @@ class AccountPage extends Component {
           </div>
         </div>
         <div className="Page-Block">
-          <div className="Page-Row">
+          <div className="Page-Row" onClick={()=>{
+            this.props.history.push('/account/more');
+          }}>
             <figure className="Page-Row-ThumbnailText-Head">
 
             </figure>
@@ -598,6 +240,35 @@ class AccountPage extends Component {
           return(
             <BoxComp history={props.history}>
                 <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
+            </BoxComp>
+          );
+        }}/>
+
+        <Route exact path="/account/more" render={(props)=>{
+          return(
+            <BoxComp history={props.history}>
+              <div className="Page">
+                <div className="Page-Block">
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h1>{'More Info'}</h1>
+                      <p> {'Here are the detail information of your accout.'}</p>
+                    </div>
+                  </div>
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{'UserId'}</h2>
+                      <p> {this.props.mymeta.i}</p>
+                    </div>
+                  </div>
+                  <div className="Page-Row">
+                    <div className="Page-Row-Text">
+                      <h2>{'JoinDate'}</h2>
+                      <p> {this.props.mymeta.j}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </BoxComp>
           );
         }}/>
@@ -698,15 +369,15 @@ class DebugPage extends Component {
           </div>
           <div className="Page-Row">
             <div className="Page-Row-Text">
-              <h2>{"NSF Daemon"}</h2>
-              <p> {'Host: '+nshost+':'+nsport+', Debug: '+nsdebug}</p>
+              <h2>{"NoService Daemon"}</h2>
+              <p> {'Host: '+nshost+', Debug: '+debug}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/nsf/signin');
           }}>
             <div className="Page-Row-Text">
-              <h2>{"NSF signin"}</h2>
+              <h2>{"NoService signin"}</h2>
               <p> {"NOOXY service SigninPage"}</p>
             </div>
           </div>
@@ -714,7 +385,7 @@ class DebugPage extends Component {
             this.props.history.push('/nsf/password');
           }}>
             <div className="Page-Row-Text">
-              <h2>{"NSF Password"}</h2>
+              <h2>{"NoService Password"}</h2>
               <p> {"NOOXY service auth by password"}</p>
             </div>
           </div>
@@ -729,68 +400,38 @@ class DebugPage extends Component {
   }
 };
 
-class ChList extends Component {
-  constructor (props) {
+class FailedPage extends Component {
+  constructor(props) {
     super(props);
-    this.rootpath = props.rootpath;
-    this.state = {
-      channels: props.chlist
-    }
-  };
-
-  renderUnreadCount(count) {
-    if(count) {
-      return(
-        <div className="ChList-Row-ChUnread">
-          {count}
-        </div>
-      )
-    }
-    else {
-      return null;
-    }
   }
-  renderRows() {
-    let elems = [];
-    for(let key in this.state.channels) {
-      elems.push(
-          <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.onSelect(key, this.props.history)}}>
-            <figure className="Page-Row-ThumbnailText-Head">
-            </figure>
-            <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.state.channels[key][0]}</h2>
-              <p>{this.state.channels[key][1]}</p>
-            </div>
-            {this.renderUnreadCount(this.state.channels[key][2])}
-          </div>
-      );
-    }
-    return elems;
-  };
 
   render() {
     return(
-      <div className="ChList-Rows" >
+      <div className="NotificationPage">
         <div className="Page-Block">
           <div className="Page-Row">
             <div className="Page-Row-Text">
-              <h1>{"Your channels"}</h1>
-              <p> {"Here are all of your channels."}</p>
+              <h1>{"Connection Failed"}</h1>
+              <p> {"Error occured while connecting to NoService."}</p>
             </div>
           </div>
-          <div className="Page-Row" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
-            <div className="Page-Row-Button">
-              <span>new channel </span><i className="material-icons">add_circle</i>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"NoService Daemon"}</h2>
+              <p> {'Host: '+nshost+', Debug: '+debug}</p>
             </div>
           </div>
-        </div>
-        <div className="Page-Block">
-          {this.renderRows()}
+          <div className="Page-Row" onClick={()=> {window.location.reload();}}>
+            <div className="Page-Row-Text">
+              <h2>{"Retry"}</h2>
+              <p> {'Click this buttom to reload the page.'}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
-}
+};
 
 class HeaderPage extends Component {
   constructor (props) {
@@ -803,7 +444,7 @@ class HeaderPage extends Component {
         ['contacts', '/contacts/', 'people'],
         ['trending', '/trending/', 'trending_up'],
         ['account', '/account/', 'account_circle'],
-        ['debug', '/debug/', 'bug_report']
+        // ['debug', '/debug/', 'bug_report']
       ],
       selectedheaderbuttons: regex_result?regex_result[3]:'channels'
     }
@@ -827,6 +468,22 @@ class HeaderPage extends Component {
     );
   };
 
+  renderDebugButton() {
+    if(this.props.debug) {
+      return (
+        <div key='debug'
+        className={'debug'===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button"}
+        onClick={()=>{
+          this.setState({selectedheaderbuttons: 'debug'});
+          this.props.history.push('/debug/');
+        }}
+        >
+          <i className="material-icons">{'bug_report'}</i>
+        </div>
+      )
+    }
+  }
+
   render() {
     return (
       <div className="HeaderPage">
@@ -834,6 +491,7 @@ class HeaderPage extends Component {
           <h1 className="HeaderPage-title"><img height="32px" src={logo}/> {this.state.headertitle} </h1>
           <div className="HeaderPage-header-bar">
             {this.renderHeaderBar()}
+            {this.renderDebugButton()}
           </div>
         </header>
         {this.props.children}
@@ -847,6 +505,7 @@ class App extends Component {
     let channelroot = "/channels/";
     super(props);
     this.state = {
+      debug: debug,
       mymeta: {},
       debuglogs: [['debug', 'debug']],
       channelroot: channelroot,
@@ -902,48 +561,81 @@ class App extends Component {
         // }
       })
     }
+
+    this.log = (title, contain)=> {
+      this.setState((prevState) => {
+        return prevState.debuglogs.push([title, contain]);
+      });
+    };
+
+    this.setDebug = (bool)=> {
+      console.log('DEBUG MODE ON');
+      this.log('DEBUG MODE ON');
+      this.setState({debug: bool});
+    };
   }
 
-  log(title, contain) {
-    this.setState((prevState) => {
-      return prevState.debuglogs.push([title, contain]);
-    });
-  }
+
+
 
   componentDidMount() {
-    this.log('NSF', 'Setting up NOOXY service implementations.');
+    this.log('NoService', 'Setting up NOOXY service implementations.');
     NSc.getImplement((err, NSimplementation)=>{
       NSc.connect(nshost);
-      this.log('NSF', 'Connecting to NOOXY service.');
+      this.log('NoService', 'Connecting to NOOXY service.');
       NSimplementation.setImplement('signin', (connprofile, data, data_sender)=>{
-        this.log('NSF Auth', 'NOOXY service signin emitted.');
+        this.log('NoService Auth', 'NOOXY service signin emitted.');
         this.history.push('/nsf/signin');
       });
       NSimplementation.setImplement('AuthbyPassword', (connprofile, data, data_sender) => {
-        this.log('NSF Auth', 'NOOXY service Authby Password emitted.');
+        this.log('NoService Auth', 'NOOXY service Authby Password emitted.');
         this.history.push('/nsf/password?authtoken='+data.d.t);
       });
-      this.log('NSF', 'Have set up NOOXY service implementations.');
+      this.log('NoService', 'Have set up NOOXY service implementations.');
       NSc.createActivitySocket('NoTalk', (err, as)=>{
-        this.updateMyMeta = (newmeta)=> {
-          as.call('updateMyMeta', newmeta, ()=>{
-            this.log('updateMyMeta', 'OK');
-          })
+        if(err) {
+          this.log('NoService', 'Connection Failed.');
+          this.setState({connectionfailed: true});
         }
-        this.log('NSF', 'Connected to the Service.');
-        as.call('getMyMeta', null, (err, json)=> {
-          this.setState({mymeta: json});
-          this.log('getMyMeta', JSON.stringify(json));
-        });
-        as.onData = (data) => {
-          this.log('NSActivity onData', data);
-          // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
-        }
-        as.onClose = ()=> {
-          this.log('NSActivity onClose', 'Activity closed.');
+        else {
+          as.onEvent('MyMetaUpdated', (err, json)=> {
+            let newmeta = json;
+            for(let i in this.state.mymeta) {
+              if(!newmeta[i]) {
+                newmeta[i] = this.state.mymeta[i];
+              }
+            }
+            this.setState({mymeta: newmeta});
+          });
+          this.updateMyMeta = (newmeta)=> {
+            as.call('updateMyMeta', newmeta, ()=>{
+              this.log('updateMyMeta', 'OK');
+            })
+          }
+          this.log('NoService', 'Connected to the Service.');
+          as.call('getMyMeta', null, (err, json)=> {
+            this.setState({mymeta: json});
+            this.log('getMyMeta', JSON.stringify(json));
+          });
+          as.onData = (data) => {
+            this.log('NSActivity onData', data);
+            // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
+          }
+          as.onClose = ()=> {
+            this.log('NSActivity onClose', 'Activity closed.');
+          }
         }
       });
     });
+  }
+
+  renderConnectionFailed() {
+    if(this.state.connectionfailed) {
+      return <FailedPage/>;
+    }
+    else {
+      return null;
+    }
   }
 
   renderChannels(props) {
@@ -976,8 +668,8 @@ class App extends Component {
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
             return(
-              <HeaderPage history={props.history}>
-                <MainCtrlComp history={props.history}/>
+              <HeaderPage history={props.history} debug={this.state.debug}>
+                <MainCtrlComp history={props.history} debug={this.state.debug}/>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChList
@@ -985,7 +677,8 @@ class App extends Component {
                     chlist={this.state.channels.chlist}
                     history={props.history}
                     selected={props.match.params.id}
-                    rootpath={this.state.channelroot}/>
+                    rootpath={this.state.channelroot}
+                    />
                   )
                 }}/>
                 <Route exact path={this.state.channelroot+':id(.+)'} render={(props)=>{
@@ -1000,7 +693,7 @@ class App extends Component {
                         rootpath={this.state.channelroot}/>
                       </SplitLeft>
                       <SplitRight>
-                        <NewChannelPage show={this.state.channels.channelnow=='new'} onChCreate={this.onChCreate} history={props.history} />
+                        <NewChannelPage show={this.state.channels.channelnow=='new'} onChCreate={this.onChCreate} history={props.history} setDebug={this.setDebug}/>
                         {this.renderChannels(props)}
                       </SplitRight>
                     </SplitComp>
@@ -1029,6 +722,7 @@ class App extends Component {
                     <PasswordPage NSc={NSc} onFinish={props.history.goBack}/>
                   );
                 }}/>
+                {this.renderConnectionFailed()}
 
               </HeaderPage>
             );
