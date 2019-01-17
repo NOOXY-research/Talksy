@@ -123,6 +123,8 @@ img {
 }
 
 .ChList-Row {
+  overflow: hidden;
+  text-overflow: ellipsis;
   position: relative;
   padding: 10px;
   box-sizing: border-box;
@@ -442,6 +444,8 @@ img {
 }
 
 .Page-Row {
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 10px;
   position: relative;
   box-sizing: border-box;
@@ -471,11 +475,17 @@ img {
   background: #ECEFF1;
 }
 .Page-Row-Text h1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 25px;
   margin: 0 0 10px 0;
   font-weight: 600;
 }
 .Page-Row-Text h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 16px;
   margin: 0;
   font-weight: 600;
@@ -500,6 +510,8 @@ img {
   display: inline-block;
   width: 45px;
   height: 45px;
+  min-width: 45px;
+  min-height: 45px;
   border-radius: 30px;
   border: 3px solid #263238;
   margin: 0;
@@ -513,19 +525,24 @@ img {
 }
 
 .Page-Row-ThumbnailText-Text {
+  max-width: 100%;
   display: flex;
   flex-grow: 1;
   padding-left: 10px;
+  width: auto;
   vertical-align: middle;
   flex-direction: column;
 }
 
 .Page-Row-ThumbnailText-Text h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: flex;
   margin: 0;
   width: 100%;
   height: auto;
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .Page-Row-ThumbnailText-Text p {

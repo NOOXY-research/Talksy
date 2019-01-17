@@ -1601,6 +1601,12 @@ function NSc() {
     return settings.user;
   }
 
+  this.logout = () => {
+    _core.getImplement((err, implement_module)=>{
+      implement_module.returnImplement('logout')();
+    });
+  }
+
   this.connect = (targetip, method, targetport) => {
     if(targetip) {
       settings.targetip = targetip;

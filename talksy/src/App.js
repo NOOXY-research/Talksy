@@ -8,16 +8,23 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { SigninPage, PasswordPage } from "./NScReact.js";
 import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
 import {ChPage, ChList, NewChannelPage} from "./channel";
+import {ContactsPage} from "./contact";
+import {AccountPage} from "./account";
 import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
-const NSc = new NSClient();
+import './tooltip.css';
+
+const NoService = new NSClient();
 
 const nshost = '0.0.0.0';
 const debug = true;
 const nsport = null;
 
-NSc.setDebug(debug);
+let NoTalk;
+let NoUser;
+
+NoService.setDebug(debug);
 // EditListPage
 class MainCtrlComp extends Component {
   constructor (props) {
@@ -75,205 +82,12 @@ class MainCtrlComp extends Component {
   }
 }
 
-class ContactsPage extends Component {
-  constructor(props) {
-    super(props);
-    // this.state = {
-    //   channels: props.channels
-    // };
-    this.state = {
-      users: {
-        'NOOXY': ['hello'],
-        'User': ['simple clear elegent'],
-        'Tomy': ['siasdfmple clear elegent'],
-        'NOfseradf': ['simple clear elegent'],
-        'NOOXY3': ['hello'],
-        'NOOXY4': ['hello'],
-        'User2': ['simple clear elegent'],
-        'User4': ['simple clear elegent'],
-        'dfseradf': ['simple clear elegent'],
-      }
-    };
-  }
-
-  renderUsers() {
-    let elems = [];
-    for(let key in this.state.users) {
-      elems.push(
-        <div key={key} className="Page-Row">
-          <figure className="Page-Row-ThumbnailText-Head">
-          </figure>
-          <div className="Page-Row-ThumbnailText-Text">
-            <h2>{key}</h2>
-            <p>{this.state.users[key]}</p>
-          </div>
-        </div>
-      );
-    }
-    return elems;
-  }
-
-  render() {
-    return(
-      <div className="Page">
-        <Route exact path="/contacts/:path(.*)" render={(props)=>{
-          return(
-            <div className="Page">
-              <div className="Page-Block">
-                <div className="Page-Row">
-                  <div className="Page-Row-Text">
-                    <h1>{"Contacts"}</h1>
-                    <p> {"Start a new Notalk channel by your contacts."}</p>
-                  </div>
-                </div>
-                <div className="Page-Row" onClick={()=>{
-                  props.history.push('/contacts/new');
-                }}>
-                  <div className="Page-Row-Button">
-                    <span>add contact </span><i className="material-icons">add_circle</i>
-                  </div>
-                </div>
-              </div>
-              <div className="Page-Block">
-                {this.renderUsers()}
-              </div>
-            </div>
-          )
-        }}/>
-
-        <Route exact path="/contacts/new" render={(props)=>{
-          return(
-            <BoxComp history={props.history}>
-            < BackPage title="New Contact" history={props.history}/>
-            </BoxComp>
-          )
-        }}/>
-      </div>
-    );
-  }
-};
-
 class SettingsPage extends Component {
   render() {
     return(
       <div className="">
         {"settings"}
       </div>
-    );
-  }
-};
-
-class AccountPage extends Component {
-  constructor(props) {
-    super(props);
-  };
-
-  updateBio = (newbio)=> {
-    this.props.updateMyMeta({b:newbio})
-    this.props.history.push('/account/');
-  };
-
-  render() {
-    return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{"Account"}</h1>
-              <p> {"Manage your Notalk account here."}</p>
-            </div>
-          </div>
-        </div>
-        <div className="Page-Block">
-          <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/account/more');
-          }}>
-            <figure className="Page-Row-ThumbnailText-Head">
-
-            </figure>
-            <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.mymeta.n?this.props.mymeta.n:'Guest'}</h2>
-              <p> {this.props.mymeta.b?this.props.mymeta.b:'You have no bio.'}</p>
-            </div>
-          </div>
-          <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/account/editbio');
-          }}>
-            <div className="Page-Row-Text">
-              <h2>{"Bio"}</h2>
-              <p> {this.props.mymeta.b}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"Active status"}</h2>
-              <p> {"Show"}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"Blocked Users"}</h2>
-              <p> {"click to edit."}</p>
-            </div>
-          </div>
-
-        </div>
-        <div className="Page-Block">
-          <a href="https://github.com/NOOXY-Research/" target="_blank">
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"Open Source"}</h2>
-                <p> {"https://github.com/NOOXY-Research/"}</p>
-              </div>
-            </div>
-          </a>
-          <a href="https://nooxy.org" target="_blank">
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
-                <h2>{"NOOXY Talk Client"}</h2>
-                <p> {"ver. alpha. copyright(c)2017-2018 NOOXY inc."}</p>
-              </div>
-            </div>
-          </a>
-        </div>
-        <Route exact path="/account/editbio" render={(props)=>{
-          return(
-            <BoxComp history={props.history}>
-                <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
-            </BoxComp>
-          );
-        }}/>
-
-        <Route exact path="/account/more" render={(props)=>{
-          return(
-            <BoxComp history={props.history}>
-              <div className="Page">
-                <div className="Page-Block">
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h1>{'More Info'}</h1>
-                      <p> {'Here are the detail information of your accout.'}</p>
-                    </div>
-                  </div>
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{'UserId'}</h2>
-                      <p> {this.props.mymeta.i}</p>
-                    </div>
-                  </div>
-                  <div className="Page-Row">
-                    <div className="Page-Row-Text">
-                      <h2>{'JoinDate'}</h2>
-                      <p> {this.props.mymeta.j}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </BoxComp>
-          );
-        }}/>
-      </div>
-
     );
   }
 };
@@ -374,7 +188,7 @@ class DebugPage extends Component {
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/nsf/signin');
+            this.props.history.push('/noservice/signin');
           }}>
             <div className="Page-Row-Text">
               <h2>{"NoService signin"}</h2>
@@ -382,7 +196,7 @@ class DebugPage extends Component {
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/nsf/password');
+            this.props.history.push('/noservice/password');
           }}>
             <div className="Page-Row-Text">
               <h2>{"NoService Password"}</h2>
@@ -455,13 +269,14 @@ class HeaderPage extends Component {
       this.state.headerbuttons.map((button)=>{
         return(
             <div key={button[0]}
-              className={button[0]===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button"}
+              className={(button[0]===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
               onClick={()=>{
                 this.setState({selectedheaderbuttons: button[0]});
                 this.props.history.push(button[1]);
               }}
             >
               <i className="material-icons">{button[2]}</i>
+              <span className="tooltiptext tooltip-bottom">{button[0]}</span>
             </div>
         );
       })
@@ -472,13 +287,14 @@ class HeaderPage extends Component {
     if(this.props.debug) {
       return (
         <div key='debug'
-        className={'debug'===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button"}
+        className={('debug'===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
         onClick={()=>{
           this.setState({selectedheaderbuttons: 'debug'});
           this.props.history.push('/debug/');
         }}
         >
           <i className="material-icons">{'bug_report'}</i>
+            <span className="tooltiptext tooltip-bottom">{"Debug components"}</span>
         </div>
       )
     }
@@ -509,56 +325,20 @@ class App extends Component {
       mymeta: {},
       debuglogs: [['debug', 'debug']],
       channelroot: channelroot,
+      channelnow: window.location.href.split(channelroot)[1]?window.location.href.split(channelroot)[1].split('/')[0]: null,
       channels: {
-        channelnow: window.location.href.split(channelroot)[1]?window.location.href.split(channelroot)[1].split('/')[0]: null,
-        chlist: {
-          'ch1': ['A Channel', 'hello?', 23, {1: ['NOOXY', 'text', 'hello', 0]}],
-          'ch2': ['B Channel', 'ok', 2],
-          'ch3': ['C Channel', 'hahaha', 23],
-          'ch4': ['Channel4', 'lastmsg', 23],
-          'ch5': ['Channel5', 'lastmsg', null],
-          'ch6': ['Channel6', 'lastmsg', 23],
-          'ch7': ['Channel7', 'lastmsg', 23],
-          'ch8': ['Channel8', 'lastmsg', 23],
-          'ch9': ['Channel9', 'lastmsg', 23],
-          'ch10': ['Chanel10', 'yves: lastmsg', 1]
-        },
-        chsdata: {
-          'ch1': {
-            messeges: {
-              1: ['NOOXY', 'text', 'hellohellohellohellohellohellohell ohellohellohellohellohello hellohellohellohellohello', '12:00'],
-              2: ['NOOXY', 'text', 'hellohel', '12:00'],
-              3: ['NOOXY', 'text', 'hellohel', '12:00'],
-              4: ['NOOXY', 'text', 'helloasdfasdfhel', '12:00'],
-              5: ['NOOXY', 'text', 'hellohel', '12:00'],
-              6: ['NOOXY', 'text', 'helloasdfhel', '12:00'],
-              7: ['Yves', 'text', 'hellohasdfadsel', '12:00'],
-              8: ['NOOXY', 'text', 'hellohel', '12:00'],
-              9: ['NOOXY', 'text', 'hellohel', '12:00'],
-              10: ['NOOXY', 'text', 'hellohel', '12:00'],
-              11: ['NOOXY', 'text', 'hellasdfsadfdohel', '12:00'],
-            },
-            id: 'ch1',
-            displayname: 'A Channel'
-          }
+        'loading': {
+          Displayname: "Loading...",
+          Description: "Talksy is loading your messeges."
         }
       }
     }
 
     this.onSelectCh = (chid, history)=> {
       this.setState((prevState) => {
-        // if(chid!='new') {
-          let channels_state = prevState.channels;
-          channels_state.channelnow = chid;
           history.push(channelroot+chid);
-          return { channels: channels_state}
-        // }
-        // else {
-        //   let channels_state = prevState.channels;
-        //   channels_state.channelnow = null;
-        //   history.push('/newmessege');
-        //   return { channels: channels_state}
-        // }
+          return { channelnow: chid}
+
       })
     }
 
@@ -580,19 +360,20 @@ class App extends Component {
 
   componentDidMount() {
     this.log('NoService', 'Setting up NOOXY service implementations.');
-    NSc.getImplement((err, NSimplementation)=>{
-      NSc.connect(nshost);
+    NoService.getImplement((err, NSimplementation)=>{
+      NoService.connect(nshost);
       this.log('NoService', 'Connecting to NOOXY service.');
       NSimplementation.setImplement('signin', (connprofile, data, data_sender)=>{
         this.log('NoService Auth', 'NOOXY service signin emitted.');
-        this.history.push('/nsf/signin');
+        this.history.push('/noservice/signin');
       });
       NSimplementation.setImplement('AuthbyPassword', (connprofile, data, data_sender) => {
         this.log('NoService Auth', 'NOOXY service Authby Password emitted.');
-        this.history.push('/nsf/password?authtoken='+data.d.t);
+        this.history.push('/noservice/password?authtoken='+data.d.t);
       });
       this.log('NoService', 'Have set up NOOXY service implementations.');
-      NSc.createActivitySocket('NoTalk', (err, as)=>{
+      NoService.createActivitySocket('NoTalk', (err, as)=>{
+        NoTalk = as;
         if(err) {
           this.log('NoService', 'Connection Failed.');
           this.setState({connectionfailed: true});
@@ -613,13 +394,32 @@ class App extends Component {
             })
           }
           this.log('NoService', 'Connected to the Service.');
+
           as.call('getMyMeta', null, (err, json)=> {
-            this.setState({mymeta: json});
             this.log('getMyMeta', JSON.stringify(json));
+            this.setState({mymeta: json});
+
+            NoService.createActivitySocket('NoUser', (err, as2)=>{
+              NoUser = as2;
+              console.log(as2);
+              NoUser.call('returnUserMeta', null, (err, json2)=> {
+                this.setState({mymeta: Object.assign({}, json, json2)});
+                this.log('NoUser', JSON.stringify(json2));
+              });
+            });
+
+            as.call('getMyChs', null, (err, json)=> {
+              this.setState((prevState)=> {
+                prevState.channels = json;
+                return prevState;
+              });
+              this.log('getMyChs', JSON.stringify(json));
+            });
           });
+
           as.onData = (data) => {
             this.log('NSActivity onData', data);
-            // this.setState({debuglogs: this.state.debuglogs.push(['NSc', data])}) ;
+            // this.setState({debuglogs: this.state.debuglogs.push(['NoService', data])}) ;
           }
           as.onClose = ()=> {
             this.log('NSActivity onClose', 'Activity closed.');
@@ -640,11 +440,13 @@ class App extends Component {
 
   renderChannels(props) {
     let elems = [];
-    for(let key in this.state.channels.chlist) {
+    for(let key in this.state.channels) {
       elems.push(
-        <ChPage key={key}
-          data={this.state.channels.chsdata[key]}
-          show={this.state.channels.channelnow==key}
+        <ChPage
+          mymeta = {this.state.mymeta}
+          channelid={key}
+          channelmeta={this.state.channels[key]}
+          show={this.state.channelnow==key}
           match={props.match} history={props.history}
           rootpath={this.state.channelroot}
         />
@@ -653,9 +455,15 @@ class App extends Component {
     return elems;
   }
 
-  onChCreate(meta) {
+  emitChCreate(meta, callback) {
     // return status
-    return ""
+    NoTalk.call('createCh', meta, (err, meta)=> {
+      callback(err, meta);
+    });
+  }
+
+  logout() {
+    NoService.logout();
   }
 
   render() {
@@ -674,7 +482,7 @@ class App extends Component {
                   return (
                     <ChList
                     onSelect={this.onSelectCh}
-                    chlist={this.state.channels.chlist}
+                    channels={this.state.channels}
                     history={props.history}
                     selected={props.match.params.id}
                     rootpath={this.state.channelroot}
@@ -687,13 +495,13 @@ class App extends Component {
                       <SplitLeft>
                         <ChList
                         onSelect={this.onSelectCh}
-                        chlist={this.state.channels.chlist}
+                        channels={this.state.channels}
                         history={props.history}
                         selected={props.match.params.id}
                         rootpath={this.state.channelroot}/>
                       </SplitLeft>
                       <SplitRight>
-                        <NewChannelPage show={this.state.channels.channelnow=='new'} onChCreate={this.onChCreate} history={props.history} setDebug={this.setDebug}/>
+                        <NewChannelPage show={this.state.channelnow=='new'} emitChCreate={this.emitChCreate} history={props.history} setDebug={this.setDebug}/>
                         {this.renderChannels(props)}
                       </SplitRight>
                     </SplitComp>
@@ -704,7 +512,7 @@ class App extends Component {
                 <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <AccountPage history={props.history} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <AccountPage history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
@@ -712,14 +520,14 @@ class App extends Component {
                     <DebugPage history={props.history} logs={this.state.debuglogs}/>
                   );
                 }}/>
-                <Route exact path='/nsf/signin' render={(props)=>{
+                <Route exact path='/noservice/signin' render={(props)=>{
                   return(
-                    <SigninPage NSc={NSc} onFinish={window.location.reload}/>
+                    <SigninPage NSc={NoService} onFinish={window.location.reload}/>
                   );
                 }}/>
-                <Route exact path='/nsf/password' render={(props)=>{
+                <Route exact path='/noservice/password' render={(props)=>{
                   return(
-                    <PasswordPage NSc={NSc} onFinish={props.history.goBack}/>
+                    <PasswordPage NSc={NoService} onFinish={props.history.goBack}/>
                   );
                 }}/>
                 {this.renderConnectionFailed()}
