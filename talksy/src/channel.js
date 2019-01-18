@@ -10,26 +10,21 @@ export class ChPage extends Component {
     this.state = {
       user: 'NOOXY'
     };
-    if(props.data) {
-      this.state.messeges = props.data.messeges;
-      this.state.id = props.data.id;
-      this.state.displayname = props.data.displayname;
-    }
   }
 
   renderMesseges() {
     let elems = [];
-    for(let key in this.state.messeges) {
+    for(let key in this.props.channelmeta.Messeges) {
       let align = 'left';
-      if(this.state.messeges[key][0]==this.state.user) {
+      if(this.props.channelmeta.Messeges[key][0]==this.props.mymeta.i) {
         align = 'right';
       }
       elems.push(
         <div key={key} className="ChPage-Messege" style={{'textAlign': align}}>
           <div className="ChPage-Bubble" >
-            <div className="ChPage-Bubble-Title">{this.props.messeges[key][0]}</div>
-            <div className="ChPage-Bubble-Text">{this.props.messeges[key][2]}</div>
-            <div className="ChPage-Bubble-Date">{this.props.messeges[key][3]}</div>
+            <div className="ChPage-Bubble-Title">{this.props.channelmeta.Messeges[key][0]}</div>
+            <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messeges[key][2]}</div>
+            <div className="ChPage-Bubble-Date">{this.props.channelmeta.Messeges[key][3]}</div>
           </div>
         </div>
       );
@@ -129,7 +124,7 @@ export class NewChannelPage extends Component {
       );
     }
     return (<select value={1} onChange={evt => {
-      this.channelmeta.v = parseInt(evt.target.value);
+      this.channelmeta.a = parseInt(evt.target.value);
     }}>{elems}</select>);
   }
 
@@ -179,7 +174,7 @@ export class NewChannelPage extends Component {
                   </div>
                   <div className="Page-Row">
                     <div className="Page-Row-Text">
-                      <h2 className="">{"Visability Level"}</h2>
+                      <h2 className="">{"Access Level"}</h2>
                       <p> {this.renderLevels()}</p>
                     </div>
                   </div>
