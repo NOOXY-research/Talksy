@@ -329,9 +329,10 @@ class App extends Component {
       channels: {
         'loading': {
           Displayname: "Loading...",
-          Description: "Talksy is loading your messeges."
+          Description: "Talksy is loading your messages."
         }
-      }
+      },
+      users:{}
     }
 
     this.onSelectCh = (chid, history)=> {
@@ -343,6 +344,9 @@ class App extends Component {
     }
 
     this.log = (title, contain)=> {
+      if(typeof(contain)!= 'string') {
+        contain = JSON.stringify(contain);
+      }
       this.setState((prevState) => {
         return prevState.debuglogs.push([title, contain]);
       });
@@ -379,14 +383,29 @@ class App extends Component {
           this.setState({connectionfailed: true});
         }
         else {
-          as.onEvent('MyMetaUpdated', (err, json)=> {
+          NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
             let newmeta = json;
             for(let i in this.state.mymeta) {
               if(!newmeta[i]) {
                 newmeta[i] = this.state.mymeta[i];
               }
             }
+            this.log('MyMetaUpdated event', json);
             this.setState({mymeta: newmeta});
+          });
+          NoTalk.onEvent('message', (err, json)=> {
+            this.log('message event', json);
+            this.setState(prevState=> {
+              let beadded ={};
+              // add to last index
+              if(prevState.channels[json.i]['Messeges'])
+                beadded[Object.keys(prevState.channels[json.i]['Messeges']).sort((a,b)=>{return b - a;})[0]+1] = json.r;
+              else
+                beadded[1] = json.r;
+              prevState.channels[json.i]['Messeges'] = Object.assign({}, beadded, prevState.channels[json.i]['Messeges']);
+
+              return prevState;
+            });
           });
           this.updateMyMeta = (newmeta)=> {
             as.call('updateMyMeta', newmeta, ()=>{
@@ -401,19 +420,32 @@ class App extends Component {
 
             NoService.createActivitySocket('NoUser', (err, as2)=>{
               NoUser = as2;
-              console.log(as2);
               NoUser.call('returnUserMeta', null, (err, json2)=> {
                 this.setState({mymeta: Object.assign({}, json, json2)});
                 this.log('NoUser', JSON.stringify(json2));
               });
-            });
+              NoTalk.call('getMyChs', null, (err, json)=> {
+                this.setState((prevState)=> {
+                  prevState.channels = json;
+                  return prevState;
+                });
+                this.log('getMyChs', JSON.stringify(json));
 
-            as.call('getMyChs', null, (err, json)=> {
-              this.setState((prevState)=> {
-                prevState.channels = json;
-                return prevState;
+                NoTalk.call('bindChs', {i: Object.keys(json)}, (err, json2)=> {
+                  json2['ChIds'] = Object.keys(json);
+                  this.log('bindCh', JSON.stringify(json2));
+                });
+
+                for(let chid in json) {
+                  NoTalk.call('getMsgs', {i: chid, r:15}, (err, json)=> {
+                    this.log('getMsgs ('+chid+')', JSON.stringify(json));
+                    this.setState(prevState=> {
+                      prevState.channels[chid]['Messeges'] = json.r;
+                      return prevState;
+                    });
+                  });
+                }
               });
-              this.log('getMyChs', JSON.stringify(json));
             });
           });
 
@@ -426,6 +458,22 @@ class App extends Component {
           }
         }
       });
+    });
+  }
+
+  loadUserMeta(userid) {
+    this.getUserMetaByUserId(userid, (err, meta)=> {
+      this.setState(prevState=> {
+        prevState.users[userid] = meta;
+        return prevState;
+      });
+    })
+  }
+
+  getUserMetaByUserId(userid, callback) {
+    NoUser.call("getUserMetaByUserId", {i:userid}, (err, json)=> {
+      this.log("getUserMetaByUserId", json);
+      callback(err, json);
     });
   }
 
@@ -443,12 +491,15 @@ class App extends Component {
     for(let key in this.state.channels) {
       elems.push(
         <ChPage
-          mymeta = {this.state.mymeta}
+          mymeta={this.state.mymeta}
           channelid={key}
           channelmeta={this.state.channels[key]}
           show={this.state.channelnow==key}
           match={props.match} history={props.history}
           rootpath={this.state.channelroot}
+          sendNewMessage={this.sendNewMessage.bind(this)}
+          loadUserMeta={this.loadUserMeta.bind(this)}
+          users={this.state.users}
         />
       );
     }
@@ -458,7 +509,16 @@ class App extends Component {
   emitChCreate(meta, callback) {
     // return status
     NoTalk.call('createCh', meta, (err, meta)=> {
+      this.log('createCh', meta);
       callback(err, meta);
+    });
+  }
+
+  sendNewMessage(chid, meta, callback) {
+    // return status
+    NoTalk.call('sendMsg', {i:chid, c:meta}, (err, json)=> {
+      this.log('sendMsg ('+chid+')', json);
+      callback(err);
     });
   }
 
@@ -501,7 +561,7 @@ class App extends Component {
                         rootpath={this.state.channelroot}/>
                       </SplitLeft>
                       <SplitRight>
-                        <NewChannelPage show={this.state.channelnow=='new'} emitChCreate={this.emitChCreate} history={props.history} setDebug={this.setDebug}/>
+                        <NewChannelPage show={this.state.channelnow=='new'} emitChCreate={this.emitChCreate.bind(this)} history={props.history} setDebug={this.setDebug}/>
                         {this.renderChannels(props)}
                       </SplitRight>
                     </SplitComp>
