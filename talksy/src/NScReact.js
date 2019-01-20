@@ -108,11 +108,20 @@ export class SigninPage extends Component {
             }
 
           }}>
+
             <div className="Page-Row-Text">
               <h2>{"Done"}</h2>
               <p> {"sign me in"}</p>
             </div>
           </div>
+          <a href={this.props.SignupURL}>
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"Siginup"}</h2>
+                <p> {"Signup a NoService account"}</p>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     );

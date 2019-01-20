@@ -1,7 +1,7 @@
 // APP.js
 // Description:
 // "APP.js" is a NOOXY NoTalk Service client.
-// Copyright 2018 NOOXY. All Rights Reserved.
+// Copyright 2018-2019 NOOXY. All Rights Reserved.
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
@@ -17,7 +17,10 @@ import './tooltip.css';
 
 const NoService = new NSClient();
 
-const nshost = '0.0.0.0';
+const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
+
+
+const nshost = 'nooxy.org';
 const debug = true;
 const nsport = null;
 
@@ -252,7 +255,7 @@ class HeaderPage extends Component {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
-      headertitle: "Talksy(DEV)",
+      headertitle: "Talksy",
       headerbuttons: [
         ['channels', '/channels/', 'chat'],
         ['contacts', '/contacts/', 'people'],
@@ -393,7 +396,7 @@ class App extends Component {
             this.log('MyMetaUpdated event', json);
             this.setState({mymeta: newmeta});
           });
-          NoTalk.onEvent('message', (err, json)=> {
+          NoTalk.onEvent('Message', (err, json)=> {
             this.log('message event', json);
             this.setState(prevState=> {
               let beadded ={};
@@ -407,6 +410,13 @@ class App extends Component {
               return prevState;
             });
           });
+          NoTalk.onEvent('AddedToChannel', (err, json)=> {
+            this.log('AddedToChannel event', json);
+            this.setState(prevState=> {
+              prevState.channels[json.i] = json.r;
+              return prevState;
+            });
+          });
           this.updateMyMeta = (newmeta)=> {
             as.call('updateMyMeta', newmeta, ()=>{
               this.log('updateMyMeta', 'OK');
@@ -414,10 +424,14 @@ class App extends Component {
           }
           this.log('NoService', 'Connected to the Service.');
 
-          as.call('getMyMeta', null, (err, json)=> {
+          NoTalk.call('getMyMeta', null, (err, json)=> {
             this.log('getMyMeta', JSON.stringify(json));
-            this.setState({mymeta: json});
-
+            if(json.i) {
+              this.setState({mymeta: json});
+            }
+            else {
+              this.updateMyMeta({a:0});
+            }
             NoService.createActivitySocket('NoUser', (err, as2)=>{
               NoUser = as2;
               NoUser.call('returnUserMeta', null, (err, json2)=> {
@@ -455,6 +469,7 @@ class App extends Component {
           }
           as.onClose = ()=> {
             this.log('NSActivity onClose', 'Activity closed.');
+            this.setState({connectionfailed: true});
           }
         }
       });
@@ -582,7 +597,7 @@ class App extends Component {
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{
                   return(
-                    <SigninPage NSc={NoService} onFinish={window.location.reload}/>
+                    <SigninPage SignupURL={NOSERVICE_SIGNUPURL} NSc={NoService} onFinish={window.location.reload}/>
                   );
                 }}/>
                 <Route exact path='/noservice/password' render={(props)=>{

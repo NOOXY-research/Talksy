@@ -11,7 +11,17 @@ img {
     .SplitLeft {
         display: none;
     }
+    .BoxComp-Box {
+      position: absolute!important;
+      height: 100%!important;
+      width: 100%!important;
+      border-radius: 0!important;
+      max-height: 100%!important;
+      max-width: 100%!important;
+    }
 }
+
+
 .App {
 
 }
@@ -529,6 +539,7 @@ img {
   max-width: 100%;
   display: flex;
   flex-grow: 1;
+  overflow: hidden;
   padding-left: 10px;
   width: auto;
   vertical-align: middle;

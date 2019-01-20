@@ -267,7 +267,9 @@ export class NewChannelPage extends Component {
             return(
               <BoxComp history={props.history}>
                 <BackPage history={props.history} title="add users">
-                  <AddToListPage title="Add users" description="Add users for your channels." list={this.state.userlist}/>
+                  <AddToListPage title="Add users" onFinish={(list)=> {
+                    this.props.history.push("/channels/new");
+                  }} description="Add users for your channels." list={this.state.userlist}/>
                 </BackPage>
               </BoxComp>
             );
@@ -307,14 +309,42 @@ export class ChList extends Component {
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.channels[key].Displayname.length>23?this.props.channels[key].Displayname.substring(0, 23)+"...":this.props.channels[key].Displayname}</h2>
+              <h2>{this.props.channels[key].Displayname}</h2>
               <p>{this.props.channels[key].LastMessage?this.props.channels[key].LastMessage:this.props.channels[key].Description}</p>
             </div>
             {this.renderUnreadCount(this.props.channels[key][2])}
           </div>
       );
     }
-    return elems;
+    if(!this.props.channels||Object.keys(this.props.channels).length == 0) {
+      return(
+        [
+        <div className="Page-Row">
+          <div className="Page-Row-Text">
+            <h1>{"You have no channels"}</h1>
+            <p>{"Click create channel to create new channel."}</p>
+          </div>
+        </div>
+        ,
+        <div className="Page-Row">
+          <div className="Page-Row-Text">
+            <h2>{"Create"}</h2>
+            <p>{"Click create channel to create new channel."}</p>
+          </div>
+        </div>
+        ,
+        <div className="Page-Row">
+          <div className="Page-Row-Text">
+            <h2>{"Explore"}</h2>
+            <p>{"Click TrendingPage to explore what people are talking about."}</p>
+          </div>
+        </div>
+        ]
+      )
+    }
+    else {
+      return elems;
+    }
   };
 
   render() {
@@ -324,7 +354,7 @@ export class ChList extends Component {
           <div className="Page-Row">
             <div className="Page-Row-Text">
               <h1>{"Your channels"}</h1>
-              <p> {"Here are all of your channels."}</p>
+              <p> {"Here are all of your channels. (Talksy is still under development, will be avalible about this summer.)"}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
