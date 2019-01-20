@@ -633,7 +633,7 @@ img {
   position: relative;
   height: calc(100% - 50px);
   width: 70%;
-  min-height: 400px;
+  min-height: 300px;
   max-height: 700px;
   min-width: 300px;
   max-width: 500px;
