@@ -8,8 +8,8 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { SigninPage, PasswordPage } from "./NScReact.js";
 import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
 import {ChPage, ChList, NewChannelPage} from "./channel";
-import {ContactsPage} from "./contact";
-import {AccountPage} from "./account";
+import {ContactsPage, NewContactsPage} from "./contact";
+import {MyAccountPage, UserAccountPage} from "./account";
 import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
@@ -335,7 +335,7 @@ class App extends Component {
           Description: "Talksy is loading your messages."
         }
       },
-      contacts: [],
+      contacts: {},
       users:{},
     }
 
@@ -371,10 +371,11 @@ class App extends Component {
       });
     }
 
-    this.addContacts =(contacts, callback)=> {
-      NoTalk.call("addConts", {c:contacts}, (err, json)=> {
+    this.addContacts =(contacts, type, callback)=> {
+      NoTalk.call("addConts", {c:contacts, t:type}, (err, json)=> {
         this.log("addConts", json);
-        callback(err, json);
+        if(callback)
+          callback(err, json);
       });
     }
 
@@ -443,7 +444,7 @@ class App extends Component {
               if(prevState.channels[json.i]['Messeges']) {
                 beadded[Object.keys(prevState.channels[json.i]['Messeges']).sort((a,b)=>{return b - a;})[0]+1] = json.r;
                 prevState.channels[json.i]['Messeges'] = Object.assign({}, beadded, prevState.channels[json.i]['Messeges']);
-              }  
+              }
               else {
                 prevState.channels[json.i]['Messeges'] ={1: json.r};
               }
@@ -454,8 +455,9 @@ class App extends Component {
           NoTalk.onEvent('AddedContacts', (err, json)=> {
             this.log('AddedContacts event', json);
             this.setState(prevState=> {
-              prevState.contacts = prevState.contacts.concat(json.r);
-              console.log(prevState.contacts)
+              for(let i in json.r) {
+                prevState.contacts[json.r[i].ToUserId] = json.r[i];
+              }
               return prevState;
             });
           });
@@ -507,7 +509,12 @@ class App extends Component {
                 });
 
                 this.getMyContacts((err, contacts)=>{
-                  this.setState({contacts: contacts});
+                  this.setState(prevState=> {
+                    for(let i in contacts) {
+                      prevState.contacts[contacts[i].ToUserId] = contacts[i];
+                    }
+                    return prevState;
+                  });
                 });
 
                 for(let chid in json) {
@@ -537,21 +544,22 @@ class App extends Component {
   }
 
   loadUserMeta(userid) {
-    if(!Object.keys(this.state.users).includes(userid)&&userid!=null) {
-      this.setState(prevState=> {
-        prevState.users[userid] = {};
-        return prevState;
-      }, ()=> {
-        NoTalk.call("getUserMeta", {i:userid}, (err, meta)=> {
-          this.log("loadUserMeta", meta);
-          this.setState(prevState=> {
-            prevState.users[userid] = meta;
-            this.setUserNameToId(meta.username, userid);
-            return prevState;
+    if(NoTalk) {
+      if(!Object.keys(this.state.users).includes(userid)&&userid!=null) {
+        this.setState(prevState=> {
+          prevState.users[userid] = {};
+          return prevState;
+        }, ()=> {
+          NoTalk.call("getUserMeta", {i:userid}, (err, meta)=> {
+            this.log("loadUserMeta", meta);
+            this.setState(prevState=> {
+              prevState.users[userid] = meta;
+              this.setUserNameToId(meta.username, userid);
+              return prevState;
+            });
           });
         });
-      });
-
+      }
     }
 
   }
@@ -659,23 +667,62 @@ class App extends Component {
                 }}/>
                 <Route exact path='/contacts:path(/|/.*)' render={(props)=> {
                   return(
-                    <ContactsPage
-                    users={this.state.users}
-                    contacts={this.state.contacts}
-                    addContacts={this.addContacts}
-                    searchUsers={this.searchUsers}
-                    getUserMetaByUserId={this.getUserMetaByUserId}
-                    loadUserMeta={this.loadUserMeta.bind(this)}
-                    setUserNameToId={this.setUserNameToId}
-                    returnUserNameToId={this.returnUserNameToId}
-                    />
+                    <div className="Page">
+                      <Route exact path="/contacts/:path(.*)" render={(props)=>{
+                        return(
+                          <ContactsPage
+                            key={props.match.params.path}
+                            users={this.state.users}
+                            contacts={this.state.contacts}
+                            getUserMetaByUserId={this.getUserMetaByUserId}
+                            loadUserMeta={this.loadUserMeta.bind(this)}
+                            history={props.history}
+                          />
+                        )
+                      }}/>
+                      <Route exact path="/contacts/new" render={(props)=>{
+                        return(
+                          <BoxComp history={props.history}>
+                            <BackPage title="New Contact" history={props.history}>
+                              <NewContactsPage
+                                searchUsers={this.searchUsers}
+                                addContacts={this.addContacts}
+                                setUserNameToId={this.setUserNameToId}
+                                returnUserNameToId={this.returnUserNameToId}
+                                history={props.history}
+                              />
+                            </BackPage>
+                          </BoxComp>
+                        )
+                      }}/>
+                    </div>
+                  )
+                }}/>
+                <Route exact path='/users/:id(.*)' render={(props)=> {
+                  if(!Object.keys(this.state.users).includes(props.match.params.id)) {
+                    this.loadUserMeta(props.match.params.id);
+                  }
+                  return(
+                    <div className="Page">
+                      <ContactsPage
+                        users={this.state.users}
+                        contacts={this.state.contacts}
+                        loadUserMeta={this.loadUserMeta.bind(this)}
+                        history={props.history}
+                      />
+                      <BoxComp history={props.history}>
+                        <BackPage title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'} history={props.history}>
+                          <UserAccountPage addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
+                        </BackPage>
+                      </BoxComp>
+                    </div>
                   )
                 }}/>
                 <Route exact path='/settings:path(/|/.*)' component={SettingsPage}/>
                 <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <AccountPage history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <MyAccountPage history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{

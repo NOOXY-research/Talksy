@@ -280,6 +280,7 @@ export class NewChannelPage extends Component {
 
                     }
                     else {
+                      console.log(this.props.contacts);
                       for(let i in this.props.contacts) {
                         let meta = this.props.users[this.props.contacts[i].ToUserId];
                         if(meta) {
