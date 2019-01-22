@@ -1,7 +1,7 @@
 .tooltip {
-    position: relative;
-    display: inline-block;
-    zcursor: help;
+    position: relative!important;
+    display: inline-block!important;
+    zcursor: help!important;
 }
 .tooltip .tooltiptext {
     visibility: hidden;
@@ -10,16 +10,16 @@
     background-color: rgba(75, 75, 75, 0.9);
     color: #fff;
     text-align: center;
-    padding: 10px 10px;
+    padding: 5px 5px;
     border-radius: 6px;
-    z-index: 999;
+    z-index: 99999;
     opacity: 0;
     transition: opacity .6s;
 }
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
-    font-size: 18px;
+    font-size: 14px;
     line-height: 20px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 
@@ -40,8 +40,9 @@
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
 .tooltip-right {
-  top: -5px;
-  left: 125%;
+  top: 50%;
+  transform: translate(0, -50%);
+  left: calc(100% + 20px);
 }
 .tooltip-right2 {
   top: -5px;
@@ -106,9 +107,10 @@
 }
 
 .tooltip-left {
-  top: -5px;
+  top: 50%;
+  transform: translate(0, -50%);
   bottom:auto;
-  right: 128%;
+  right: calc(100% + 20px);
 }
 
 .tooltip-left2 {

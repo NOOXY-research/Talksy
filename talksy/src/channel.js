@@ -42,18 +42,16 @@ export class ChannelPage extends Component {
     let keys = Object.keys(this.props.channelmeta.Messages?this.props.channelmeta.Messages:{}).sort((a,b)=>{return a - b;});
     for(let i in keys) {
       let key = keys[i];
-      let align = 'left';
+      let me  = false;
       if(this.props.channelmeta.Messages[key][0]==this.props.mymeta.i) {
-        align = 'right';
+        me = true;
       }
       elems.push(
-        <div key={key} className="ChPage-Messege" style={{'textAlign': align}}>
-          <div className="ChPage-Bubble" >
-            <div className="ChPage-Bubble-Title">{this.renderUserName(key)}</div>
-            <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messages[key][2]}</div>
-            <div className="ChPage-Bubble-Date">{this.props.channelmeta.Messages[key][3]}</div>
-          </div>
-        </div>
+        <li className={(me?"ChPage-Bubble-Me":"ChPage-Bubble-Other")+" tooltip"} >
+          <div className="ChPage-Bubble-Title">{me?null:this.renderUserName(key)}</div>
+          <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messages[key][2]}</div>
+          <span className={"tooltiptext "+(me?"tooltip-left":"tooltip-right")}>{this.props.channelmeta.Messages[key][4]}</span>
+        </li>
       );
     }
     return elems;
@@ -90,9 +88,9 @@ export class ChannelPage extends Component {
               {this.renderTooltips()}
             </div>
           </div>
-          <div className="ChPage-Messages">
+          <ul className="ChPage-Messages">
             {this.renderMessages()}
-          </div>
+          </ul>
           <div className="ChPage-Sender">
             <input placeholder="input text...." className="ChPage-Sender-Input" ref={el => this.TextInput = el} onChange={evt=> {
               this.ToBeSent = evt.target.value;

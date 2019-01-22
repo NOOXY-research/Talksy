@@ -34,6 +34,7 @@ img {
     }
     .HeaderPage-header-bar{
       float: right!important;
+      margin-right: 60px!important;
     }
 }
 
@@ -83,7 +84,7 @@ img {
   margin: 0 10px;
   color: white;
   font-size: 28px;
-  overflow: hidden;
+  /* overflow: scroll; */
   /* display: none; */
 }
 
@@ -312,22 +313,79 @@ img {
   cursor: pointer;
 }
 
-.ChPage-Messeges{
+.ChPage-Messages{
   position: absolute;
   height: calc(100% - 100px);
   width: 100%;
   overflow-x: auto;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-.ChPage-Messege{
-  position: relative;
-  margin-top: 5px ;
-  display: inline-block;
-  width: 100%;
-
+.ChPage-Bubble-Me{
+  display:inline-block;
+  clear: both;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin-bottom: 2px;
+  font-family: Helvetica, Arial, sans-serif;
+  float: right;
+  background: #00838F;
+  text-align: left;
+  color: #fff;
 }
 
-.ChPage-Bubble{
+.ChPage-Bubble-Other{
+  display:inline-block;
+  clear: both;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin-bottom: 2px;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #5f6569;
+  color: white;
+  text-align: left;
+  float: left;
+}
+
+.ChPage-Bubble-Other:first-of-type {
+  border-bottom-left-radius: 5px;
+}
+
+.ChPage-Bubble-Me:first-of-type {
+  border-bottom-right-radius: 5px;
+}
+
+.ChPage-Bubble-Other + .ChPage-Bubble-Me{
+  border-bottom-right-radius: 5px;
+}
+
+.ChPage-Bubble-Me + .ChPage-Bubble-Other{
+  border-bottom-left-radius: 5px;
+}
+
+.ChPage-Bubble-Other + .ChPage-Bubble-Other{
+  border-top-left-radius: 5px;
+}
+
+.ChPage-Bubble-Me + .ChPage-Bubble-Me{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.ChPage-Bubble-Me:last-of-type {
+  border-bottom-right-radius: 15px;
+}
+
+.ChPage-Bubble-Other:last-of-type {
+  border-bottom-left-radius: 15px;
+}
+
+/*
+.ChPage-Bubble-Me{
   margin: 0 10px;
   position: relative;
   vertical-align: middle;
@@ -342,6 +400,22 @@ img {
   max-width: 300px;
   min-width: 100px;
 }
+
+.ChPage-Bubble-Other{
+  margin: 0 10px;
+  position: relative;
+  vertical-align: middle;
+  background-color: #006064;
+  border-radius: 15px;
+  min-height: 30px;
+  color: white;
+  padding: 8px;
+  box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  max-width: 300px;
+  min-width: 100px;
+} */
 .ChPage-Bubble-Title {
   position: relative;
   font-size: 13px;

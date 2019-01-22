@@ -16,13 +16,13 @@ import './App.css';
 import './tooltip.css';
 
 const NoService = new NSClient();
-const VERSION = "alpha 2019.1.22"
+const VERSION = "alpha 2019.1.23"
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
 
 
-const nshost = '0.0.0.0';
-const debug = true;
+const nshost = 'nooxy.org';
+const debug = false;
 const nsport = null;
 
 let NoTalk;
