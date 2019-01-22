@@ -88,7 +88,7 @@ export class MyAccountPage extends Component {
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h2>{"Open Source"}</h2>
-                <p> {"https://github.com/NOOXY-Research/"}</p>
+                <p> {"view our shared opensource code "}</p>
               </div>
             </div>
           </a>
@@ -96,7 +96,7 @@ export class MyAccountPage extends Component {
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h2>{"NOOXY Talk Client"}</h2>
-                <p> {"ver. alpha. copyright(c)2017-2018 NOOXY inc."}</p>
+                <p> {"ver. "+this.props.version+" copyright(c)2017-2019 NOOXY inc."}</p>
               </div>
             </div>
           </a>

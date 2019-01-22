@@ -1,13 +1,13 @@
 // APP.js
 // Description:
 // "APP.js" is a NOOXY NoTalk Service client.
-// Copyright 2018-2019 NOOXY. All Rights Reserved.
+// Copyright 2019-2019 NOOXY. All Rights Reserved.
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { SigninPage, PasswordPage } from "./NScReact.js";
 import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
-import {ChPage, ChList, NewChannelPage} from "./channel";
+import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "./channel";
 import {ContactsPage, NewContactsPage} from "./contact";
 import {MyAccountPage, UserAccountPage} from "./account";
 import NSClient from './NSc.js';
@@ -16,6 +16,7 @@ import './App.css';
 import './tooltip.css';
 
 const NoService = new NSClient();
+const VERSION = "alpha 2019.1.22"
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
 
@@ -103,7 +104,7 @@ class TrendingPage extends Component {
           <div className="Page-Row">
             <div className="Page-Row-Text">
               <h1>{"Trending"}</h1>
-              <p> {"Knowing what's people are taking about."}</p>
+              <p> {"Knowing what's people are taking about. (Not avalible now)"}</p>
             </div>
           </div>
         </div>
@@ -180,7 +181,7 @@ class DebugPage extends Component {
         <div className="Page-Block">
           <div className="Page-Row">
             <div className="Page-Row-Text">
-              <h1>{"Debug"}</h1>
+              <h1>{"Debug Component"}</h1>
               <p> {"here are the debug components."}</p>
             </div>
           </div>
@@ -210,6 +211,12 @@ class DebugPage extends Component {
         </div>
 
         <div className="Page-Block">
+        <div className="Page-Row">
+          <div className="Page-Row-Text">
+            <h1>{"Debug Logs"}</h1>
+            <p> {"below are the debug logs."}</p>
+          </div>
+        </div>
         {this.renderLogs()}
         </div>
       </div>
@@ -400,6 +407,42 @@ class App extends Component {
     this.returnUserNameToId = (name)=> {
       return this.UserNameToId[name];
     }
+
+    this.loadUserMeta = (userid)=> {
+      if(NoTalk&&userid) {
+        if(!Object.keys(this.state.users).includes(userid)&&userid!=null) {
+          this.setState(prevState=> {
+            prevState.users[userid] = {};
+            return prevState;
+          }, ()=> {
+            NoTalk.call("getUserMeta", {i:userid}, (err, meta)=> {
+              this.log("loadUserMeta", meta);
+              this.setState(prevState=> {
+                prevState.users[userid] = meta;
+                this.setUserNameToId(meta.username, userid);
+                return prevState;
+              });
+            });
+          });
+        }
+      }
+    }
+
+    this.createChannel = (meta, callback)=> {
+      // return status
+      NoTalk.call('createCh', meta, (err, meta)=> {
+        this.log('createCh', meta);
+        callback(err, meta);
+      });
+    }
+
+    this.updateChannel = (meta, callback)=> {
+      // return status
+      NoTalk.call('updateCh', meta, (err, meta)=> {
+        this.log('updateCh', meta);
+        callback(err, meta);
+      });
+    }
   }
 
 
@@ -441,12 +484,12 @@ class App extends Component {
             this.setState(prevState=> {
               let beadded ={};
               // add to last index
-              if(prevState.channels[json.i]['Messeges']) {
-                beadded[Object.keys(prevState.channels[json.i]['Messeges']).sort((a,b)=>{return b - a;})[0]+1] = json.r;
-                prevState.channels[json.i]['Messeges'] = Object.assign({}, beadded, prevState.channels[json.i]['Messeges']);
+              if(prevState.channels[json.i]['Messages']) {
+                beadded[Object.keys(prevState.channels[json.i]['Messages']).sort((a,b)=>{return b - a;})[0]+1] = json.r;
+                prevState.channels[json.i]['Messages'] = Object.assign({}, beadded, prevState.channels[json.i]['Messages']);
               }
               else {
-                prevState.channels[json.i]['Messeges'] ={1: json.r};
+                prevState.channels[json.i]['Messages'] ={1: json.r};
               }
               return prevState;
             });
@@ -457,6 +500,17 @@ class App extends Component {
             this.setState(prevState=> {
               for(let i in json.r) {
                 prevState.contacts[json.r[i].ToUserId] = json.r[i];
+              }
+              return prevState;
+            });
+          });
+
+          NoTalk.onEvent('ChannelUpdated', (err, json)=> {
+            this.log('ChannelUpdated event', json);
+            this.setState(prevState=> {
+              console.log(json);
+              for(let key in json.r) {
+                prevState.channels[json.i][key] = json.r[key];
               }
               return prevState;
             });
@@ -521,7 +575,7 @@ class App extends Component {
                   NoTalk.call('getMsgs', {i: chid, r:15}, (err, json)=> {
                     this.log('getMsgs ('+chid+')', JSON.stringify(json));
                     this.setState(prevState=> {
-                      prevState.channels[chid]['Messeges'] = json.r;
+                      prevState.channels[chid]['Messages'] = json.r;
                       return prevState;
                     });
                   });
@@ -543,26 +597,7 @@ class App extends Component {
     });
   }
 
-  loadUserMeta(userid) {
-    if(NoTalk) {
-      if(!Object.keys(this.state.users).includes(userid)&&userid!=null) {
-        this.setState(prevState=> {
-          prevState.users[userid] = {};
-          return prevState;
-        }, ()=> {
-          NoTalk.call("getUserMeta", {i:userid}, (err, meta)=> {
-            this.log("loadUserMeta", meta);
-            this.setState(prevState=> {
-              prevState.users[userid] = meta;
-              this.setUserNameToId(meta.username, userid);
-              return prevState;
-            });
-          });
-        });
-      }
-    }
 
-  }
 
   renderConnectionFailed() {
     if(this.state.connectionfailed) {
@@ -577,31 +612,55 @@ class App extends Component {
     let elems = [];
     for(let key in this.state.channels) {
       elems.push(
-        <ChPage
-          contacts={this.state.contacts}
-          mymeta={this.state.mymeta}
-          channelid={key}
-          channelmeta={this.state.channels[key]}
-          show={this.state.channelnow==key}
-          match={props.match} history={props.history}
-          rootpath={this.state.channelroot}
-          sendNewMessage={this.sendNewMessage.bind(this)}
-          loadUserMeta={this.loadUserMeta.bind(this)}
-          users={this.state.users}
-        />
+        <Route exact path={this.state.channelroot+':id([^/]+):more(/?)'} render={(props)=>{
+          return(
+            <ChannelPage
+              contacts={this.state.contacts}
+              mymeta={this.state.mymeta}
+              channelid={key}
+              channelmeta={this.state.channels[key]}
+              show={this.state.channelnow==key}
+              match={props.match} history={props.history}
+              rootpath={this.state.channelroot}
+              sendNewMessage={this.sendNewMessage.bind(this)}
+              loadUserMeta={this.loadUserMeta.bind(this)}
+              users={this.state.users}
+              onSettingsClick={()=> {
+                props.history.push(this.state.channelroot+props.match.params.id+'/settings');
+              }}
+            />
+          )
+        }}/>
+
       );
+      elems.push(
+        <Route exact path={this.state.channelroot+':id([^/]+)/settings:more(.*)'} render={(props)=>{
+          if(this.state.channelnow==key) {
+            return(
+              <BackPage title="Channel Settings" history={props.history}>
+                <ChannelSettingsPage
+                  contacts={this.state.contacts}
+                  mymeta={this.state.mymeta}
+                  channelid={key}
+                  channelmeta={this.state.channels[key]}
+                  updateChannel={this.updateChannel}
+                  addUsersToChannel={this.addUsersToChannel}
+                  history={props.history}
+                  users={this.state.users}
+                  loadUserMeta={this.loadUserMeta}
+                  returnUserNameToId={this.returnUserNameToId}
+                />
+              </BackPage>
+            )
+          }
+          else {
+            return null;
+          }
+        }}/>
+      )
     }
     return elems;
   }
-
-  emitChCreate(meta, callback) {
-    // return status
-    NoTalk.call('createCh', meta, (err, meta)=> {
-      this.log('createCh', meta);
-      callback(err, meta);
-    });
-  }
-
   sendNewMessage(chid, meta, callback) {
     // return status
     NoTalk.call('sendMsg', {i:chid, c:meta}, (err, json)=> {
@@ -616,7 +675,7 @@ class App extends Component {
 
   render() {
     // let HeaderPageReg = '/:page([^/]*)';
-    // let ChPageReg = '/channels/:id([0-9]+)';
+    // let ChannelPageReg = '/channels/:id([0-9]+)';
     let HeaderPageReg = ':page(.*)';
     return (
       <Router>
@@ -628,7 +687,9 @@ class App extends Component {
                 <MainCtrlComp history={props.history} debug={this.state.debug}/>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
-                    <ChList
+                    <ChannelList
+                    loadUserMeta={this.loadUserMeta}
+                    users={this.state.users}
                     onSelect={this.onSelectCh}
                     channels={this.state.channels}
                     history={props.history}
@@ -637,11 +698,13 @@ class App extends Component {
                     />
                   )
                 }}/>
-                <Route exact path={this.state.channelroot+':id(.+)'} render={(props)=>{
+                <Route exact path={this.state.channelroot+':id([^/]+):more(.*)'} render={(props)=>{
                   return(
                     <SplitComp show={true}>
                       <SplitLeft>
-                        <ChList
+                        <ChannelList
+                        loadUserMeta={this.loadUserMeta}
+                        users={this.state.users}
                         onSelect={this.onSelectCh}
                         channels={this.state.channels}
                         history={props.history}
@@ -651,7 +714,7 @@ class App extends Component {
                       <SplitRight>
                         <NewChannelPage
                         show={this.state.channelnow=='new'}
-                        emitChCreate={this.emitChCreate.bind(this)}
+                        createChannel={this.createChannel.bind(this)}
                         history={props.history}
                         setDebug={this.setDebug}
                         returnUserNameToId={this.returnUserNameToId}
@@ -722,7 +785,7 @@ class App extends Component {
                 <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <MyAccountPage history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <MyAccountPage version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{

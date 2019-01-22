@@ -19,8 +19,23 @@ img {
       max-height: 100%!important;
       max-width: 100%!important;
     }
+    .HeaderPage-title {
+      font-size: 20px!important;
+    }
+
 }
 
+@media only screen and (min-width: 400px) {
+    .HeaderPage-title {
+      position: absolute!important;
+      left: 0!important;
+      display: inline-block!important;
+      padding-left: 20px!important;
+    }
+    .HeaderPage-header-bar{
+      float: right!important;
+    }
+}
 
 .App {
 
@@ -68,13 +83,14 @@ img {
   margin: 0 10px;
   color: white;
   font-size: 28px;
+  overflow: hidden;
   /* display: none; */
 }
 
 .HeaderPage-header-bar-button {
   display: inline-block;
   height: inherit;
-  width: 60px;
+  width: 50px;
   margin: 0;
   cursor: pointer;
   border-bottom: 3px solid rgba(0, 0, 0, 0.0);
@@ -131,6 +147,7 @@ img {
   top: 50px;
   font-size: 20px;
 }
+
 
 .ChList-Row {
   overflow: hidden;
@@ -551,7 +568,7 @@ img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: flex;
+  display: block;
   margin: 0;
   width: 100%;
   height: auto;
@@ -559,11 +576,14 @@ img {
 }
 
 .Page-Row-ThumbnailText-Text p {
-  display: flex;
+  display: block;
   margin: 0;
   width: 100%;
   height: auto;
   font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .BackPage {
@@ -577,15 +597,24 @@ img {
   font-size: 24px;
   animation: animateright .3s;
 }
+.BackPage::before {
+  display: block;
+  position: relative;
+  content: '';
+  height: 50px;
+}
+
 
 .BackPage-Header {
   color: white;
   top: 0;
   height: 50px;
+  width: 100%;
+  z-index: 99999;
   line-height: 50px;
   border-bottom: 1px solid #ECEFF1;
   box-sizing: border-box;
-  position: relative;
+  position: absolute;
   background: #37474F;
   user-select: none;
 }
@@ -599,8 +628,9 @@ img {
   font-size: 25px;
   cursor: pointer;
 }
+
 .BackPage-Contain{
-  position: absolute;
+  position: relative;
   height: calc(100% - 50px);
   width: 100%;
   overflow-x: auto;

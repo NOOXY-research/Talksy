@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
 import './tooltip.css';
 
-export class ChPage extends Component {
+export class ChannelPage extends Component {
   constructor(props) {
     super(props);
     this.ToBeSent = null;
@@ -20,16 +20,16 @@ export class ChPage extends Component {
 
   renderUserName(msgidx) {
       let username;
-      if(this.props.channelmeta.Messeges[msgidx][0]&&this.props.users[this.props.channelmeta.Messeges[msgidx][0]]) {
-        username = this.props.users[this.props.channelmeta.Messeges[msgidx][0]].username;
+      if(this.props.channelmeta.Messages[msgidx][0]&&this.props.users[this.props.channelmeta.Messages[msgidx][0]]) {
+        username = this.props.users[this.props.channelmeta.Messages[msgidx][0]].username;
       }
-      else if(this.props.channelmeta.Messeges[msgidx][0]) {
-        if(!this.requestedUsers.includes(this.props.channelmeta.Messeges[msgidx][0])) {
-          this.props.loadUserMeta(this.props.channelmeta.Messeges[msgidx][0]);
-          this.requestedUsers.push(this.props.channelmeta.Messeges[msgidx][0]);
+      else if(this.props.channelmeta.Messages[msgidx][0]) {
+        if(!this.requestedUsers.includes(this.props.channelmeta.Messages[msgidx][0])) {
+          this.props.loadUserMeta(this.props.channelmeta.Messages[msgidx][0]);
+          this.requestedUsers.push(this.props.channelmeta.Messages[msgidx][0]);
         }
 
-        username = this.props.channelmeta.Messeges[msgidx][0];
+        username = this.props.channelmeta.Messages[msgidx][0];
       }
       else {
         username="Guest";
@@ -37,21 +37,21 @@ export class ChPage extends Component {
       return username;
   }
 
-  renderMesseges() {
+  renderMessages() {
     let elems = [];
-    let keys = Object.keys(this.props.channelmeta.Messeges?this.props.channelmeta.Messeges:{}).sort((a,b)=>{return a - b;});
+    let keys = Object.keys(this.props.channelmeta.Messages?this.props.channelmeta.Messages:{}).sort((a,b)=>{return a - b;});
     for(let i in keys) {
       let key = keys[i];
       let align = 'left';
-      if(this.props.channelmeta.Messeges[key][0]==this.props.mymeta.i) {
+      if(this.props.channelmeta.Messages[key][0]==this.props.mymeta.i) {
         align = 'right';
       }
       elems.push(
         <div key={key} className="ChPage-Messege" style={{'textAlign': align}}>
           <div className="ChPage-Bubble" >
             <div className="ChPage-Bubble-Title">{this.renderUserName(key)}</div>
-            <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messeges[key][2]}</div>
-            <div className="ChPage-Bubble-Date">{this.props.channelmeta.Messeges[key][3]}</div>
+            <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messages[key][2]}</div>
+            <div className="ChPage-Bubble-Date">{this.props.channelmeta.Messages[key][3]}</div>
           </div>
         </div>
       );
@@ -64,7 +64,7 @@ export class ChPage extends Component {
       return (<span className="tooltiptext tooltip-bottom">{this.props.channelmeta.Description}</span>)
     }
     else {
-      return null
+      return (<span className="tooltiptext tooltip-bottom">{"this channel has no description"}</span>)
     }
   }
 
@@ -81,7 +81,7 @@ export class ChPage extends Component {
             onClick={()=>{this.props.history.push(this.props.rootpath)}}>
               <i className="material-icons">arrow_back</i>
             </div>
-            <div className="tooltip ChPage-Header-right-Button">
+            <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onSettingsClick()}}>
               <i className="material-icons">settings</i>
               <span className="tooltiptext tooltip-left">Manage your channel settings</span>
             </div>
@@ -90,8 +90,8 @@ export class ChPage extends Component {
               {this.renderTooltips()}
             </div>
           </div>
-          <div className="ChPage-Messeges">
-            {this.renderMesseges()}
+          <div className="ChPage-Messages">
+            {this.renderMessages()}
           </div>
           <div className="ChPage-Sender">
             <input placeholder="input text...." className="ChPage-Sender-Input" ref={el => this.TextInput = el} onChange={evt=> {
@@ -136,12 +136,12 @@ export class NewChannelPage extends Component {
         0: "A normal talk",
         1: "A live talk",
       },
-      userlist: []
+      userlist: [],
+      channelmeta: {
+        t:0,
+        a:1
+      }
     };
-    this.channelmeta = {
-      t:0,
-      v:1
-    }
   }
 
   renderTypes() {
@@ -153,7 +153,11 @@ export class NewChannelPage extends Component {
       );
     }
     return (<select onChange={evt => {
-      this.channelmeta.t = parseInt(evt.target.value);
+      let value = evt.target.value;
+      this.setState(prevState=> {
+        prevState.channelmeta.t = parseInt(value);
+        return prevState;
+      })
     }}>{elems}</select>);
   }
 
@@ -165,8 +169,12 @@ export class NewChannelPage extends Component {
         <option key={key} value={i++}>{this.state.levels[key]}</option>
       );
     }
-    return (<select value={1} onChange={evt => {
-      this.channelmeta.a = parseInt(evt.target.value);
+    return (<select value={this.state.channelmeta.a} onChange={evt => {
+      let value = evt.target.value;
+      this.setState(prevState=> {
+        prevState.channelmeta.a = parseInt(value);
+        return prevState;
+      })
     }}>{elems}</select>);
   }
 
@@ -191,11 +199,16 @@ export class NewChannelPage extends Component {
                     <div className="Page-Row-Text">
                       <h2>{"Channel's Name"}</h2>
                       <input placeholder="Enter your channel's name" className="ChPage-Sender-Input" onChange={evt => {
-                        if(evt.target.value=='how2debug?') {
+                        let value = evt.target.value;
+                        if(value=='how2debug?') {
                           this.props.setDebug(true)
                         }
                         else {
-                          this.channelmeta.n = evt.target.value;
+                          this.setState(prevState=> {
+
+                            prevState.channelmeta.n = value;
+                            return prevState;
+                          })
                         }
                       }}></input>
                     </div>
@@ -210,7 +223,11 @@ export class NewChannelPage extends Component {
                     <div className="Page-Row-Text">
                       <h2>{"Description"}</h2>
                       <input placeholder="Enter your description" className="ChPage-Sender-Input" onChange={evt => {
-                        this.channelmeta.d = evt.target.value;
+                        let value = evt.target.value;
+                        this.setState(prevState=> {
+                          prevState.channelmeta.d = value;
+                          return prevState;
+                        })
                       }}></input>
                     </div>
                   </div>
@@ -236,7 +253,7 @@ export class NewChannelPage extends Component {
 
                 <div className="Page-Block">
                   <div className="Page-Row"  onClick={()=>{
-                    this.props.emitChCreate(this.channelmeta, (err, meta)=> {
+                    this.props.createChannel(this.state.channelmeta, (err, meta)=> {
                       if(meta.s=='OK') {
                         let list=[];
                         for(let i in this.state.userlist) {
@@ -244,7 +261,10 @@ export class NewChannelPage extends Component {
                         }
                         this.props.addUsersToChannel(meta.i, list, ()=>{
                           this.props.history.push('/channels/'+meta.i);
-                          this.channelmeta = null;
+                          this.setState(prevState=> {
+                            prevState.channelmeta = {t:0,a:1};
+                            return prevState;
+                          })
                         });
                       }
                       else {
@@ -315,7 +335,213 @@ export class NewChannelPage extends Component {
   }
 }
 
-export class ChList extends Component {
+export class ChannelSettingsPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state= {
+      searchusers:[],
+      status: 'Below are you settings.',
+      levels: {
+        0: "Admin can access, member can view",
+        1: "Member can access and view",
+        2: "Member can access, nooxy user can view",
+        3: "Member can access, public can view",
+        4: "Nooxy user can access and view",
+        5: "Nooxy user can access, public can view",
+        6: "public can access, public can view"
+      },
+      types: {
+        0: "A normal talk",
+        1: "A live talk",
+      },
+      channelmeta: {
+        a: props.channelmeta.AccessLevel,
+        t: props.channelmeta.Type,
+      }
+      ,
+      userlist: []
+    };
+    console.log(props.channelmeta);
+  }
+
+  renderTypes() {
+    let elems = [];
+    let i=0;
+    for(let key in this.state.types) {
+      elems.push(
+          <option key={key} value={key}>{this.state.types[key]}</option>
+      );
+    }
+    return (<select value={this.state.channelmeta.t} onChange={evt => {
+      let value = evt.target.value;
+      this.setState(prevState=> {
+        prevState.channelmeta.t = parseInt(value);
+        return prevState
+      })
+    }}>{elems}</select>);
+  }
+
+  renderLevels() {
+    let elems = [];
+    let i=0;
+    for(let key in this.state.levels) {
+      elems.push(
+        <option key={key} value={key}>{this.state.levels[key]}</option>
+      );
+    }
+    return (<select value={this.state.channelmeta.a} onChange={evt => {
+      let value = evt.target.value;
+      this.setState(prevState=> {
+        prevState.channelmeta.a = parseInt(value);
+        return prevState;
+      });
+
+    }}>{elems}</select>);
+  }
+
+  render() {
+    return(
+      [<div className="Page">
+            <div className="Page">
+              <div className="Page-Block">
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h1>{"Manage your channel's settings"}</h1>
+                    <p> {this.state.status}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="Page-Block">
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h2>{"Channel's Name"}</h2>
+                    <input placeholder={this.props.channelmeta.Displayname} className="ChPage-Sender-Input" onChange={evt => {
+                      let value = evt.target.value;
+                      this.setState(prevState=> {
+                        prevState.channelmeta.n = value;
+                        return prevState;
+                      });
+                    }}></input>
+                  </div>
+                </div>
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h2>{"Channel's photo"}</h2>
+                    <input type="file" name="pic" accept="image/*"/>
+                  </div>
+                </div>
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h2>{"Description"}</h2>
+                    <input placeholder={this.props.channelmeta.Description?this.props.channelmeta.Description:"enter your channel's description"} className="ChPage-Sender-Input" onChange={evt => {
+                      let value = evt.target.value;
+                      this.setState(prevState=> {
+                        prevState.channelmeta.d = value;
+                        return prevState;
+                      });
+                    }}></input>
+                  </div>
+                </div>
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h2 className="">{"Access Level"}</h2>
+                    <p> {this.renderLevels()}</p>
+                  </div>
+                </div>
+                <div className="Page-Row">
+                  <div className="Page-Row-Text">
+                    <h2>{"Type"}</h2>
+                    <p> {this.renderTypes()}</p>
+                  </div>
+                </div>
+                <div className="Page-Row"  onClick={()=>{this.props.history.push('/channels/'+this.props.channelid+'/settings/addusers')}}>
+                  <div className="Page-Row-Text">
+                    <h2>{"Users"}</h2>
+                    <p> {"click to edit."}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="Page-Block">
+                <div className="Page-Row"  onClick={()=>{
+                  this.state.channelmeta.i = this.props.channelid;
+                  this.props.updateChannel(this.state.channelmeta, (err, meta)=> {
+                    if(meta.s=='OK') {
+                      let list=[];
+                      for(let i in this.state.userlist) {
+                        list.push(this.props.returnUserNameToId(this.state.userlist[i]));
+                      }
+                      this.props.addUsersToChannel(this.props.channelid, list, ()=>{
+                        this.props.history.push('/channels/'+this.props.channelid);
+                        this.setState(prevState=> {
+                          prevState.channelmeta = {a:1, t:0};
+                          return prevState;
+                        });
+
+                      });
+                    }
+                    else {
+                      this.setState({'status':meta.s});
+                    }
+                  })
+
+                }}>
+                  <div className="Page-Row-Text">
+                    <h2>{"Update"}</h2>
+                    <p> {"update this channel"}</p>
+                  </div>
+                </div>
+                <div className="Page-Row" onClick={()=>{this.props.history.push('/channels/'+this.props.channelid);}}>
+                  <div className="Page-Row-Text">
+                    <h2>{"Cancel"}</h2>
+                    <p> {"giveup editing the channel"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </div>
+        ,
+        <Route exact path={'/channels/'+this.props.channelid+'/settings/addusers'} render={(props)=>{
+          return(
+            <BoxComp history={props.history}>
+                <AddToListPageRestrictedItems title="Add users" onChange={(name, prev)=>{
+                  let list = [];
+                  if(name=="") {
+
+                  }
+                  else {
+                    for(let i in this.props.contacts) {
+                      let meta = this.props.users[this.props.contacts[i].ToUserId];
+                      if(meta) {
+                        if(meta.username.startsWith(name)) {
+                          list.push(meta.username);
+                          this.setState({searchusers: list});
+                        }
+                      }
+                      else {
+                        this.props.loadUserMeta(this.props.contacts[i].ToUserId);
+                      }
+                      // console.log(this.props.users[this.props.contacts[i].ToUserId].username);
+                    }
+                  }
+
+                }}
+                onFinish={(list)=> {
+                  this.setState({userlist: list});
+                  this.props.history.push('/channels/'+this.props.channelid+'/settings');
+                }} description="Add users for your channels." restricteditems={this.state.searchusers} list={this.state.userlist}/>
+            </BoxComp>
+          );
+        }}/>
+      ]
+
+
+    );
+  }
+}
+
+export class ChannelList extends Component {
   constructor (props) {
     super(props);
     this.rootpath = props.rootpath;
@@ -333,6 +559,26 @@ export class ChList extends Component {
       return null;
     }
   }
+
+  renderLastMessages(chmeta) {
+    if(chmeta.Messages&&Object.keys(chmeta.Messages).length>0) {
+      let lastmsg = chmeta.Messages[Object.keys(chmeta.Messages)[Object.keys(chmeta.Messages).length-1]];
+      if(this.props.users[lastmsg[0]]) {
+        return(this.props.users[lastmsg[0]].username+': '+lastmsg[2])
+      }
+      else {
+        this.props.loadUserMeta(lastmsg[0]);
+        return(lastmsg[2])
+      }
+    }
+    else if (chmeta.Description){
+      return(chmeta.Description)
+    }
+    else {
+      return(null)
+    }
+  }
+
   renderRows() {
     let elems = [];
     for(let key in this.props.channels) {
@@ -342,7 +588,7 @@ export class ChList extends Component {
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
               <h2>{this.props.channels[key].Displayname}</h2>
-              <p>{this.props.channels[key].LastMessage?this.props.channels[key].LastMessage:this.props.channels[key].Description}</p>
+              <p>{this.renderLastMessages(this.props.channels[key])}</p>
             </div>
             {this.renderUnreadCount(this.props.channels[key][2])}
           </div>

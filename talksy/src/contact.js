@@ -46,7 +46,7 @@ export class ContactsPage extends Component {
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h1>{"Contacts"}</h1>
-                <p> {"Start a new Notalk channel by your contacts."}</p>
+                <p> {"Start a new Notalk channel with your contacts."}</p>
               </div>
             </div>
             <div className="Page-Row" onClick={()=>{
