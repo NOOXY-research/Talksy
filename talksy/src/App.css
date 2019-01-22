@@ -407,6 +407,7 @@ img {
   width: calc(100% - 10px);
   left: 5px;
   background-color: #eceff1;
+  z-index: 99999;
   overflow-y: auto;
   bottom: 0;
   box-shadow: 0 3px 3px 0 rgba(0,0,0,0.20), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);

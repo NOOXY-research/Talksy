@@ -20,7 +20,7 @@ const NoService = new NSClient();
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
 
 
-const nshost = 'nooxy.org';
+const nshost = '0.0.0.0';
 const debug = true;
 const nsport = null;
 
@@ -335,8 +335,11 @@ class App extends Component {
           Description: "Talksy is loading your messages."
         }
       },
-      users:{}
+      contacts: [],
+      users:{},
     }
+
+    this.UserNameToId = {};
 
     this.onSelectCh = (chid, history)=> {
       this.setState((prevState) => {
@@ -360,6 +363,42 @@ class App extends Component {
       this.log('DEBUG MODE ON');
       this.setState({debug: bool});
     };
+
+    this.searchUsers = (username, callback)=> {
+      NoUser.call("searchUsersByUsername", {n:username}, (err, json)=> {
+        this.log("searchUsers", json);
+        callback(err, json.r);
+      });
+    }
+
+    this.addContacts =(contacts, callback)=> {
+      NoTalk.call("addConts", {c:contacts}, (err, json)=> {
+        this.log("addConts", json);
+        callback(err, json);
+      });
+    }
+
+    this.getMyContacts = (callback)=> {
+      NoTalk.call("getMyConts", null, (err, json)=> {
+        this.log("getMyConts", json);
+        callback(err, json.r);
+      });
+    }
+
+    this.addUsersToChannel = (chid, users, callback)=> {
+      NoTalk.call("addUsersToCh", {c:chid,i:users}, (err, json)=> {
+        this.log("addUsersToChannel", json);
+        callback(err, json);
+      });
+    }
+
+    this.setUserNameToId= (name, id)=> {
+      this.UserNameToId[name] = id;
+    }
+
+    this.returnUserNameToId = (name)=> {
+      return this.UserNameToId[name];
+    }
   }
 
 
@@ -401,20 +440,37 @@ class App extends Component {
             this.setState(prevState=> {
               let beadded ={};
               // add to last index
-              if(prevState.channels[json.i]['Messeges'])
+              if(prevState.channels[json.i]['Messeges']) {
                 beadded[Object.keys(prevState.channels[json.i]['Messeges']).sort((a,b)=>{return b - a;})[0]+1] = json.r;
-              else
-                beadded[1] = json.r;
-              prevState.channels[json.i]['Messeges'] = Object.assign({}, beadded, prevState.channels[json.i]['Messeges']);
-
+                prevState.channels[json.i]['Messeges'] = Object.assign({}, beadded, prevState.channels[json.i]['Messeges']);
+              }  
+              else {
+                prevState.channels[json.i]['Messeges'] ={1: json.r};
+              }
               return prevState;
             });
           });
+
+          NoTalk.onEvent('AddedContacts', (err, json)=> {
+            this.log('AddedContacts event', json);
+            this.setState(prevState=> {
+              prevState.contacts = prevState.contacts.concat(json.r);
+              console.log(prevState.contacts)
+              return prevState;
+            });
+          });
+
           NoTalk.onEvent('AddedToChannel', (err, json)=> {
             this.log('AddedToChannel event', json);
             this.setState(prevState=> {
+              console.log(json);
               prevState.channels[json.i] = json.r;
               return prevState;
+            }, ()=> {
+              NoTalk.call('bindChs', {i: [json.i]}, (err, json2)=> {
+                json2['ChIds'] = Object.keys(json);
+                this.log('bindCh', JSON.stringify(json2));
+              });
             });
           });
           this.updateMyMeta = (newmeta)=> {
@@ -450,6 +506,10 @@ class App extends Component {
                   this.log('bindCh', JSON.stringify(json2));
                 });
 
+                this.getMyContacts((err, contacts)=>{
+                  this.setState({contacts: contacts});
+                });
+
                 for(let chid in json) {
                   NoTalk.call('getMsgs', {i: chid, r:15}, (err, json)=> {
                     this.log('getMsgs ('+chid+')', JSON.stringify(json));
@@ -477,19 +537,23 @@ class App extends Component {
   }
 
   loadUserMeta(userid) {
-    this.getUserMetaByUserId(userid, (err, meta)=> {
+    if(!Object.keys(this.state.users).includes(userid)&&userid!=null) {
       this.setState(prevState=> {
-        prevState.users[userid] = meta;
+        prevState.users[userid] = {};
         return prevState;
+      }, ()=> {
+        NoTalk.call("getUserMeta", {i:userid}, (err, meta)=> {
+          this.log("loadUserMeta", meta);
+          this.setState(prevState=> {
+            prevState.users[userid] = meta;
+            this.setUserNameToId(meta.username, userid);
+            return prevState;
+          });
+        });
       });
-    })
-  }
 
-  getUserMetaByUserId(userid, callback) {
-    NoUser.call("getUserMetaByUserId", {i:userid}, (err, json)=> {
-      this.log("getUserMetaByUserId", json);
-      callback(err, json);
-    });
+    }
+
   }
 
   renderConnectionFailed() {
@@ -506,6 +570,7 @@ class App extends Component {
     for(let key in this.state.channels) {
       elems.push(
         <ChPage
+          contacts={this.state.contacts}
           mymeta={this.state.mymeta}
           channelid={key}
           channelmeta={this.state.channels[key]}
@@ -576,13 +641,36 @@ class App extends Component {
                         rootpath={this.state.channelroot}/>
                       </SplitLeft>
                       <SplitRight>
-                        <NewChannelPage show={this.state.channelnow=='new'} emitChCreate={this.emitChCreate.bind(this)} history={props.history} setDebug={this.setDebug}/>
+                        <NewChannelPage
+                        show={this.state.channelnow=='new'}
+                        emitChCreate={this.emitChCreate.bind(this)}
+                        history={props.history}
+                        setDebug={this.setDebug}
+                        returnUserNameToId={this.returnUserNameToId}
+                        users={this.state.users}
+                        loadUserMeta={this.loadUserMeta.bind(this)}
+                        contacts={this.state.contacts}
+                        addUsersToChannel= {this.addUsersToChannel}
+                        />
                         {this.renderChannels(props)}
                       </SplitRight>
                     </SplitComp>
                   )
                 }}/>
-                <Route exact path='/contacts:path(/|/.*)' component={ContactsPage}/>
+                <Route exact path='/contacts:path(/|/.*)' render={(props)=> {
+                  return(
+                    <ContactsPage
+                    users={this.state.users}
+                    contacts={this.state.contacts}
+                    addContacts={this.addContacts}
+                    searchUsers={this.searchUsers}
+                    getUserMetaByUserId={this.getUserMetaByUserId}
+                    loadUserMeta={this.loadUserMeta.bind(this)}
+                    setUserNameToId={this.setUserNameToId}
+                    returnUserNameToId={this.returnUserNameToId}
+                    />
+                  )
+                }}/>
                 <Route exact path='/settings:path(/|/.*)' component={SettingsPage}/>
                 <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{

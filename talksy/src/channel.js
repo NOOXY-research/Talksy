@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
 import './tooltip.css';
 
 export class ChPage extends Component {
@@ -9,10 +9,10 @@ export class ChPage extends Component {
     super(props);
     this.ToBeSent = null;
     this.sendNewMessage =()=> {
-          if(this.ToBeSent&&this.ToBeSent.length>0)
-            this.props.sendNewMessage(this.props.channelid, [0, this.ToBeSent, null], (err, meta)=> {
-              this.resetInput();
-          });
+      if(this.ToBeSent&&this.ToBeSent.length>0)
+        this.props.sendNewMessage(this.props.channelid, [0, this.ToBeSent, null], (err, meta)=> {
+          this.resetInput();
+      });
     };
     this.requestedUsers = [];
 
@@ -121,6 +121,7 @@ export class NewChannelPage extends Component {
   constructor(props) {
     super(props);
     this.state= {
+      searchusers:[],
       status: 'create a new Notalk channel.',
       levels: {
         0: "Admin can access, member can view",
@@ -135,6 +136,7 @@ export class NewChannelPage extends Component {
         0: "A normal talk",
         1: "A live talk",
       },
+      userlist: []
     };
     this.channelmeta = {
       t:0,
@@ -234,11 +236,16 @@ export class NewChannelPage extends Component {
 
                 <div className="Page-Block">
                   <div className="Page-Row"  onClick={()=>{
-
                     this.props.emitChCreate(this.channelmeta, (err, meta)=> {
                       if(meta.s=='OK') {
-                        this.props.history.push('/');
-                        this.channelmeta = null;
+                        let list=[];
+                        for(let i in this.state.userlist) {
+                          list.push(this.props.returnUserNameToId(this.state.userlist[i]));
+                        }
+                        this.props.addUsersToChannel(meta.i, list, ()=>{
+                          this.props.history.push('/channels/'+meta.i);
+                          this.channelmeta = null;
+                        });
                       }
                       else {
                         this.setState({'status':meta.s});
@@ -267,9 +274,33 @@ export class NewChannelPage extends Component {
             return(
               <BoxComp history={props.history}>
                 <BackPage history={props.history} title="add users">
-                  <AddToListPage title="Add users" onFinish={(list)=> {
+                  <AddToListPageRestrictedItems title="Add users" onChange={(name, prev)=>{
+                    let list = [];
+                    if(name=="") {
+
+                    }
+                    else {
+                      for(let i in this.props.contacts) {
+                        let meta = this.props.users[this.props.contacts[i].ToUserId];
+                        if(meta) {
+                          if(meta.username.startsWith(name)) {
+                            list.push(meta.username);
+                            this.setState({searchusers: list});
+                          }
+                        }
+                        else {
+                          this.props.loadUserMeta(this.props.contacts[i].ToUserId);
+                        }
+                        // console.log(this.props.users[this.props.contacts[i].ToUserId].username);
+                      }
+                    }
+
+
+                  }}
+                  onFinish={(list)=> {
+                    this.setState({userlist: list});
                     this.props.history.push("/channels/new");
-                  }} description="Add users for your channels." list={this.state.userlist}/>
+                  }} description="Add users for your channels." restricteditems={this.state.searchusers} list={this.state.userlist}/>
                 </BackPage>
               </BoxComp>
             );

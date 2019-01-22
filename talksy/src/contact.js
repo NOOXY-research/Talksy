@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
 
 export class ContactsPage extends Component {
   constructor(props) {
@@ -10,30 +10,26 @@ export class ContactsPage extends Component {
     //   channels: props.channels
     // };
     this.state = {
-      users: {
-        'NOOXY': ['hello'],
-        'User': ['simple clear elegent'],
-        'Tomy': ['siasdfmple clear elegent'],
-        'NOfseradf': ['simple clear elegent'],
-        'NOOXY3': ['hello'],
-        'NOOXY4': ['hello'],
-        'User2': ['simple clear elegent'],
-        'User4': ['simple clear elegent'],
-        'dfseradf': ['simple clear elegent'],
-      }
+      searchusers: []
     };
+
+    this.usernametoid = {};
   }
 
-  renderUsers() {
+  renderContacts() {
     let elems = [];
-    for(let key in this.state.users) {
+    for(let key in this.props.contacts) {
+      let usermeta = this.props.users[this.props.contacts[key].ToUserId];
+      if(!Object.keys(this.props.users).includes(this.props.contacts[key].ToUserId)) {
+        this.props.loadUserMeta(this.props.contacts[key].ToUserId);
+      }
       elems.push(
         <div key={key} className="Page-Row">
           <figure className="Page-Row-ThumbnailText-Head">
           </figure>
           <div className="Page-Row-ThumbnailText-Text">
-            <h2>{key}</h2>
-            <p>{this.state.users[key]}</p>
+            <h2>{usermeta?usermeta.username:"loading..."}</h2>
+            <p>{usermeta?usermeta.b:"loading..."}</p>
           </div>
         </div>
       );
@@ -63,7 +59,7 @@ export class ContactsPage extends Component {
                 </div>
               </div>
               <div className="Page-Block">
-                {this.renderUsers()}
+                {this.renderContacts()}
               </div>
             </div>
           )
@@ -73,7 +69,24 @@ export class ContactsPage extends Component {
           return(
             <BoxComp history={props.history}>
             <BackPage title="New Contact" history={props.history}>
-              <AddToListPage title="Add contacts" description="Add friends for your contact." list={this.state.userlist}/>
+              <AddToListPageRestrictedItems title="Add contacts" onChange={(name, prev)=>{
+                this.props.searchUsers(name, (err, rows)=> {
+                  let list = [];
+                  for(let i in rows) {
+                    list.push(rows[i].username);
+                    this.props.setUserNameToId(rows[i].username, rows[i].userid);
+                  }
+                  this.setState({searchusers: list});
+                })
+              }} description="Add friends for your contact." restricteditems={this.state.searchusers} list={this.state.userlist} onFinish={(list)=> {
+                let userids = [];
+                for(let i in list) {
+                  userids.push(this.props.returnUserNameToId(list[i]))
+                }
+                this.props.addContacts(userids, (err)=> {
+                  props.history.push('/contacts/');
+                });
+              }}/>
             </BackPage>
             </BoxComp>
           )
