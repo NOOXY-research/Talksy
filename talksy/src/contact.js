@@ -16,7 +16,6 @@ export class ContactsPage extends Component {
     this.timeSince = (date)=> {
       let seconds = Math.floor((new Date() - date) / 1000);
       let interval = Math.floor(seconds / 31536000);
-
       if (interval > 1) {
         return interval + " years";
       }
@@ -48,8 +47,8 @@ export class ContactsPage extends Component {
       if(usermeta.active==true) {
         return <mark className="Page-Row-ThumbnailText-Head-Active-Circle"/>
       }
-      else if((new Date(usermeta.active+" GMT+0")-new Date)<1000*60*60) {
-        return <mark className="Page-Row-ThumbnailText-Head-Active">{this.timeSince(new Date(usermeta.active+" GMT+0"))}</mark>
+      else if((new Date(usermeta.active.replace(/ /g,"T"))-new Date)<1000*60*60) {
+        return <mark className="Page-Row-ThumbnailText-Head-Active">{this.timeSince(new Date(usermeta.active.replace(/ /g,"T")))}</mark>
       }
       else {
         return null
