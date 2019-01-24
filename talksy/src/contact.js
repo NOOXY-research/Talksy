@@ -103,6 +103,7 @@ export class ContactsPage extends Component {
       return([
           <div className="Page-Block">
             <div className="Page-Row">
+            <Ink/>
               <div className="Page-Row-Text">
                 <h1>{"Contacts"}</h1>
                 <p> {"Start a new Talksy channel with your contacts or see who are online."}</p>
@@ -111,7 +112,7 @@ export class ContactsPage extends Component {
             <div className="Page-Row" onClick={()=>{
               this.props.history.push('/contacts/new');
             }}>
-              <Ink />
+            <Ink />
               <div className="Page-Row-Button">
                 <span>add contact </span><i className="material-icons">add_circle</i>
               </div>

@@ -24,6 +24,7 @@ export class MyAccountPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Account"}</h1>
               <p> {"Manage your Notalk account here."}</p>
@@ -124,18 +125,21 @@ export class MyAccountPage extends Component {
                 <div className="Page">
                   <div className="Page-Block">
                     <div className="Page-Row">
+                    <Ink/>
                       <div className="Page-Row-Text">
                         <h1>{'More Info'}</h1>
                         <p> {'Here are the detail information of your accout.'}</p>
                       </div>
                     </div>
                     <div className="Page-Row">
+                    <Ink/>
                       <div className="Page-Row-Text">
                         <h2>{'UserId'}</h2>
                         <p> {this.props.mymeta.i}</p>
                       </div>
                     </div>
                     <div className="Page-Row">
+                    <Ink/>
                       <div className="Page-Row-Text">
                         <h2>{'JoinDate'}</h2>
                         <p> {this.props.mymeta.j}</p>

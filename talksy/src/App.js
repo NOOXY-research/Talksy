@@ -104,6 +104,7 @@ class TrendingPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Trending"}</h1>
               <p> {"Knowing what's people are taking about. (Not avalible now)"}</p>

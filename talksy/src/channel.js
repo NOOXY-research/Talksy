@@ -619,6 +619,7 @@ export class ChannelList extends Component {
       return(
         [
         <div className="Page-Row">
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"You have no channels"}</h2>
             <p>{"Click create channel to create new channel."}</p>
@@ -651,6 +652,7 @@ export class ChannelList extends Component {
       <div className="ChList-Rows" >
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Your channels"}</h1>
               <p> {"Here are all of your channels. (Talksy is still under development, will be avalible about this summer.)"}</p>
