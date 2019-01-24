@@ -16,7 +16,7 @@ import './App.css';
 import './tooltip.css';
 
 const NoService = new NSClient();
-const VERSION = "alpha 2019.1.24.5"
+const VERSION = "alpha 2019.1.25"
 const REFRESH_ACTIVITY_INTERVAL= 1000*60;
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
@@ -321,7 +321,11 @@ class HeaderPage extends Component {
             {this.renderDebugButton()}
           </div>
         </header>
+        <div className="HeaderPage-Container">
+        <div className="HeaderPage-Contain">
         {this.props.children}
+        </div>
+        </div>
       </div>
     );
   }
@@ -710,7 +714,6 @@ class App extends Component {
             this.history = props.history;
             return(
               <HeaderPage history={props.history} debug={this.state.debug}>
-                <MainCtrlComp history={props.history} debug={this.state.debug}/>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChannelList
