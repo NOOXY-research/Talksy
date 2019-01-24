@@ -16,7 +16,7 @@ import './App.css';
 import './tooltip.css';
 
 const NoService = new NSClient();
-const VERSION = "alpha 2019.1.24.4"
+const VERSION = "alpha 2019.1.24.5"
 const REFRESH_ACTIVITY_INTERVAL= 1000*60;
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
