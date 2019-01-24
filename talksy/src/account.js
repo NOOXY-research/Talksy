@@ -150,6 +150,35 @@ export class MyAccountPage extends Component {
 export class UserAccountPage extends Component {
   constructor(props) {
     super(props);
+
+    this.timeSince = (date)=> {
+      let seconds = Math.floor((new Date() - date) / 1000);
+      let interval = Math.floor(seconds / 31536000);
+
+      if (interval > 1) {
+        return interval + " years";
+      }
+      interval = Math.floor(seconds / 2592000);
+      if (interval > 1) {
+        return interval + " months";
+      }
+      interval = Math.floor(seconds / 86400);
+      if (interval > 1) {
+        return interval + " days";
+      }
+      interval = Math.floor(seconds / 3600);
+      if (interval > 1) {
+        return interval + " hours";
+      }
+      interval = Math.floor(seconds / 60);
+      if (interval > 1) {
+        return interval + " minutes";
+      }
+      if(seconds>0)
+        return Math.floor(seconds) + " seconds";
+      else
+        return "0 s"
+    }
   };
 
   renderProfile() {
@@ -168,6 +197,12 @@ export class UserAccountPage extends Component {
             <div className="Page-Row-Text">
               <h2>{"Bio"}</h2>
               <p> {this.props.usermeta.b}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+            <div className="Page-Row-Text">
+              <h2>{"Latest Online"}</h2>
+              <p> {this.props.usermeta.active==null?"no record":this.props.usermeta.active==true?"now":this.timeSince(new Date(this.props.usermeta.active+" GMT+0"))+" ago"}</p>
             </div>
           </div>
         </div>

@@ -12,6 +12,52 @@ export class ContactsPage extends Component {
     this.state = {
       searchusers: []
     };
+
+    this.timeSince = (date)=> {
+      let seconds = Math.floor((new Date() - date) / 1000);
+      let interval = Math.floor(seconds / 31536000);
+
+      if (interval > 1) {
+        return interval + " years";
+      }
+      interval = Math.floor(seconds / 2592000);
+      if (interval > 1) {
+        return interval + " months";
+      }
+      interval = Math.floor(seconds / 86400);
+      if (interval > 1) {
+        return interval + " days";
+      }
+      interval = Math.floor(seconds / 3600);
+      if (interval > 1) {
+        return interval + " h";
+      }
+      interval = Math.floor(seconds / 60);
+      if (interval > 1) {
+        return interval + " m";
+      }
+      if(seconds>0)
+        return Math.floor(seconds) + " s";
+      else
+        return "0 s"
+    }
+  }
+
+  renderActiveIcon(usermeta) {
+    if(usermeta&&usermeta.active) {
+      if(usermeta.active==true) {
+        return <mark className="Page-Row-ThumbnailText-Head-Active-Circle"/>
+      }
+      else if((new Date(usermeta.active+" GMT+0")-new Date)<1000*60*60) {
+        return <mark className="Page-Row-ThumbnailText-Head-Active">{this.timeSince(new Date(usermeta.active+" GMT+0"))}</mark>
+      }
+      else {
+        return null
+      }
+    }
+    else {
+      return null
+    }
   }
 
   renderContacts() {
@@ -27,6 +73,7 @@ export class ContactsPage extends Component {
             this.props.history.push('/users/'+usermeta.userid);
           }}>
             <figure className="Page-Row-ThumbnailText-Head">
+            {this.renderActiveIcon(usermeta)}
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
               <h2>{usermeta?usermeta.username:"loading..."}</h2>
@@ -37,6 +84,16 @@ export class ContactsPage extends Component {
       }
 
     }
+    if(elems.length ==0) {
+      elems.push(
+        <div className="Page-Row">
+          <div className="Page-Row-Text">
+            <h2>{"You have no contacts"}</h2>
+            <p> {"Please add contacts to access more functions."}</p>
+          </div>
+        </div>
+      );
+    }
     return elems;
   }
 
@@ -46,7 +103,7 @@ export class ContactsPage extends Component {
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h1>{"Contacts"}</h1>
-                <p> {"Start a new Notalk channel with your contacts."}</p>
+                <p> {"Start a new Talksy channel with your contacts or see who are online."}</p>
               </div>
             </div>
             <div className="Page-Row" onClick={()=>{

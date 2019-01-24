@@ -16,7 +16,8 @@ import './App.css';
 import './tooltip.css';
 
 const NoService = new NSClient();
-const VERSION = "alpha 2019.1.23"
+const VERSION = "alpha 2019.1.24.2"
+const REFRESH_ACTIVITY_INTERVAL= 1000*60;
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
 
@@ -393,6 +394,13 @@ class App extends Component {
       });
     }
 
+    this.getUserActivity = (userid, callback)=> {
+      NoTalk.call("getUserAct", {i: userid}, (err, json)=> {
+        this.log("getUserAct("+userid+")", json);
+        callback(err, json.r);
+      });
+    }
+
     this.addUsersToChannel = (chid, users, callback)=> {
       NoTalk.call("addUsersToCh", {c:chid,i:users}, (err, json)=> {
         this.log("addUsersToChannel", json);
@@ -420,6 +428,12 @@ class App extends Component {
               this.setState(prevState=> {
                 prevState.users[userid] = meta;
                 this.setUserNameToId(meta.username, userid);
+                this.getUserActivity(userid, (err, active)=> {
+                  this.setState(prevState=> {
+                    prevState.users[userid].active = active;
+                    return prevState;
+                  });
+                });
                 return prevState;
               });
             });
@@ -568,11 +582,23 @@ class App extends Component {
                       prevState.contacts[contacts[i].ToUserId] = contacts[i];
                     }
                     return prevState;
-                  });
+                  })
+                  setInterval(()=> {
+                    let contacts = this.state.contacts;
+                    for(let i in contacts) {
+                      this.getUserActivity(contacts[i].ToUserId, (err, active)=> {
+                        this.setState(prevState=> {
+                          if(prevState.users[contacts[i].ToUserId])
+                            prevState.users[contacts[i].ToUserId].active = active;
+                          return prevState;
+                        });
+                      });
+                    }
+                  }, REFRESH_ACTIVITY_INTERVAL);
                 });
 
                 for(let chid in json) {
-                  NoTalk.call('getMsgs', {i: chid, r:15}, (err, json)=> {
+                  NoTalk.call('getMsgs', {i: chid, r:30}, (err, json)=> {
                     this.log('getMsgs ('+chid+')', JSON.stringify(json));
                     this.setState(prevState=> {
                       prevState.channels[chid]['Messages'] = json.r;

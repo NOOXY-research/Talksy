@@ -291,9 +291,19 @@ img {
   background: #37474F;
   user-select: none;
 }
+
+.ChPage-Header-Title {
+  position: relative;
+  float: left;
+  height: auto;
+  width: auto;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
 .ChPage-Header-left-Button {
-  left: 0;
-  position: absolute;
+  position: relative;
+  float: left;
   height: inherit;
   padding: 0;
   width: 50px;
@@ -303,8 +313,8 @@ img {
 }
 
 .ChPage-Header-right-Button {
-  right: 0;
-  position: absolute;
+  float: right;
+  position: relative;
   height: inherit;
   padding: 0;
   width: 50px;
@@ -610,6 +620,7 @@ img {
   width: 100%;
 }
 .Page-Row-ThumbnailText-Head {
+  position: relative;
   display: inline-block;
   width: 45px;
   height: 45px;
@@ -621,6 +632,36 @@ img {
   box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3), inset 3px 3px 0 rgba(38, 50, 56, 0.3);
   background-color: white;
   transition: .3s;
+}
+.Page-Row-ThumbnailText-Head-Active-Circle {
+  display: block;
+  position: absolute;
+  border: 3px solid #263238;
+  width: 15px;
+  height: 15px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 30px;
+  box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3);
+  background-color: #1de9b6;
+}
+
+.Page-Row-ThumbnailText-Head-Active {
+  display: block;
+  position: absolute;
+  border: 3px solid #263238;
+  min-width: 15px;
+  height: 15px;
+  width: auto;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 15px;
+  padding: 0 2px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 30px;
+  box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3);
+  background-color: #1de9b6;
 }
 
 .Page-Row-ThumbnailText-Head:hover {

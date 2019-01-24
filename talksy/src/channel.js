@@ -18,6 +18,19 @@ export class ChannelPage extends Component {
 
   }
 
+  componentDidMount() {
+    this.scrollToBottom();
+  }
+
+  componentDidUpdate() {
+    this.scrollToBottom("smooth");
+  }
+
+  scrollToBottom (b) {
+    if(this.props.show)
+      this.MessagesEnd.scrollIntoView({ behavior: b });
+  }
+
   renderUserName(msgidx) {
       let username;
       if(this.props.channelmeta.Messages[msgidx][0]&&this.props.users[this.props.channelmeta.Messages[msgidx][0]]) {
@@ -59,10 +72,10 @@ export class ChannelPage extends Component {
 
   renderTooltips() {
     if(this.props.channelmeta.Description) {
-      return (<span className="tooltiptext tooltip-bottom">{this.props.channelmeta.Description}</span>)
+      return (<span className="tooltiptext tooltip-right">{this.props.channelmeta.Description}</span>)
     }
     else {
-      return (<span className="tooltiptext tooltip-bottom">{"this channel has no description"}</span>)
+      return (<span className="tooltiptext tooltip-right">{"this channel has no description"}</span>)
     }
   }
 
@@ -71,47 +84,47 @@ export class ChannelPage extends Component {
   }
 
   render() {
-    if(this.props.show) {
-      return(
-        <div className="ChPage">
-          <div className="ChPage-Header">
-            <div className="ChPage-Header-left-Button"
-            onClick={()=>{this.props.history.push(this.props.rootpath)}}>
-              <i className="material-icons">arrow_back</i>
-            </div>
-            <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onSettingsClick()}}>
-              <i className="material-icons">settings</i>
-              <span className="tooltiptext tooltip-left">Manage your channel settings</span>
-            </div>
-            <div className="tooltip">
-              {(this.props.channelmeta.Displayname)}
-              {this.renderTooltips()}
-            </div>
+    return(
+      <div className="ChPage" style={this.props.show?null:{ display:"none"}}>
+        <div className="ChPage-Header">
+          <div className="ChPage-Header-left-Button"
+          onClick={()=>{this.props.history.push(this.props.rootpath)}}>
+            <i className="material-icons">arrow_back</i>
           </div>
-          <ul className="ChPage-Messages">
-            {this.renderMessages()}
-          </ul>
-          <div className="ChPage-Sender">
-            <input placeholder="input text...." className="ChPage-Sender-Input" ref={el => this.TextInput = el} onChange={evt=> {
-              this.ToBeSent = evt.target.value;
-            }}
-            onKeyPress={
-              (event)=> {
-                if(event.key == 'Enter'){
-                  this.sendNewMessage()
-                }
-              }
-            }></input>
-            <div className="ChPage-Sender-Buttons">
-              <div className="ChPage-Sender-Button" onClick={this.sendNewMessage}><i className="material-icons">send</i></div>
-            </div>
+          <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onSettingsClick()}}>
+            <i className="material-icons">settings</i>
+            <span className="tooltiptext tooltip-left">Manage your channel settings</span>
+          </div>
+          <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onPeopleClick()}}>
+            <i className="material-icons">people</i>
+            <span className="tooltiptext tooltip-left">Manage your channel members</span>
+          </div>
+          <div className=" ChPage-Header-Title tooltip">
+            {(this.props.channelmeta.Displayname)}
+            {this.renderTooltips()}
           </div>
         </div>
-      );
-    }
-    else {
-      return null;
-    }
+        <ul className="ChPage-Messages">
+          {this.renderMessages()}
+          <div style={{ float:"left", clear: "both" }} ref={el => this.MessagesEnd = el}></div>
+        </ul>
+        <div className="ChPage-Sender">
+          <input placeholder="input text...." className="ChPage-Sender-Input" ref={el => this.TextInput = el} onChange={evt=> {
+            this.ToBeSent = evt.target.value;
+          }}
+          onKeyPress={
+            (event)=> {
+              if(event.key == 'Enter'){
+                this.sendNewMessage()
+              }
+            }
+          }></input>
+          <div className="ChPage-Sender-Buttons">
+            <div className="ChPage-Sender-Button" onClick={this.sendNewMessage}><i className="material-icons">send</i></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 
@@ -597,24 +610,24 @@ export class ChannelList extends Component {
         [
         <div className="Page-Row">
           <div className="Page-Row-Text">
-            <h1>{"You have no channels"}</h1>
+            <h2>{"You have no channels"}</h2>
             <p>{"Click create channel to create new channel."}</p>
           </div>
         </div>
-        ,
-        <div className="Page-Row">
-          <div className="Page-Row-Text">
-            <h2>{"Create"}</h2>
-            <p>{"Click create channel to create new channel."}</p>
-          </div>
-        </div>
-        ,
-        <div className="Page-Row">
-          <div className="Page-Row-Text">
-            <h2>{"Explore"}</h2>
-            <p>{"Click TrendingPage to explore what people are talking about."}</p>
-          </div>
-        </div>
+        // ,
+        // <div className="Page-Row">
+        //   <div className="Page-Row-Text">
+        //     <h2>{"Create"}</h2>
+        //     <p>{"Click create channel to create new channel."}</p>
+        //   </div>
+        // </div>
+        // ,
+        // <div className="Page-Row">
+        //   <div className="Page-Row-Text">
+        //     <h2>{"Explore"}</h2>
+        //     <p>{"Click TrendingPage to explore what people are talking about."}</p>
+        //   </div>
+        // </div>
         ]
       )
     }
