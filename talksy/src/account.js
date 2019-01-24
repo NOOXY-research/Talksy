@@ -202,7 +202,7 @@ export class UserAccountPage extends Component {
           <div className="Page-Row">
             <div className="Page-Row-Text">
               <h2>{"Latest Online"}</h2>
-              <p> {this.props.usermeta.active==null?"no record":this.props.usermeta.active==true?"now":this.timeSince(new Date(this.props.usermeta.active.replace(/ /g,"T")))+" ago"}</p>
+              <p> {this.props.usermeta.active==null?"no record":this.props.usermeta.active==true?"now":this.timeSince(new Date(this.props.usermeta.active.replace(/ /g,"T")+"Z"))+" ago"}</p>
             </div>
           </div>
         </div>
