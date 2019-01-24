@@ -47,7 +47,7 @@ export class ContactsPage extends Component {
       if(usermeta.active==true) {
         return <mark className="Page-Row-ThumbnailText-Head-Active-Circle"/>
       }
-      else if((new Date(usermeta.active.replace(/ /g,"T")+"Z")-new Date())<1000*60*60) {
+      else if((new Date(usermeta.active.replace(/ /g,"T")+"Z")-new Date())<3600) {
         return <mark className="Page-Row-ThumbnailText-Head-Active">{this.timeSince(new Date(usermeta.active.replace(/ /g,"T")+"Z"))}</mark>
       }
       else {
