@@ -1,8 +1,8 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
-
+import { BoxComp, PageRow, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import Ink from 'react-ink';
 
 export class MyAccountPage extends Component {
   constructor(props) {
@@ -34,8 +34,8 @@ export class MyAccountPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/account/more');
           }}>
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
-
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
               <h2>{this.props.mymeta.username?this.props.mymeta.username:(this.props.mymeta.n?this.props.mymeta.n:'Guest')}</h2>
@@ -45,6 +45,7 @@ export class MyAccountPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/account/editbio');
           }}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Bio"}</h2>
               <p> {this.props.mymeta.b}</p>
@@ -62,6 +63,7 @@ export class MyAccountPage extends Component {
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Blocked Users"}</h2>
               <p> {"click to edit."}</p>
@@ -71,12 +73,14 @@ export class MyAccountPage extends Component {
         </div>
         <div className="Page-Block" onClick={()=> {this.props.logout()}}>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Logout"}</h2>
               <p> {"logout your account"}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=> {this.props.history.push('/noservice/signin')}}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Switch Account"}</h2>
               <p> {"switch your account"}</p>
@@ -86,6 +90,7 @@ export class MyAccountPage extends Component {
         <div className="Page-Block">
           <a href="https://github.com/NOOXY-Research/" target="_blank">
             <div className="Page-Row">
+            <Ink/>
               <div className="Page-Row-Text">
                 <h2>{"Open Source"}</h2>
                 <p> {"view our shared opensource code "}</p>
@@ -94,6 +99,7 @@ export class MyAccountPage extends Component {
           </a>
           <a href="https://nooxy.org" target="_blank">
             <div className="Page-Row">
+            <Ink/>
               <div className="Page-Row-Text">
                 <h2>{"NOOXY Talk Client"}</h2>
                 <p> {"ver. "+this.props.version+" copyright(c)2017-2019 NOOXY inc."}</p>
@@ -186,6 +192,7 @@ export class UserAccountPage extends Component {
       return(
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
@@ -194,12 +201,14 @@ export class UserAccountPage extends Component {
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Bio"}</h2>
               <p> {this.props.usermeta.b}</p>
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Latest Online"}</h2>
               <p> {this.props.usermeta.active==null?"no record":this.props.usermeta.active==true?"now":this.timeSince(new Date(this.props.usermeta.active.replace(/ /g,"T")+"Z"))+" ago"}</p>
@@ -212,6 +221,7 @@ export class UserAccountPage extends Component {
       return(
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
@@ -246,6 +256,7 @@ export class UserAccountPage extends Component {
         }
         rows.push(
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Relation"}</h2>
               <p> {this.renderRelation(this.props.contacts[i].Type)}</p>
@@ -258,6 +269,7 @@ export class UserAccountPage extends Component {
     if(!has_relation) {
       rows.push(
         <div className="Page-Row" onClick={()=> {this.props.addContacts([this.props.usermeta.userid], 0)}}>
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Add to contact"}</h2>
             <p> {"Add this account to your contact."}</p>
@@ -268,6 +280,7 @@ export class UserAccountPage extends Component {
     else {
       rows.push(
         <div className="Page-Row" onClick={()=> {this.props.addContacts([this.props.usermeta.userid], 1)}}>
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Remove from contact"}</h2>
             <p> {"Remove this account from your contact."}</p>
@@ -276,6 +289,7 @@ export class UserAccountPage extends Component {
       )
       rows.push(
         <div className="Page-Row">
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Add to channel"}</h2>
             <p> {"Add this account to your existed channel."}</p>

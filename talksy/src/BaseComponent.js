@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Ink from 'react-ink';
 
 export class BoxComp extends Component {
   render() {
@@ -15,6 +16,17 @@ export class BoxComp extends Component {
       );
   }
 };
+
+export class PageRow extends Component {
+  render() {
+      return(
+        <div className="Page-Row">
+        <Ink/>
+        {this.props.children}
+        </div>
+      );
+  }
+}
 
 export class SplitComp extends Component {
   render() {
@@ -178,6 +190,7 @@ export class AddToListPage extends Component {
         <div className="Page-Block">
           {this.renderList()}
           <div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
+            <Ink/>
             <div className="Page-Row-Button">
               <span>Finish </span><i className="material-icons">check_circle</i>
             </div>
@@ -247,6 +260,7 @@ export class AddToListPageRestrictedItems extends Component {
           this.addItem(value);
         }
       }>
+        <Ink/>
         <div className="Page-Row-Text">
           <h2>{value}</h2>
           <p >{!this.state.list.includes(value)?"click to add":"the item have been added"}</p>
@@ -295,6 +309,7 @@ export class AddToListPageRestrictedItems extends Component {
           </div>
           {this.renderList()}
           <div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
+            <Ink/>
             <div className="Page-Row-Button">
               <span>Finish </span><i className="material-icons">check_circle</i>
             </div>

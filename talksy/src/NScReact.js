@@ -4,6 +4,7 @@
 // Copyright 2018 NOOXY. All Rights Reserved.
 
 import React, { Component } from 'react';
+import Ink from 'react-ink';
 import './NScReact.css';
 
 const getQueryVariable = (variable)=>
@@ -86,6 +87,7 @@ export class SigninPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Signing in"}</h1>
               <p> {this.state.status}</p>
@@ -114,7 +116,7 @@ export class SigninPage extends Component {
 
         <div className="Page-Block">
           <div className="Page-Row"  onClick={this.Signin}>
-
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Done"}</h2>
               <p> {"sign me in"}</p>
@@ -122,6 +124,7 @@ export class SigninPage extends Component {
           </div>
           <a href={this.props.SignupURL}>
             <div className="Page-Row">
+            <Ink/>
               <div className="Page-Row-Text">
                 <h2>{"Siginup"}</h2>
                 <p> {"Signup a NoService account"}</p>
@@ -172,6 +175,7 @@ export class PasswordPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Enter your Password"}</h1>
               <p> {"In order to access this service. You must enter your password of your account."}</p>
@@ -200,6 +204,7 @@ export class PasswordPage extends Component {
 
         <div className="Page-Block">
           <div className="Page-Row"  onClick={this.Signin}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Done"}</h2>
               <p> {"This is my password."}</p>

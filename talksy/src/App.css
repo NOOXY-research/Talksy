@@ -113,6 +113,7 @@ html, body {
 
 .HeaderPage-header-bar-button {
   display: inline-block;
+  position: relative;
   height: inherit;
   width: 50px;
   margin: 0;
@@ -129,6 +130,7 @@ html, body {
 }
 
 .HeaderPage-header-bar-button-selected {
+  position: relative;
   display: inline-block;
   height: inherit;
   width: 80px;
@@ -361,6 +363,7 @@ html, body {
 .ChPage-Bubble-Me{
   display:inline-block;
   clear: both;
+  position: relative;
   padding: 5px 10px;
   border-radius: 15px;
   margin-bottom: 2px;
@@ -372,6 +375,7 @@ html, body {
 }
 
 .ChPage-Bubble-Other{
+  position: relative;
   display:inline-block;
   clear: both;
   padding: 5px 10px;

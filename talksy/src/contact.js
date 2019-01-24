@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import Ink from 'react-ink'
 
 export class ContactsPage extends Component {
   constructor(props) {
@@ -71,6 +72,7 @@ export class ContactsPage extends Component {
           <div key={key} className="Page-Row" onClick={()=>{
             this.props.history.push('/users/'+usermeta.userid);
           }}>
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
             {this.renderActiveIcon(usermeta)}
             </figure>
@@ -86,6 +88,7 @@ export class ContactsPage extends Component {
     if(elems.length ==0) {
       elems.push(
         <div className="Page-Row">
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"You have no contacts"}</h2>
             <p> {"Please add contacts to access more functions."}</p>
@@ -108,6 +111,7 @@ export class ContactsPage extends Component {
             <div className="Page-Row" onClick={()=>{
               this.props.history.push('/contacts/new');
             }}>
+              <Ink />
               <div className="Page-Row-Button">
                 <span>add contact </span><i className="material-icons">add_circle</i>
               </div>

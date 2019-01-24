@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import Ink from 'react-ink'
 import './tooltip.css';
 
 export class ChannelPage extends Component {
@@ -61,6 +62,7 @@ export class ChannelPage extends Component {
       }
       elems.push(
         <li className={(me?"ChPage-Bubble-Me":"ChPage-Bubble-Other")+" tooltip"} >
+        <Ink />
           <div className="ChPage-Bubble-Title">{me?null:this.renderUserName(key)}</div>
           <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messages[key][2]}</div>
           <span className={"tooltiptext "+(me?"tooltip-left":"tooltip-right")}>{this.props.channelmeta.Messages[key][4]}</span>
@@ -89,6 +91,7 @@ export class ChannelPage extends Component {
         <div className="ChPage-Header">
           <div className="ChPage-Header-left-Button"
           onClick={()=>{this.props.history.push(this.props.rootpath)}}>
+          <Ink />
             <i className="material-icons">arrow_back</i>
           </div>
           <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onSettingsClick()}}>
@@ -198,6 +201,7 @@ export class NewChannelPage extends Component {
               <div className="Page">
                 <div className="Page-Block">
                   <div className="Page-Row">
+                  <Ink/>
                     <div className="Page-Row-Text">
                       <h1>{"Create a new channel"}</h1>
                       <p> {this.state.status}</p>
@@ -284,12 +288,14 @@ export class NewChannelPage extends Component {
                     })
 
                   }}>
+                  <Ink/>
                     <div className="Page-Row-Text">
                       <h2>{"Create"}</h2>
                       <p> {"create this channel"}</p>
                     </div>
                   </div>
                   <div className="Page-Row" onClick={()=>{this.props.history.push('/');}}>
+                  <Ink/>
                     <div className="Page-Row-Text">
                       <h2>{"Cancel"}</h2>
                       <p> {"Do not create this channel"}</p>
@@ -416,6 +422,7 @@ export class ChannelSettingsPage extends Component {
             <div className="Page">
               <div className="Page-Block">
                 <div className="Page-Row">
+                <Ink/>
                   <div className="Page-Row-Text">
                     <h1>{"Manage your channel's settings"}</h1>
                     <p> {this.state.status}</p>
@@ -498,12 +505,14 @@ export class ChannelSettingsPage extends Component {
                   })
 
                 }}>
+                <Ink/>
                   <div className="Page-Row-Text">
                     <h2>{"Update"}</h2>
                     <p> {"update this channel"}</p>
                   </div>
                 </div>
                 <div className="Page-Row" onClick={()=>{this.props.history.push('/channels/'+this.props.channelid);}}>
+                <Ink/>
                   <div className="Page-Row-Text">
                     <h2>{"Cancel"}</h2>
                     <p> {"giveup editing the channel"}</p>
@@ -595,6 +604,7 @@ export class ChannelList extends Component {
     for(let key in this.props.channels) {
       elems.push(
           <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.onSelect(key, this.props.history)}}>
+            <Ink />
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
@@ -647,6 +657,7 @@ export class ChannelList extends Component {
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
+            <Ink />
             <div className="Page-Row-Button">
               <span>new channel </span><i className="material-icons">add_circle</i>
             </div>

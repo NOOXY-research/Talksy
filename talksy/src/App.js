@@ -10,13 +10,14 @@ import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage
 import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "./channel";
 import {ContactsPage, NewContactsPage} from "./contact";
 import {MyAccountPage, UserAccountPage} from "./account";
+import Ink from 'react-ink';
 import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
 import './tooltip.css';
 
 const NoService = new NSClient();
-const VERSION = "alpha 2019.1.25"
+const VERSION = "alpha 2019.1.25.2"
 const REFRESH_ACTIVITY_INTERVAL= 1000*60;
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
@@ -166,6 +167,7 @@ class DebugPage extends Component {
     for(let key in this.props.logs) {
       elems.push(
           <div key={key} className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{'ln['+key+'] '+(this.props.logs[key])[0]}</h2>
               <p>{(this.props.logs[key])[1]}</p>
@@ -181,12 +183,14 @@ class DebugPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Debug Component"}</h1>
               <p> {"here are the debug components."}</p>
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService Daemon"}</h2>
               <p> {'Host: '+nshost+', Debug: '+debug}</p>
@@ -195,6 +199,7 @@ class DebugPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/noservice/signin');
           }}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService signin"}</h2>
               <p> {"NOOXY service SigninPage"}</p>
@@ -203,6 +208,7 @@ class DebugPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/noservice/password');
           }}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService Password"}</h2>
               <p> {"NOOXY service auth by password"}</p>
@@ -213,6 +219,7 @@ class DebugPage extends Component {
 
         <div className="Page-Block">
         <div className="Page-Row">
+        <Ink/>
           <div className="Page-Row-Text">
             <h1>{"Debug Logs"}</h1>
             <p> {"below are the debug logs."}</p>
@@ -247,6 +254,7 @@ class FailedPage extends Component {
             </div>
           </div>
           <div className="Page-Row" onClick={()=> {window.location.reload();}}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Retry"}</h2>
               <p> {'Click this buttom to reload the page.'}</p>
