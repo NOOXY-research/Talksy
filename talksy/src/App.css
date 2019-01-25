@@ -12,6 +12,9 @@ html, body {
   height: 100%;
   overflow-y:hidden;
 }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 @media only screen and (max-width: 600px) {
     .SplitLeft {
         display: none;
@@ -23,11 +26,9 @@ html, body {
       border-radius: 0!important;
       max-height: 100%!important;
       max-width: 100%!important;
+      top: 0!important;
+      left: 0!important;
     }
-    .HeaderPage-title {
-      font-size: 20px!important;
-    }
-
 }
 
 @media only screen and (min-width: 400px) {
@@ -505,12 +506,12 @@ html, body {
 
 .ChPage-Sender-Buttons {
   display: inline-block;
-  flex-grow: auto;
   /* cursor: pointer; */
   user-select: none;
 }
 
 .ChPage-Sender-Button {
+  position: relative;
   display: inline-block;
   vertical-align: middle;
   border-radius: 16px;
@@ -520,6 +521,7 @@ html, body {
   background-color: #ECEFF1;
   cursor: pointer;
   line-height: 32px;
+  margin-bottom: 5px;
   user-select: none;
   transition: .3s;
 }
@@ -556,7 +558,6 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-  height: inherit;
 }
 
 .Page-Block {
@@ -779,7 +780,7 @@ html, body {
 }
 
 .BoxComp {
-  display: flex;
+  display: inline-block;
   top: 0;
   left: 0;
   position: absolute;

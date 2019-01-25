@@ -58,6 +58,7 @@ export class BackPage extends Component {
             onClick={()=>{
               this.props.history.goBack()
             }}>
+            <Ink/>
               <i className="material-icons">arrow_back</i>
             </div>
             {(this.props.title)}

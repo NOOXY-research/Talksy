@@ -5,6 +5,8 @@ import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPag
 import Ink from 'react-ink'
 import './tooltip.css';
 
+const READ_NEW_LINE = 20;
+
 export class ChannelPage extends Component {
   constructor(props) {
     super(props);
@@ -16,7 +18,9 @@ export class ChannelPage extends Component {
       });
     };
     this.requestedUsers = [];
-
+    this.Scroll = false;
+    this.Init = false;
+    this.LatestReadline = 0;
   }
 
   componentDidMount() {
@@ -24,7 +28,10 @@ export class ChannelPage extends Component {
   }
 
   componentDidUpdate() {
-    this.scrollToBottom("smooth");
+    if(this.hasUnread()||this.Scroll==true) {
+      this.scrollToBottom("smooth");
+      this.Scroll = false;
+    }
   }
 
   scrollToBottom (b) {
@@ -72,6 +79,26 @@ export class ChannelPage extends Component {
     return elems;
   }
 
+  hasUnread() {
+    if(this.props.show&&this.props.channelmeta['Messages']) {
+      let _ll = Object.keys(this.props.channelmeta['Messages']).sort((a,b)=>{return b - a;})[0];
+      if((this.props.channelmeta['LatestReadline'] == null || this.props.channelmeta['LatestReadline']<_ll)) {
+        return _ll;
+      }
+      else {
+        return false;
+      }
+    }
+  }
+
+  handleScroll(e) {
+    const bottom = e.target.scrollTop === 0;
+    if (bottom) {
+      let _fl = Object.keys(this.props.channelmeta['Messages']).sort((a,b)=>{return a - b;})[0];
+      this.props.getMoreMessages(this.props.channelid);
+    }
+  }
+
   renderTooltips() {
     if(this.props.channelmeta.Description) {
       return (<span className="tooltiptext tooltip-right">{this.props.channelmeta.Description}</span>)
@@ -86,6 +113,13 @@ export class ChannelPage extends Component {
   }
 
   render() {
+    let _ll = this.hasUnread();
+    if(_ll) {
+      this.props.readChannelLine(this.props.channelid, _ll, ()=>{  });
+    }
+    if(this.Init==false&&this.props.channelmeta.Messages!=null) {
+      this.Scroll=true;
+    }
     return(
       <div className="ChPage" style={this.props.show?null:{ display:"none"}}>
         <div className="ChPage-Header">
@@ -95,10 +129,12 @@ export class ChannelPage extends Component {
             <i className="material-icons">arrow_back</i>
           </div>
           <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onSettingsClick()}}>
+          <Ink/>
             <i className="material-icons">settings</i>
             <span className="tooltiptext tooltip-left">Manage your channel settings</span>
           </div>
           <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onPeopleClick()}}>
+          <Ink/>
             <i className="material-icons">people</i>
             <span className="tooltiptext tooltip-left">Manage your channel members</span>
           </div>
@@ -107,7 +143,7 @@ export class ChannelPage extends Component {
             {this.renderTooltips()}
           </div>
         </div>
-        <ul className="ChPage-Messages">
+        <ul className="ChPage-Messages" onScroll={this.handleScroll.bind(this)}>
           {this.renderMessages()}
           <div style={{ float:"left", clear: "both" }} ref={el => this.MessagesEnd = el}></div>
         </ul>
@@ -123,7 +159,7 @@ export class ChannelPage extends Component {
             }
           }></input>
           <div className="ChPage-Sender-Buttons">
-            <div className="ChPage-Sender-Button" onClick={this.sendNewMessage}><i className="material-icons">send</i></div>
+            <div className="ChPage-Sender-Button" onClick={this.sendNewMessage}><Ink/><i className="material-icons">send</i></div>
           </div>
         </div>
       </div>
@@ -317,7 +353,6 @@ export class NewChannelPage extends Component {
 
                     }
                     else {
-                      console.log(this.props.contacts);
                       for(let i in this.props.contacts) {
                         let meta = this.props.users[this.props.contacts[i].ToUserId];
                         if(meta) {
@@ -378,7 +413,6 @@ export class ChannelSettingsPage extends Component {
       ,
       userlist: []
     };
-    console.log(props.channelmeta);
   }
 
   renderTypes() {
@@ -482,6 +516,27 @@ export class ChannelSettingsPage extends Component {
               </div>
 
               <div className="Page-Block">
+                <div className="Page-Row" onClick={()=>{this.props.deleteChannel(this.props.channelid, (err, json)=> {
+                  if(json.e==null) {
+                    this.setState(prevState=> {
+                      prevState.channelmeta = {a:1, t:0};
+                      this.props.history.push("/");
+                      return prevState;
+                    });
+                  }
+                  else {
+                    this.setState({'status':json.s});
+                  }
+                });}}>
+                <Ink/>
+                  <div className="Page-Row-Text">
+                    <h2>{"Delete"}</h2>
+                    <p> {"Delete the channel"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="Page-Block">
                 <div className="Page-Row"  onClick={()=>{
                   this.state.channelmeta.i = this.props.channelid;
                   this.props.updateChannel(this.state.channelmeta, (err, meta)=> {
@@ -568,7 +623,7 @@ export class ChannelList extends Component {
   };
 
   renderUnreadCount(count) {
-    if(count) {
+    if(count>0) {
       return(
         <div className="ChList-Row-ChUnread">
           {count}
@@ -602,6 +657,8 @@ export class ChannelList extends Component {
   renderRows() {
     let elems = [];
     for(let key in this.props.channels) {
+      let _ll = this.props.channels[key]['Messages']?Object.keys(this.props.channels[key]['Messages']).sort((a,b)=>{return b - a;})[0]:0;
+      let _lrl = this.props.channels[key]['LatestReadline']?this.props.channels[key]['LatestReadline']:0;
       elems.push(
           <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.onSelect(key, this.props.history)}}>
             <Ink />
@@ -611,7 +668,7 @@ export class ChannelList extends Component {
               <h2>{this.props.channels[key].Displayname}</h2>
               <p>{this.renderLastMessages(this.props.channels[key])}</p>
             </div>
-            {this.renderUnreadCount(this.props.channels[key][2])}
+            {this.renderUnreadCount(_ll-_lrl)}
           </div>
       );
     }
