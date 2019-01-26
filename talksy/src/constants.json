@@ -1,0 +1,11 @@
+{
+  "ROOT_PATH": "/",
+  "VERSION": "alpha 2019.1.26.4",
+  "DEBUG": true,
+  "NOSERVICE_HOST": "0.0.0.0",
+  "REFRESH_ACTIVITY_INTERVAL": 60000,
+  "RETRY_INTERVAL": 3000,
+  "READ_NEW_LINE": 10,
+  "NOSERVICE_SIGNUP_URL": "https://nooxy.org/static/NoService/signup.html",
+  "NOSERVICE_NOUSER_URL": "https://nooxy.org/static/NoService/NoUserSettings.html"
+}

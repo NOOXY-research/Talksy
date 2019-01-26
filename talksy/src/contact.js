@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
-import Ink from 'react-ink'
+import Ink from 'react-ink';
+
 
 export class ContactsPage extends Component {
   constructor(props) {
@@ -77,8 +78,8 @@ export class ContactsPage extends Component {
             {this.renderActiveIcon(usermeta)}
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{usermeta?usermeta.username:"loading..."}</h2>
-              <p>{usermeta?usermeta.b:"loading..."}</p>
+              <h2>{usermeta?usermeta.username:this.props.langs.loading+"..."}</h2>
+              <p>{usermeta?usermeta.b:this.props.langs.loading+"l..."}</p>
             </div>
           </div>
         );
@@ -105,7 +106,7 @@ export class ContactsPage extends Component {
             <div className="Page-Row">
             <Ink/>
               <div className="Page-Row-Text">
-                <h1>{"Contacts"}</h1>
+                <h1>{this.props.langs.contacts}</h1>
                 <p> {"Start a new Talksy channel with your contacts or see who are online."}</p>
               </div>
             </div>
@@ -114,7 +115,7 @@ export class ContactsPage extends Component {
             }}>
             <Ink />
               <div className="Page-Row-Button">
-                <span>add contact </span><i className="material-icons">add_circle</i>
+                <span>{this.props.langs.new_contacts}</span><i className="material-icons">add_circle</i>
               </div>
             </div>
           </div>

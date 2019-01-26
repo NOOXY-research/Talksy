@@ -16,21 +16,24 @@ import logo from './logo.png';
 import './App.css';
 import './tooltip.css';
 
+const CONSTANTS = require('./constants.json');
+
 const NoService = new NSClient();
-const VERSION = "alpha 2019.1.26"
-const REFRESH_ACTIVITY_INTERVAL= 1000*60;
-const RETRY_INTERVAL= 1000*5;
-const READ_NEW_LINE = 10;
+const VERSION = CONSTANTS.VERSION;
+const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
+const RETRY_INTERVAL= CONSTANTS.RETRY_INTERVAL;
+const READ_NEW_LINE = CONSTANTS.READ_NEW_LINE;
 
-const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
+const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
+const NOSERVICE_NOUSER_URL = CONSTANTS.NOSERVICE_NOUSER_URL;
 
-
-const nshost = '0.0.0.0';
-const debug = true;
+const nshost = CONSTANTS.NOSERVICE_HOST;
+const debug = CONSTANTS.DEBUG;
 const nsport = null;
 
 let NoTalk;
 let NoUser;
+
 
 NoService.setDebug(debug);
 // EditListPage
@@ -41,10 +44,10 @@ class MainCtrlComp extends Component {
     this.state = {
       headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
       buttons: {
-        'channels': [ '/channels/', 'chat'],
-        'contacts': [ '/contacts/', 'people'],
-        'trending': ['/trending/', 'trending_up'],
-        'account': ['/account/', 'account_circle'],
+        'channels': [ '/channels/', 'chat', this.props.langs['channels']],
+        'contacts': [ '/contacts/', 'people', this.props.langs['contacts']],
+        'trending': ['/trending/', 'trending_up', this.props.langs['trending']],
+        'account': ['/account/', 'account_circle', this.props.langs['account']],
         // 'debug': ['/debug/', 'bug_report']
       },
       selectedbutton: regex_result?regex_result[3]:'channels'
@@ -108,7 +111,7 @@ class TrendingPage extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h1>{"Trending"}</h1>
+              <h1>{this.props.langs.trending}</h1>
               <p> {"Knowing what's people are taking about. (Not avalible now)"}</p>
             </div>
           </div>
@@ -292,7 +295,7 @@ class HeaderPage extends Component {
               }}
             >
               <i className="material-icons">{button[2]}</i>
-              <span className="tooltiptext tooltip-bottom">{button[0]}</span>
+              <span className="tooltiptext tooltip-bottom">{this.props.langs[button[0]]}</span>
             </div>
         );
       })
@@ -341,6 +344,7 @@ class App extends Component {
     let channelroot = "/channels/";
     super(props);
     this.state = {
+      langs: require('./langs.json')['en'],
       debug: debug,
       mymeta: {},
       debuglogs: [['debug', 'debug']],
@@ -353,7 +357,7 @@ class App extends Component {
         }
       },
       contacts: {},
-      users:{},
+      users:{}
     }
 
     this.UserNameToId = {};
@@ -434,7 +438,7 @@ class App extends Component {
         });
     }
 
-    this.getMoreMessages = (chid, begin, rows)=> {
+    this.getMoreMessages = (chid, callback)=> {
       let _fl = Object.keys(this.state.channels[chid]['Messages']).sort((a,b)=>{return a - b;})[0];
 
       if(_fl!=1) {
@@ -444,6 +448,7 @@ class App extends Component {
           this.log('getMsgs ('+chid+')', JSON.stringify(json));
           this.setState(prevState=> {
             prevState.channels[chid]['Messages'] = Object.assign({}, json.r, prevState.channels[chid]['Messages']);
+            callback(false);
             return prevState;
           });
         });
@@ -631,6 +636,9 @@ class App extends Component {
                 NoUser.call('returnUserMeta', null, (err, json2)=> {
                   this.setState({mymeta: Object.assign({}, json, json2)});
                   this.log('NoUser', JSON.stringify(json2));
+                  if(json2.country&&json2.country.toLowerCase()=="taiwan") {
+                    this.setState({langs: require('./langs.json')['zh-tw']});
+                  }
                 });
                 NoTalk.call('getMyChs', null, (err, json)=> {
                   this.setState((prevState)=> {
@@ -786,7 +794,7 @@ class App extends Component {
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
             return(
-              <HeaderPage history={props.history} debug={this.state.debug}>
+              <HeaderPage langs={this.state.langs} history={props.history} debug={this.state.debug}>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChannelList
@@ -797,6 +805,7 @@ class App extends Component {
                     history={props.history}
                     selected={props.match.params.id}
                     rootpath={this.state.channelroot}
+                    langs={this.state.langs}
                     />
                   )
                 }}/>
@@ -811,10 +820,13 @@ class App extends Component {
                         channels={this.state.channels}
                         history={props.history}
                         selected={props.match.params.id}
-                        rootpath={this.state.channelroot}/>
+                        rootpath={this.state.channelroot}
+                        langs={this.state.langs}
+                        />
                       </SplitLeft>
                       <SplitRight>
                         <NewChannelPage
+                        langs={this.state.langs}
                         show={this.state.channelnow=='new'}
                         createChannel={this.createChannel.bind(this)}
                         history={props.history}
@@ -842,13 +854,14 @@ class App extends Component {
                             getUserMetaByUserId={this.getUserMetaByUserId}
                             loadUserMeta={this.loadUserMeta.bind(this)}
                             history={props.history}
+                            langs={this.state.langs}
                           />
                         )
                       }}/>
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
                           <BoxComp history={props.history}>
-                            <BackPage title="New Contact" history={props.history}>
+                            <BackPage title={this.state.langs.new_contacts} history={props.history}>
                               <NewContactsPage
                                 searchUsers={this.searchUsers}
                                 addContacts={this.addContacts}
@@ -874,20 +887,25 @@ class App extends Component {
                         contacts={this.state.contacts}
                         loadUserMeta={this.loadUserMeta.bind(this)}
                         history={props.history}
+                        langs={this.state.langs}
                       />
                       <BoxComp history={props.history}>
                         <BackPage title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'} history={props.history}>
-                          <UserAccountPage addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
+                          <UserAccountPage langs={this.state.langs} addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
                         </BackPage>
                       </BoxComp>
                     </div>
                   )
                 }}/>
                 <Route exact path='/settings:path(/|/.*)' component={SettingsPage}/>
-                <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
+                <Route exact path='/trending:path(/|/.*)'  component={(props)=> {
+                  return(
+                    <TrendingPage langs={this.state.langs}/>
+                  )
+                }}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <MyAccountPage version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <MyAccountPage nouserurl={NOSERVICE_NOUSER_URL} langs={this.state.langs} version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
@@ -897,7 +915,7 @@ class App extends Component {
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{
                   return(
-                    <SigninPage SignupURL={NOSERVICE_SIGNUPURL} NSc={NoService} onFinish={window.location.reload}/>
+                    <SigninPage SignupURL={NOSERVICE_SIGNUP_URL} NSc={NoService} onFinish={window.location.reload}/>
                   );
                 }}/>
                 <Route exact path='/noservice/password' render={(props)=>{

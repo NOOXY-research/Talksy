@@ -26,8 +26,8 @@ export class MyAccountPage extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h1>{"Account"}</h1>
-              <p> {"Manage your Notalk account here."}</p>
+              <h1>{this.props.langs.account}</h1>
+              <p> {this.props.langs.account_description}</p>
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@ export class MyAccountPage extends Component {
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.mymeta.username?this.props.mymeta.username:(this.props.mymeta.n?this.props.mymeta.n:'Guest')}</h2>
+              <h2>{this.props.mymeta.username?this.props.mymeta.username:(this.props.mymeta.n?this.props.mymeta.n:this.props.langs.guest)}</h2>
               <p> {this.props.mymeta.b?this.props.mymeta.b:'You have no bio.'}</p>
             </div>
           </div>
@@ -48,13 +48,13 @@ export class MyAccountPage extends Component {
           }}>
           <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Bio"}</h2>
+              <h2>{this.props.langs.bio}</h2>
               <p> {this.props.mymeta.b}</p>
             </div>
           </div>
           <div className="Page-Row">
             <div className="Page-Row-Text">
-              <h2>{"Active status"}</h2>
+              <h2>{this.props.langs.active_status}</h2>
               <select value={this.props.mymeta.a} onChange={evt => {
                 this.updateActivity(evt.target.value);
               }}>
@@ -66,7 +66,7 @@ export class MyAccountPage extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Blocked Users"}</h2>
+              <h2>{this.props.langs.blocked_user}</h2>
               <p> {"click to edit."}</p>
             </div>
           </div>
@@ -76,17 +76,26 @@ export class MyAccountPage extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Logout"}</h2>
+              <h2>{this.props.langs.logout}</h2>
               <p> {"logout your account"}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=> {this.props.history.push('/noservice/signin')}}>
           <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Switch Account"}</h2>
+              <h2>{this.props.langs.switch_account}</h2>
               <p> {"switch your account"}</p>
             </div>
           </div>
+          <a href={this.props.nouserurl} target="_blank">
+            <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h2>{this.props.langs.account_info}</h2>
+                <p> {this.props.langs.account_info_description}</p>
+              </div>
+            </div>
+          </a>
         </div>
         <div className="Page-Block">
           <a href="https://github.com/NOOXY-Research/" target="_blank">
@@ -112,23 +121,59 @@ export class MyAccountPage extends Component {
           return(
             <BoxComp history={props.history}>
             <BackPage title="New Bio" history={props.history}>
-                <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
+                <EditTextPage title={this.props.langs.bio} description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
             </BackPage>
             </BoxComp>
           );
         }}/>
 
         <Route exact path="/account/more" render={(props)=>{
+          console.log(this.props.mymeta);
           return(
             <BoxComp history={props.history}>
-              <BackPage title="More about you" history={props.history}>
+              <BackPage title={this.props.langs.about_you} history={props.history}>
                 <div className="Page">
                   <div className="Page-Block">
                     <div className="Page-Row">
                     <Ink/>
                       <div className="Page-Row-Text">
-                        <h1>{'More Info'}</h1>
+                        <h1>{this.props.langs.about_you}</h1>
                         <p> {'Here are the detail information of your accout.'}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.displayname}</h2>
+                        <p> {this.props.mymeta.displayname}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.about_you}</h2>
+                        <p> {this.props.mymeta.aboutme}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.country}</h2>
+                        <p> {this.props.mymeta.country}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.phone}</h2>
+                        <p> {this.props.mymeta.phonenumber}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.email}</h2>
+                        <p> {this.props.mymeta.email}</p>
                       </div>
                     </div>
                     <div className="Page-Row">
@@ -200,14 +245,14 @@ export class UserAccountPage extends Component {
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.usermeta.username?this.props.usermeta.username:(this.props.usermeta.n?this.props.usermeta.n:'Guest')}</h2>
+              <h2>{this.props.usermeta.username?this.props.usermeta.username:(this.props.usermeta.n?this.props.usermeta.n:this.props.langs.guest)}</h2>
               <p> {this.props.usermeta.b?this.props.usermeta.b:'Have no bio.'}</p>
             </div>
           </div>
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Bio"}</h2>
+              <h2>{this.props.langs.bio}</h2>
               <p> {this.props.usermeta.b}</p>
             </div>
           </div>

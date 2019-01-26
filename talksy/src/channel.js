@@ -39,6 +39,11 @@ export class ChannelPage extends Component {
       this.MessagesEnd.scrollIntoView({ behavior: b });
   }
 
+  scrollToTop (b) {
+    if(this.props.show)
+      this.MessagesTop.scrollIntoView({ behavior: b });
+  }
+
   renderUserName(msgidx) {
       let username;
       if(this.props.channelmeta.Messages[msgidx][0]&&this.props.users[this.props.channelmeta.Messages[msgidx][0]]) {
@@ -95,7 +100,9 @@ export class ChannelPage extends Component {
     const bottom = e.target.scrollTop === 0;
     if (bottom) {
       let _fl = Object.keys(this.props.channelmeta['Messages']).sort((a,b)=>{return a - b;})[0];
-      this.props.getMoreMessages(this.props.channelid);
+      this.props.getMoreMessages(this.props.channelid,()=> {
+        this.scrollToTop("smooth");
+      });
     }
   }
 
@@ -119,6 +126,7 @@ export class ChannelPage extends Component {
     }
     if(this.Init==false&&this.props.channelmeta.Messages!=null) {
       this.Scroll=true;
+      this.Init = true;
     }
     return(
       <div className="ChPage" style={this.props.show?null:{ display:"none"}}>
@@ -144,6 +152,7 @@ export class ChannelPage extends Component {
           </div>
         </div>
         <ul className="ChPage-Messages" onScroll={this.handleScroll.bind(this)}>
+          <div style={{ float:"left", clear: "both" }} ref={el => this.MessagesTop = el}></div>
           {this.renderMessages()}
           <div style={{ float:"left", clear: "both" }} ref={el => this.MessagesEnd = el}></div>
         </ul>
@@ -239,7 +248,7 @@ export class NewChannelPage extends Component {
                   <div className="Page-Row">
                   <Ink/>
                     <div className="Page-Row-Text">
-                      <h1>{"Create a new channel"}</h1>
+                      <h1>{this.props.langs.new_channels}</h1>
                       <p> {this.state.status}</p>
                     </div>
                   </div>
@@ -711,14 +720,14 @@ export class ChannelList extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h1>{"Your channels"}</h1>
-              <p> {"Here are all of your channels. (Talksy is still under development, will be avalible about this summer.)"}</p>
+              <h1>{this.props.langs.channels}</h1>
+              <p> {this.props.langs.channellist_description}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
             <Ink />
             <div className="Page-Row-Button">
-              <span>new channel </span><i className="material-icons">add_circle</i>
+              <span>{this.props.langs.new_channels}</span><i className="material-icons">add_circle</i>
             </div>
           </div>
         </div>
