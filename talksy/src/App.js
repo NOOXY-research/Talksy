@@ -25,7 +25,6 @@ const RETRY_INTERVAL= CONSTANTS.RETRY_INTERVAL;
 const READ_NEW_LINE = CONSTANTS.READ_NEW_LINE;
 
 const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
-const NOSERVICE_NOUSER_URL = CONSTANTS.NOSERVICE_NOUSER_URL;
 
 const nshost = CONSTANTS.NOSERVICE_HOST;
 const debug = CONSTANTS.DEBUG;
@@ -905,7 +904,7 @@ class App extends Component {
                 }}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <MyAccountPage nouserurl={NOSERVICE_NOUSER_URL} langs={this.state.langs} version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <MyAccountPage langs={this.state.langs} version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{

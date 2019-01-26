@@ -4,6 +4,11 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { BoxComp, PageRow, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
 import Ink from 'react-ink';
 
+const CONSTANTS = require('./constants.json');
+
+const NOSERVICE_NOUSER_URL = CONSTANTS.NOSERVICE_NOUSER_URL;
+
+
 export class MyAccountPage extends Component {
   constructor(props) {
     super(props);
@@ -20,6 +25,7 @@ export class MyAccountPage extends Component {
   };
 
   render() {
+    console.log(NOSERVICE_NOUSER_URL);
     return(
       <div className="Page">
         <div className="Page-Block">
@@ -87,7 +93,9 @@ export class MyAccountPage extends Component {
               <p> {"switch your account"}</p>
             </div>
           </div>
-          <a href={this.props.nouserurl} target="_blank">
+        </div>
+        <div className="Page-Block">
+          <a href={CONSTANTS.NOSERVICE_NOUSER_URL} target="_blank">
             <div className="Page-Row">
             <Ink/>
               <div className="Page-Row-Text">
@@ -98,7 +106,7 @@ export class MyAccountPage extends Component {
           </a>
         </div>
         <div className="Page-Block">
-          <a href="https://github.com/NOOXY-Research/" target="_blank">
+          <a href={CONSTANTS.OPENSOURCE_URL} target="_blank">
             <div className="Page-Row">
             <Ink/>
               <div className="Page-Row-Text">

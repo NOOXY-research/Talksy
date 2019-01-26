@@ -1,4 +1,4 @@
-# NoTalk-reactjs
-Reactjs frontend for NSF NoChat service.
+# Talksy
+Reactjs frontend for NoService NoTalk service.
 ![alt text](/imgs/NoTalkAD.png)
-![alt text](/imgs/figure1.png)
+![alt text](/imgs/Talksy.png)

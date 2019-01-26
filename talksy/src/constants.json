@@ -7,5 +7,6 @@
   "RETRY_INTERVAL": 3000,
   "READ_NEW_LINE": 10,
   "NOSERVICE_SIGNUP_URL": "https://nooxy.org/static/NoService/signup.html",
-  "NOSERVICE_NOUSER_URL": "https://nooxy.org/static/NoService/NoUserSettings.html"
+  "NOSERVICE_NOUSER_URL": "https://nooxy.org/static/NoService/NoUserSettings.html",
+  "OPENSOURCE_URL": "https://github.com/NOOXY-Research/"
 }
