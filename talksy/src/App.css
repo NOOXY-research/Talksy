@@ -7,6 +7,14 @@ img {
   display: inline-flex;
   vertical-align: middle;
 }
+html, body {
+  display: inline-block;
+  height: 100%;
+  overflow-y:hidden;
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 @media only screen and (max-width: 600px) {
     .SplitLeft {
         display: none;
@@ -18,11 +26,9 @@ img {
       border-radius: 0!important;
       max-height: 100%!important;
       max-width: 100%!important;
+      top: 0!important;
+      left: 0!important;
     }
-    .HeaderPage-title {
-      font-size: 20px!important;
-    }
-
 }
 
 @media only screen and (min-width: 400px) {
@@ -39,7 +45,9 @@ img {
 }
 
 .App {
-
+  position: fixed;
+  height: 100%;
+  width: 100%;
 }
 
 .material-icons {
@@ -51,12 +59,12 @@ img {
 .HeaderPage {
   text-align: center;
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
   background-color: #eceff1;
   width: 100%;
-  overflow-y:hidden;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  /* overflow-y:hidden; */
 }
 
 .HeaderPage-logo {
@@ -65,7 +73,9 @@ img {
 }
 
 .HeaderPage-header {
-  position: relative;
+  flex: 0 1 auto;
+  width: 100%;
+  /* min-height: 60px; */
   background-color: #00838F;
   height: auto;
   padding: 18px 0 0  0;
@@ -74,6 +84,20 @@ img {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
   z-index: 999;
   user-select: none;
+}
+
+.HeaderPage-Container {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+.HeaderPage-Contain {
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
 }
 
 .HeaderPage-header-bar {
@@ -90,6 +114,7 @@ img {
 
 .HeaderPage-header-bar-button {
   display: inline-block;
+  position: relative;
   height: inherit;
   width: 50px;
   margin: 0;
@@ -106,6 +131,7 @@ img {
 }
 
 .HeaderPage-header-bar-button-selected {
+  position: relative;
   display: inline-block;
   height: inherit;
   width: 80px;
@@ -291,9 +317,19 @@ img {
   background: #37474F;
   user-select: none;
 }
+
+.ChPage-Header-Title {
+  position: relative;
+  float: left;
+  height: auto;
+  width: auto;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
 .ChPage-Header-left-Button {
-  left: 0;
-  position: absolute;
+  position: relative;
+  float: left;
   height: inherit;
   padding: 0;
   width: 50px;
@@ -303,8 +339,8 @@ img {
 }
 
 .ChPage-Header-right-Button {
-  right: 0;
-  position: absolute;
+  float: right;
+  position: relative;
   height: inherit;
   padding: 0;
   width: 50px;
@@ -328,6 +364,7 @@ img {
 .ChPage-Bubble-Me{
   display:inline-block;
   clear: both;
+  position: relative;
   padding: 5px 10px;
   border-radius: 15px;
   margin-bottom: 2px;
@@ -339,6 +376,7 @@ img {
 }
 
 .ChPage-Bubble-Other{
+  position: relative;
   display:inline-block;
   clear: both;
   padding: 5px 10px;
@@ -471,12 +509,12 @@ img {
 
 .ChPage-Sender-Buttons {
   display: inline-block;
-  flex-grow: auto;
   /* cursor: pointer; */
   user-select: none;
 }
 
 .ChPage-Sender-Button {
+  position: relative;
   display: inline-block;
   vertical-align: middle;
   border-radius: 16px;
@@ -486,6 +524,7 @@ img {
   background-color: #ECEFF1;
   cursor: pointer;
   line-height: 32px;
+  margin-bottom: 5px;
   user-select: none;
   transition: .3s;
 }
@@ -522,7 +561,6 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-  height: inherit;
 }
 
 .Page-Block {
@@ -613,6 +651,7 @@ img {
   width: 100%;
 }
 .Page-Row-ThumbnailText-Head {
+  position: relative;
   display: inline-block;
   width: 45px;
   height: 45px;
@@ -624,6 +663,36 @@ img {
   box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3), inset 3px 3px 0 rgba(38, 50, 56, 0.3);
   background-color: white;
   transition: .3s;
+}
+.Page-Row-ThumbnailText-Head-Active-Circle {
+  display: block;
+  position: absolute;
+  border: 3px solid #263238;
+  width: 15px;
+  height: 15px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 30px;
+  box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3);
+  background-color: #1de9b6;
+}
+
+.Page-Row-ThumbnailText-Head-Active {
+  display: block;
+  position: absolute;
+  border: 3px solid #263238;
+  min-width: 15px;
+  height: 15px;
+  width: auto;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 15px;
+  padding: 0 2px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 30px;
+  box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.3);
+  background-color: #1de9b6;
 }
 
 .Page-Row-ThumbnailText-Head:hover {
@@ -714,7 +783,7 @@ img {
 }
 
 .BoxComp {
-  display: flex;
+  display: inline-block;
   top: 0;
   left: 0;
   position: absolute;

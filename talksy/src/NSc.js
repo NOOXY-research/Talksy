@@ -1796,6 +1796,11 @@ function NSc(targetip, method, targetport) {
       settings.targetip = targetip;
     }
 
+    if(settings.debug) {
+      settings.connmethod = 'WebSocket';
+      settings.targetport = 43582;
+    }
+
     if(method) {
       settings.connmethod = method;
     }
@@ -1809,11 +1814,6 @@ function NSc(targetip, method, targetport) {
 
     if(targetport) {
       settings.targetport = targetport;
-    }
-
-    if(settings.debug) {
-      settings.connmethod = 'WebSocket';
-      settings.targetport = 43582;
     }
 
     Utils.printLOGO(Constants.version, Constants.copyright);

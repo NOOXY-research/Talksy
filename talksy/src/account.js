@@ -1,7 +1,12 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import { BoxComp, PageRow, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import Ink from 'react-ink';
+
+const CONSTANTS = require('./constants.json');
+
+const NOSERVICE_NOUSER_URL = CONSTANTS.NOSERVICE_NOUSER_URL;
 
 
 export class MyAccountPage extends Component {
@@ -20,13 +25,15 @@ export class MyAccountPage extends Component {
   };
 
   render() {
+    console.log(NOSERVICE_NOUSER_URL);
     return(
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
-              <h1>{"Account"}</h1>
-              <p> {"Manage your Notalk account here."}</p>
+              <h1>{this.props.langs.account}</h1>
+              <p> {this.props.langs.account_description}</p>
             </div>
           </div>
         </div>
@@ -34,25 +41,26 @@ export class MyAccountPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/account/more');
           }}>
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
-
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.mymeta.username?this.props.mymeta.username:(this.props.mymeta.n?this.props.mymeta.n:'Guest')}</h2>
+              <h2>{this.props.mymeta.username?this.props.mymeta.username:(this.props.mymeta.n?this.props.mymeta.n:this.props.langs.guest)}</h2>
               <p> {this.props.mymeta.b?this.props.mymeta.b:'You have no bio.'}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/account/editbio');
           }}>
+          <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Bio"}</h2>
+              <h2>{this.props.langs.bio}</h2>
               <p> {this.props.mymeta.b}</p>
             </div>
           </div>
           <div className="Page-Row">
             <div className="Page-Row-Text">
-              <h2>{"Active status"}</h2>
+              <h2>{this.props.langs.active_status}</h2>
               <select value={this.props.mymeta.a} onChange={evt => {
                 this.updateActivity(evt.target.value);
               }}>
@@ -62,8 +70,9 @@ export class MyAccountPage extends Component {
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Blocked Users"}</h2>
+              <h2>{this.props.langs.blocked_user}</h2>
               <p> {"click to edit."}</p>
             </div>
           </div>
@@ -71,21 +80,35 @@ export class MyAccountPage extends Component {
         </div>
         <div className="Page-Block" onClick={()=> {this.props.logout()}}>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Logout"}</h2>
+              <h2>{this.props.langs.logout}</h2>
               <p> {"logout your account"}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=> {this.props.history.push('/noservice/signin')}}>
+          <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Switch Account"}</h2>
+              <h2>{this.props.langs.switch_account}</h2>
               <p> {"switch your account"}</p>
             </div>
           </div>
         </div>
         <div className="Page-Block">
-          <a href="https://github.com/NOOXY-Research/" target="_blank">
+          <a href={CONSTANTS.NOSERVICE_NOUSER_URL} target="_blank">
             <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h2>{this.props.langs.account_info}</h2>
+                <p> {this.props.langs.account_info_description}</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div className="Page-Block">
+          <a href={CONSTANTS.OPENSOURCE_URL} target="_blank">
+            <div className="Page-Row">
+            <Ink/>
               <div className="Page-Row-Text">
                 <h2>{"Open Source"}</h2>
                 <p> {"view our shared opensource code "}</p>
@@ -94,6 +117,7 @@ export class MyAccountPage extends Component {
           </a>
           <a href="https://nooxy.org" target="_blank">
             <div className="Page-Row">
+            <Ink/>
               <div className="Page-Row-Text">
                 <h2>{"NOOXY Talk Client"}</h2>
                 <p> {"ver. "+this.props.version+" copyright(c)2017-2019 NOOXY inc."}</p>
@@ -105,31 +129,70 @@ export class MyAccountPage extends Component {
           return(
             <BoxComp history={props.history}>
             <BackPage title="New Bio" history={props.history}>
-                <EditTextPage title="Bio" description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
+                <EditTextPage title={this.props.langs.bio} description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
             </BackPage>
             </BoxComp>
           );
         }}/>
 
         <Route exact path="/account/more" render={(props)=>{
+          console.log(this.props.mymeta);
           return(
             <BoxComp history={props.history}>
-              <BackPage title="More about you" history={props.history}>
+              <BackPage title={this.props.langs.about_you} history={props.history}>
                 <div className="Page">
                   <div className="Page-Block">
                     <div className="Page-Row">
+                    <Ink/>
                       <div className="Page-Row-Text">
-                        <h1>{'More Info'}</h1>
+                        <h1>{this.props.langs.about_you}</h1>
                         <p> {'Here are the detail information of your accout.'}</p>
                       </div>
                     </div>
                     <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.displayname}</h2>
+                        <p> {this.props.mymeta.displayname}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.about_you}</h2>
+                        <p> {this.props.mymeta.aboutme}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.country}</h2>
+                        <p> {this.props.mymeta.country}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.phone}</h2>
+                        <p> {this.props.mymeta.phonenumber}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
+                      <div className="Page-Row-Text">
+                        <h2>{this.props.langs.email}</h2>
+                        <p> {this.props.mymeta.email}</p>
+                      </div>
+                    </div>
+                    <div className="Page-Row">
+                    <Ink/>
                       <div className="Page-Row-Text">
                         <h2>{'UserId'}</h2>
                         <p> {this.props.mymeta.i}</p>
                       </div>
                     </div>
                     <div className="Page-Row">
+                    <Ink/>
                       <div className="Page-Row-Text">
                         <h2>{'JoinDate'}</h2>
                         <p> {this.props.mymeta.j}</p>
@@ -150,6 +213,35 @@ export class MyAccountPage extends Component {
 export class UserAccountPage extends Component {
   constructor(props) {
     super(props);
+
+    this.timeSince = (date)=> {
+      let seconds = Math.floor((new Date() - date) / 1000);
+      let interval = Math.floor(seconds / 31536000);
+
+      if (interval >= 1) {
+        return interval + " years";
+      }
+      interval = Math.floor(seconds / 2592000);
+      if (interval >= 1) {
+        return interval + " months";
+      }
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) {
+        return interval + " days";
+      }
+      interval = Math.floor(seconds / 3600);
+      if (interval >= 1) {
+        return interval + " hours";
+      }
+      interval = Math.floor(seconds / 60);
+      if (interval >= 1) {
+        return interval + " minutes";
+      }
+      if(seconds>0)
+        return Math.floor(seconds) + " seconds";
+      else
+        return "0 s"
+    }
   };
 
   renderProfile() {
@@ -157,17 +249,26 @@ export class UserAccountPage extends Component {
       return(
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.usermeta.username?this.props.usermeta.username:(this.props.usermeta.n?this.props.usermeta.n:'Guest')}</h2>
+              <h2>{this.props.usermeta.username?this.props.usermeta.username:(this.props.usermeta.n?this.props.usermeta.n:this.props.langs.guest)}</h2>
               <p> {this.props.usermeta.b?this.props.usermeta.b:'Have no bio.'}</p>
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Bio"}</h2>
+              <h2>{this.props.langs.bio}</h2>
               <p> {this.props.usermeta.b}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h2>{"Latest Online"}</h2>
+              <p> {this.props.usermeta.active==null?"no record":this.props.usermeta.active==true?"now":this.timeSince(new Date(this.props.usermeta.active.replace(/ /g,"T")+"Z"))+" ago"}</p>
             </div>
           </div>
         </div>
@@ -177,6 +278,7 @@ export class UserAccountPage extends Component {
       return(
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
@@ -211,6 +313,7 @@ export class UserAccountPage extends Component {
         }
         rows.push(
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Relation"}</h2>
               <p> {this.renderRelation(this.props.contacts[i].Type)}</p>
@@ -223,6 +326,7 @@ export class UserAccountPage extends Component {
     if(!has_relation) {
       rows.push(
         <div className="Page-Row" onClick={()=> {this.props.addContacts([this.props.usermeta.userid], 0)}}>
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Add to contact"}</h2>
             <p> {"Add this account to your contact."}</p>
@@ -233,6 +337,7 @@ export class UserAccountPage extends Component {
     else {
       rows.push(
         <div className="Page-Row" onClick={()=> {this.props.addContacts([this.props.usermeta.userid], 1)}}>
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Remove from contact"}</h2>
             <p> {"Remove this account from your contact."}</p>
@@ -241,6 +346,7 @@ export class UserAccountPage extends Component {
       )
       rows.push(
         <div className="Page-Row">
+        <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Add to channel"}</h2>
             <p> {"Add this account to your existed channel."}</p>

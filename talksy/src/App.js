@@ -10,18 +10,23 @@ import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage
 import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "./channel";
 import {ContactsPage, NewContactsPage} from "./contact";
 import {MyAccountPage, UserAccountPage} from "./account";
+import Ink from 'react-ink';
 import NSClient from './NSc.js';
 import logo from './logo.png';
 import './App.css';
 import './tooltip.css';
 
-const VERSION = "alpha 2019.1.23"
+const CONSTANTS = require('./constants.json');
 
-const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
+const VERSION = CONSTANTS.VERSION;
+const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
+const RETRY_INTERVAL= CONSTANTS.RETRY_INTERVAL;
+const READ_NEW_LINE = CONSTANTS.READ_NEW_LINE;
 
+const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
 
-const nshost = 'nooxy.org';
-const debug = false;
+const nshost = CONSTANTS.NOSERVICE_HOST;
+const debug = CONSTANTS.DEBUG;
 const nsport = null;
 
 const NoService = new NSClient(nshost);
@@ -29,6 +34,7 @@ NoService.setDebug(debug);
 
 let NoTalk;
 let NoUser;
+
 
 NoService.setDebug(debug);
 // EditListPage
@@ -39,10 +45,10 @@ class MainCtrlComp extends Component {
     this.state = {
       headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
       buttons: {
-        'channels': [ '/channels/', 'chat'],
-        'contacts': [ '/contacts/', 'people'],
-        'trending': ['/trending/', 'trending_up'],
-        'account': ['/account/', 'account_circle'],
+        'channels': [ '/channels/', 'chat', this.props.langs['channels']],
+        'contacts': [ '/contacts/', 'people', this.props.langs['contacts']],
+        'trending': ['/trending/', 'trending_up', this.props.langs['trending']],
+        'account': ['/account/', 'account_circle', this.props.langs['account']],
         // 'debug': ['/debug/', 'bug_report']
       },
       selectedbutton: regex_result?regex_result[3]:'channels'
@@ -104,8 +110,9 @@ class TrendingPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
-              <h1>{"Trending"}</h1>
+              <h1>{this.props.langs.trending}</h1>
               <p> {"Knowing what's people are taking about. (Not avalible now)"}</p>
             </div>
           </div>
@@ -167,6 +174,7 @@ class DebugPage extends Component {
     for(let key in this.props.logs) {
       elems.push(
           <div key={key} className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{'ln['+key+'] '+(this.props.logs[key])[0]}</h2>
               <p>{(this.props.logs[key])[1]}</p>
@@ -182,12 +190,14 @@ class DebugPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Debug Component"}</h1>
               <p> {"here are the debug components."}</p>
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService Daemon"}</h2>
               <p> {'Host: '+nshost+', Debug: '+debug}</p>
@@ -196,6 +206,7 @@ class DebugPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/noservice/signin');
           }}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService signin"}</h2>
               <p> {"NOOXY service SigninPage"}</p>
@@ -204,6 +215,7 @@ class DebugPage extends Component {
           <div className="Page-Row" onClick={()=>{
             this.props.history.push('/noservice/password');
           }}>
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService Password"}</h2>
               <p> {"NOOXY service auth by password"}</p>
@@ -214,6 +226,7 @@ class DebugPage extends Component {
 
         <div className="Page-Block">
         <div className="Page-Row">
+        <Ink/>
           <div className="Page-Row-Text">
             <h1>{"Debug Logs"}</h1>
             <p> {"below are the debug logs."}</p>
@@ -237,20 +250,15 @@ class FailedPage extends Component {
         <div className="Page-Block">
           <div className="Page-Row">
             <div className="Page-Row-Text">
-              <h1>{"Connection Failed"}</h1>
-              <p> {"Error occured while connecting to NoService."}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"NoService Daemon"}</h2>
-              <p> {'Host: '+nshost+', Debug: '+debug}</p>
+              <h1>{"Disconnected"}</h1>
+              <p> {"Error occured while connecting to NoService. We are trying to reconnect."}</p>
             </div>
           </div>
           <div className="Page-Row" onClick={()=> {window.location.reload();}}>
+          <Ink/>
             <div className="Page-Row-Text">
-              <h2>{"Retry"}</h2>
-              <p> {'Click this buttom to reload the page.'}</p>
+              <h2>{"Retry now"}</h2>
+              <p> {'Click this buttom to reload the page now.'}</p>
             </div>
           </div>
         </div>
@@ -288,7 +296,7 @@ class HeaderPage extends Component {
               }}
             >
               <i className="material-icons">{button[2]}</i>
-              <span className="tooltiptext tooltip-bottom">{button[0]}</span>
+              <span className="tooltiptext tooltip-bottom">{this.props.langs[button[0]]}</span>
             </div>
         );
       })
@@ -322,7 +330,11 @@ class HeaderPage extends Component {
             {this.renderDebugButton()}
           </div>
         </header>
+        <div className="HeaderPage-Container">
+        <div className="HeaderPage-Contain">
         {this.props.children}
+        </div>
+        </div>
       </div>
     );
   }
@@ -333,6 +345,7 @@ class App extends Component {
     let channelroot = "/channels/";
     super(props);
     this.state = {
+      langs: require('./langs.json')['en'],
       debug: debug,
       mymeta: {},
       debuglogs: [['debug', 'debug']],
@@ -345,7 +358,7 @@ class App extends Component {
         }
       },
       contacts: {},
-      users:{},
+      users:{}
     }
 
     this.UserNameToId = {};
@@ -374,31 +387,82 @@ class App extends Component {
     };
 
     this.searchUsers = (username, callback)=> {
-      NoUser.call("searchUsersByUsername", {n:username}, (err, json)=> {
-        this.log("searchUsers", json);
-        callback(err, json.r);
-      });
+      if(NoUser)
+        NoUser.call("searchUsersByUsername", {n:username}, (err, json)=> {
+          this.log("searchUsers", json);
+          callback(err, json.r);
+        });
     }
 
     this.addContacts =(contacts, type, callback)=> {
-      NoTalk.call("addConts", {c:contacts, t:type}, (err, json)=> {
-        this.log("addConts", json);
-        if(callback)
-          callback(err, json);
-      });
+      if(NoTalk)
+        NoTalk.call("addConts", {c:contacts, t:type}, (err, json)=> {
+          this.log("addConts", json);
+          if(callback)
+            callback(err, json);
+        });
     }
 
     this.getMyContacts = (callback)=> {
-      NoTalk.call("getMyConts", null, (err, json)=> {
-        this.log("getMyConts", json);
-        callback(err, json.r);
-      });
+      if(NoTalk)
+        NoTalk.call("getMyConts", null, (err, json)=> {
+          this.log("getMyConts", json);
+          callback(err, json.r);
+        });
+    }
+
+    this.getUserActivity = (userid, callback)=> {
+      if(NoTalk)
+        NoTalk.call("getUserAct", {i: userid}, (err, json)=> {
+          this.log("getUserAct("+userid+")", json);
+          callback(err, json.r);
+        });
     }
 
     this.addUsersToChannel = (chid, users, callback)=> {
-      NoTalk.call("addUsersToCh", {c:chid,i:users}, (err, json)=> {
-        this.log("addUsersToChannel", json);
-        callback(err, json);
+      if(NoTalk)
+        NoTalk.call("addUsersToCh", {c:chid,i:users}, (err, json)=> {
+          this.log("addUsersToChannel", json);
+          callback(err, json);
+        });
+    }
+
+    this.readChannelLine = (chid, line, callback)=> {
+      if(NoTalk)
+        NoTalk.call("readChLine", {i:chid,l:line}, (err, json)=> {
+          this.log("readChannelLine", json);
+          this.setState(prevState=>{
+            prevState.channels[chid]['LatestReadline'] = line;
+            return prevState;
+          });
+          callback(err, json);
+        });
+    }
+
+    this.getMoreMessages = (chid, callback)=> {
+      let _fl = Object.keys(this.state.channels[chid]['Messages']).sort((a,b)=>{return a - b;})[0];
+
+      if(_fl!=1) {
+        let begin=(_fl-READ_NEW_LINE)>=0?(_fl-READ_NEW_LINE):0;
+        let rows =READ_NEW_LINE;
+        NoTalk.call('getMsgs', {i: chid, b:begin, r:rows}, (err, json)=> {
+          this.log('getMsgs ('+chid+')', JSON.stringify(json));
+          this.setState(prevState=> {
+            prevState.channels[chid]['Messages'] = Object.assign({}, json.r, prevState.channels[chid]['Messages']);
+            callback(false);
+            return prevState;
+          });
+        });
+      }
+    }
+
+    this.deleteChannel = (chid, callback)=> {
+      // return status
+      if(NoTalk)
+        NoTalk.call('delCh', {i:chid}, (err, meta)=> {
+          this.log('delete Channel', meta);
+          if(callback)
+            callback(err, meta);
       });
     }
 
@@ -422,6 +486,12 @@ class App extends Component {
               this.setState(prevState=> {
                 prevState.users[userid] = meta;
                 this.setUserNameToId(meta.username, userid);
+                this.getUserActivity(userid, (err, active)=> {
+                  this.setState(prevState=> {
+                    prevState.users[userid].active = active;
+                    return prevState;
+                  });
+                });
                 return prevState;
               });
             });
@@ -432,17 +502,19 @@ class App extends Component {
 
     this.createChannel = (meta, callback)=> {
       // return status
-      NoTalk.call('createCh', meta, (err, meta)=> {
-        this.log('createCh', meta);
-        callback(err, meta);
-      });
+      if(NoTalk)
+        NoTalk.call('createCh', meta, (err, meta)=> {
+          this.log('createCh', meta);
+          callback(err, meta);
+        });
     }
 
     this.updateChannel = (meta, callback)=> {
       // return status
-      NoTalk.call('updateCh', meta, (err, meta)=> {
-        this.log('updateCh', meta);
-        callback(err, meta);
+      if(NoTalk)
+        NoTalk.call('updateCh', meta, (err, meta)=> {
+          this.log('updateCh', meta);
+          callback(err, meta);
       });
     }
   }
@@ -463,138 +535,173 @@ class App extends Component {
         this.history.push('/noservice/password?authtoken='+data.d.t);
       });
       this.log('NoService', 'Have set up NOOXY service implementations.');
-      NoService.createActivitySocket('NoTalk', (err, as)=>{
-        NoTalk = as;
-        if(err) {
-          this.log('NoService', 'Connection Failed.');
-          this.setState({connectionfailed: true});
-        }
-        else {
-          NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
-            let newmeta = json;
-            for(let i in this.state.mymeta) {
-              if(!newmeta[i]) {
-                newmeta[i] = this.state.mymeta[i];
-              }
-            }
-            this.log('MyMetaUpdated event', json);
-            this.setState({mymeta: newmeta});
-          });
-          NoTalk.onEvent('Message', (err, json)=> {
-            this.log('message event', json);
-            this.setState(prevState=> {
-              let beadded ={};
-              // add to last index
-              if(prevState.channels[json.i]['Messages']) {
-                beadded[Object.keys(prevState.channels[json.i]['Messages']).sort((a,b)=>{return b - a;})[0]+1] = json.r;
-                prevState.channels[json.i]['Messages'] = Object.assign({}, beadded, prevState.channels[json.i]['Messages']);
-              }
-              else {
-                prevState.channels[json.i]['Messages'] ={1: json.r};
-              }
-              return prevState;
-            });
-          });
 
-          NoTalk.onEvent('AddedContacts', (err, json)=> {
-            this.log('AddedContacts event', json);
-            this.setState(prevState=> {
-              for(let i in json.r) {
-                prevState.contacts[json.r[i].ToUserId] = json.r[i];
-              }
-              return prevState;
-            });
-          });
-
-          NoTalk.onEvent('ChannelUpdated', (err, json)=> {
-            this.log('ChannelUpdated event', json);
-            this.setState(prevState=> {
-              console.log(json);
-              for(let key in json.r) {
-                prevState.channels[json.i][key] = json.r[key];
-              }
-              return prevState;
-            });
-          });
-
-          NoTalk.onEvent('AddedToChannel', (err, json)=> {
-            this.log('AddedToChannel event', json);
-            this.setState(prevState=> {
-              console.log(json);
-              prevState.channels[json.i] = json.r;
-              return prevState;
-            }, ()=> {
-              NoTalk.call('bindChs', {i: [json.i]}, (err, json2)=> {
-                json2['ChIds'] = Object.keys(json);
-                this.log('bindCh', JSON.stringify(json2));
-              });
-            });
-          });
-          this.updateMyMeta = (newmeta)=> {
-            as.call('updateMyMeta', newmeta, ()=>{
-              this.log('updateMyMeta', 'OK');
-            })
+      let _startup = ()=> {
+        this.log('NoService', 'Starting up.');
+        NoService.createActivitySocket('NoTalk', (err, as)=>{
+          NoTalk = as;
+          if(err) {
+            this.log('NoService', 'Connection Failed.');
+            this.setState({connectionfailed: true});
+            NoTalk = NoUser = null;
+            setTimeout(_startup, RETRY_INTERVAL);
           }
-          this.log('NoService', 'Connected to the Service.');
-
-          NoTalk.call('getMyMeta', null, (err, json)=> {
-            this.log('getMyMeta', JSON.stringify(json));
-            if(json.i) {
-              this.setState({mymeta: json});
-            }
-            else {
-              this.updateMyMeta({a:0});
-            }
-            NoService.createActivitySocket('NoUser', (err, as2)=>{
-              NoUser = as2;
-              NoUser.call('returnUserMeta', null, (err, json2)=> {
-                this.setState({mymeta: Object.assign({}, json, json2)});
-                this.log('NoUser', JSON.stringify(json2));
+          else {
+            NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
+              let newmeta = json;
+              for(let i in this.state.mymeta) {
+                if(!newmeta[i]) {
+                  newmeta[i] = this.state.mymeta[i];
+                }
+              }
+              this.log('MyMetaUpdated event', json);
+              this.setState({mymeta: newmeta});
+            });
+            NoTalk.onEvent('Message', (err, json)=> {
+              this.log('message event', json);
+              this.setState(prevState=> {
+                let beadded ={};
+                // add to last index
+                if(prevState.channels[json.i]['Messages']&&Object.keys(prevState.channels[json.i]['Messages']).length!=0) {
+                  beadded[parseInt(Object.keys(prevState.channels[json.i]['Messages']).sort((a,b)=>{return b - a;})[0])+1] = json.r;
+                  prevState.channels[json.i]['Messages'] = Object.assign({}, beadded, prevState.channels[json.i]['Messages']);
+                }
+                else {
+                  prevState.channels[json.i]['Messages'] ={1: json.r};
+                }
+                return prevState;
               });
-              NoTalk.call('getMyChs', null, (err, json)=> {
-                this.setState((prevState)=> {
-                  prevState.channels = json;
-                  return prevState;
-                });
-                this.log('getMyChs', JSON.stringify(json));
+            });
 
-                NoTalk.call('bindChs', {i: Object.keys(json)}, (err, json2)=> {
+            NoTalk.onEvent('AddedContacts', (err, json)=> {
+              this.log('AddedContacts event', json);
+              this.setState(prevState=> {
+                for(let i in json.r) {
+                  prevState.contacts[json.r[i].ToUserId] = json.r[i];
+                }
+                return prevState;
+              });
+            });
+
+            NoTalk.onEvent('ChannelUpdated', (err, json)=> {
+              this.log('ChannelUpdated event', json);
+              this.setState(prevState=> {
+                for(let key in json.r) {
+                  prevState.channels[json.i][key] = json.r[key];
+                }
+                return prevState;
+              });
+            });
+
+            NoTalk.onEvent('ChannelDeleted', (err, json)=> {
+              this.log('ChannelDeleted event', json);
+              this.setState(prevState=> {
+                delete prevState.channels[json.i];
+                return prevState;
+              });
+            });
+
+            NoTalk.onEvent('AddedToChannel', (err, json)=> {
+              this.log('AddedToChannel event', json);
+              this.setState(prevState=> {
+                prevState.channels[json.i] = json.r;
+                return prevState;
+              }, ()=> {
+                NoTalk.call('bindChs', {i: [json.i]}, (err, json2)=> {
                   json2['ChIds'] = Object.keys(json);
                   this.log('bindCh', JSON.stringify(json2));
                 });
-
-                this.getMyContacts((err, contacts)=>{
-                  this.setState(prevState=> {
-                    for(let i in contacts) {
-                      prevState.contacts[contacts[i].ToUserId] = contacts[i];
-                    }
-                    return prevState;
-                  });
-                });
-
-                for(let chid in json) {
-                  NoTalk.call('getMsgs', {i: chid, r:15}, (err, json)=> {
-                    this.log('getMsgs ('+chid+')', JSON.stringify(json));
-                    this.setState(prevState=> {
-                      prevState.channels[chid]['Messages'] = json.r;
-                      return prevState;
-                    });
-                  });
-                }
               });
             });
-          });
+            this.updateMyMeta = (newmeta)=> {
+              as.call('updateMyMeta', newmeta, ()=>{
+                this.log('updateMyMeta', 'OK');
+              })
+            }
+            this.log('NoService', 'Connected to the Service.');
 
-          as.onData = (data) => {
-            this.log('NSActivity onData', data);
-            // this.setState({debuglogs: this.state.debuglogs.push(['NoService', data])}) ;
+            NoTalk.call('getMyMeta', null, (err, json)=> {
+              this.log('getMyMeta', JSON.stringify(json));
+              if(json.i) {
+                this.setState({mymeta: json});
+              }
+              else {
+                this.updateMyMeta({a:0});
+              }
+              NoService.createActivitySocket('NoUser', (err, as2)=>{
+                NoUser = as2;
+                //
+                this.setState({connectionfailed: false});
+                //
+                NoUser.call('returnUserMeta', null, (err, json2)=> {
+                  this.setState({mymeta: Object.assign({}, json, json2)});
+                  this.log('NoUser', JSON.stringify(json2));
+                  if(json2.country&&json2.country.toLowerCase()=="taiwan") {
+                    this.setState({langs: require('./langs.json')['zh-tw']});
+                  }
+                });
+                NoTalk.call('getMyChs', null, (err, json)=> {
+                  this.setState((prevState)=> {
+                    prevState.channels = json;
+                    return prevState;
+                  });
+                  this.log('getMyChs', JSON.stringify(json));
+
+                  NoTalk.call('bindChs', {i: Object.keys(json)}, (err, json2)=> {
+                    json2['ChIds'] = Object.keys(json);
+                    this.log('bindCh', JSON.stringify(json2));
+                  });
+
+                  this.getMyContacts((err, contacts)=>{
+                    this.setState(prevState=> {
+                      for(let i in contacts) {
+                        prevState.contacts[contacts[i].ToUserId] = contacts[i];
+                      }
+                      return prevState;
+                    })
+                    setInterval(()=> {
+                      let contacts = this.state.contacts;
+                      for(let i in contacts) {
+                        this.getUserActivity(contacts[i].ToUserId, (err, active)=> {
+                          this.setState(prevState=> {
+                            if(prevState.users[contacts[i].ToUserId])
+                              prevState.users[contacts[i].ToUserId].active = active;
+                            return prevState;
+                          });
+                        });
+                      }
+                    }, REFRESH_ACTIVITY_INTERVAL);
+                  });
+
+                  for(let chid in json) {
+                    NoTalk.call('getMsgs', {i: chid, r:30}, (err, json)=> {
+                      this.log('getMsgs ('+chid+')', JSON.stringify(json));
+                      this.setState(prevState=> {
+                        prevState.channels[chid]['Messages'] = json.r;
+                        prevState.channels[chid]['LatestReadline'] = json.l;
+                        return prevState;
+                      });
+                    });
+                  }
+                });
+              });
+            });
+
+            as.onData = (data) => {
+              this.log('NSActivity onData', data);
+              // this.setState({debuglogs: this.state.debuglogs.push(['NoService', data])}) ;
+            }
+
+            as.onClose = ()=> {
+              this.log('NSActivity onClose', 'Activity closed.');
+              this.setState({connectionfailed: true});
+              NoTalk = NoUser = null;
+              setTimeout(_startup, RETRY_INTERVAL);
+            }
           }
-          as.onClose = ()=> {
-            this.log('NSActivity onClose', 'Activity closed.');
-            this.setState({connectionfailed: true});
-          }
-        }
-      });
+        });
+      }
+      _startup();
     });
   }
 
@@ -616,6 +723,7 @@ class App extends Component {
         <Route exact path={this.state.channelroot+':id([^/]+):more(/?)'} render={(props)=>{
           return(
             <ChannelPage
+              readChannelLine = {this.readChannelLine}
               contacts={this.state.contacts}
               mymeta={this.state.mymeta}
               channelid={key}
@@ -625,6 +733,7 @@ class App extends Component {
               rootpath={this.state.channelroot}
               sendNewMessage={this.sendNewMessage.bind(this)}
               loadUserMeta={this.loadUserMeta.bind(this)}
+              getMoreMessages = {this.getMoreMessages.bind(this)}
               users={this.state.users}
               onSettingsClick={()=> {
                 props.history.push(this.state.channelroot+props.match.params.id+'/settings');
@@ -650,6 +759,7 @@ class App extends Component {
                   users={this.state.users}
                   loadUserMeta={this.loadUserMeta}
                   returnUserNameToId={this.returnUserNameToId}
+                  deleteChannel={this.deleteChannel}
                 />
               </BackPage>
             )
@@ -684,8 +794,7 @@ class App extends Component {
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
             return(
-              <HeaderPage history={props.history} debug={this.state.debug}>
-                <MainCtrlComp history={props.history} debug={this.state.debug}/>
+              <HeaderPage langs={this.state.langs} history={props.history} debug={this.state.debug}>
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChannelList
@@ -696,6 +805,7 @@ class App extends Component {
                     history={props.history}
                     selected={props.match.params.id}
                     rootpath={this.state.channelroot}
+                    langs={this.state.langs}
                     />
                   )
                 }}/>
@@ -710,10 +820,13 @@ class App extends Component {
                         channels={this.state.channels}
                         history={props.history}
                         selected={props.match.params.id}
-                        rootpath={this.state.channelroot}/>
+                        rootpath={this.state.channelroot}
+                        langs={this.state.langs}
+                        />
                       </SplitLeft>
                       <SplitRight>
                         <NewChannelPage
+                        langs={this.state.langs}
                         show={this.state.channelnow=='new'}
                         createChannel={this.createChannel.bind(this)}
                         history={props.history}
@@ -741,13 +854,14 @@ class App extends Component {
                             getUserMetaByUserId={this.getUserMetaByUserId}
                             loadUserMeta={this.loadUserMeta.bind(this)}
                             history={props.history}
+                            langs={this.state.langs}
                           />
                         )
                       }}/>
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
                           <BoxComp history={props.history}>
-                            <BackPage title="New Contact" history={props.history}>
+                            <BackPage title={this.state.langs.new_contacts} history={props.history}>
                               <NewContactsPage
                                 searchUsers={this.searchUsers}
                                 addContacts={this.addContacts}
@@ -773,20 +887,25 @@ class App extends Component {
                         contacts={this.state.contacts}
                         loadUserMeta={this.loadUserMeta.bind(this)}
                         history={props.history}
+                        langs={this.state.langs}
                       />
                       <BoxComp history={props.history}>
                         <BackPage title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'} history={props.history}>
-                          <UserAccountPage addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
+                          <UserAccountPage langs={this.state.langs} addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
                         </BackPage>
                       </BoxComp>
                     </div>
                   )
                 }}/>
                 <Route exact path='/settings:path(/|/.*)' component={SettingsPage}/>
-                <Route exact path='/trending:path(/|/.*)' component={TrendingPage}/>
+                <Route exact path='/trending:path(/|/.*)'  component={(props)=> {
+                  return(
+                    <TrendingPage langs={this.state.langs}/>
+                  )
+                }}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <MyAccountPage version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <MyAccountPage langs={this.state.langs} version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
@@ -796,7 +915,7 @@ class App extends Component {
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{
                   return(
-                    <SigninPage SignupURL={NOSERVICE_SIGNUPURL} NSc={NoService} onFinish={window.location.reload}/>
+                    <SigninPage SignupURL={NOSERVICE_SIGNUP_URL} NSc={NoService} onFinish={window.location.reload}/>
                   );
                 }}/>
                 <Route exact path='/noservice/password' render={(props)=>{

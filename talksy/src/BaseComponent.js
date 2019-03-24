@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Ink from 'react-ink';
 
 export class BoxComp extends Component {
   render() {
@@ -7,6 +8,7 @@ export class BoxComp extends Component {
           <div className="BoxComp-Back" onClick={()=>{
             this.props.history.goBack()
           }}>
+          <Ink/>
           </div>
           <div className="BoxComp-Box">
             {this.props.children}
@@ -15,6 +17,17 @@ export class BoxComp extends Component {
       );
   }
 };
+
+export class PageRow extends Component {
+  render() {
+      return(
+        <div className="Page-Row">
+        <Ink/>
+        {this.props.children}
+        </div>
+      );
+  }
+}
 
 export class SplitComp extends Component {
   render() {
@@ -40,10 +53,12 @@ export class BackPage extends Component {
       return(
         <div className="BackPage">
           <div className="BackPage-Header">
+          <Ink/>
             <div className="BackPage-Back-Button"
             onClick={()=>{
               this.props.history.goBack()
             }}>
+            <Ink/>
               <i className="material-icons">arrow_back</i>
             </div>
             {(this.props.title)}
@@ -70,6 +85,7 @@ export class EditTextPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{this.props.title}</h1>
               <p> {this.props.description}</p>
@@ -82,6 +98,7 @@ export class EditTextPage extends Component {
             </div>
           </div>
           <div className="Page-Row" onClick={()=>{this.props.onFinish(this.state.text)}}>
+          <Ink/>
             <div className="Page-Row-Button">
               <span>OK </span><i className="material-icons">check_circle</i>
             </div>
@@ -122,6 +139,7 @@ export class AddToListPage extends Component {
     return this.state.list.map(value=> {
       return(
       <div key={index++} className="Page-Row">
+      <Ink/>
         <div className="Page-Row-Text">
           <h2>{value}</h2>
           <p onClick={
@@ -146,12 +164,14 @@ export class AddToListPage extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{this.props.title}</h1>
               <p> {this.props.description}</p>
             </div>
           </div>
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h2>{"Add item"}</h2>
               <input placeholder="input here" className="ChPage-Sender-Input" ref={el => this.TextInput = el}
@@ -178,6 +198,7 @@ export class AddToListPage extends Component {
         <div className="Page-Block">
           {this.renderList()}
           <div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
+            <Ink/>
             <div className="Page-Row-Button">
               <span>Finish </span><i className="material-icons">check_circle</i>
             </div>
@@ -219,6 +240,7 @@ export class AddToListPageRestrictedItems extends Component {
     return this.state.list.map(value=> {
       return(
       <div key={index++} className="Page-Row">
+      <Ink/>
         <div className="Page-Row-Text">
           <h2>{value}</h2>
           <p onClick={
@@ -247,6 +269,7 @@ export class AddToListPageRestrictedItems extends Component {
           this.addItem(value);
         }
       }>
+        <Ink/>
         <div className="Page-Row-Text">
           <h2>{value}</h2>
           <p >{!this.state.list.includes(value)?"click to add":"the item have been added"}</p>
@@ -261,6 +284,7 @@ export class AddToListPageRestrictedItems extends Component {
       <div className="Page">
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{this.props.title}</h1>
               <p> {this.props.description}</p>
@@ -288,6 +312,7 @@ export class AddToListPageRestrictedItems extends Component {
 
         <div className="Page-Block">
           <div className="Page-Row">
+          <Ink/>
             <div className="Page-Row-Text">
               <h1>{"Your items"}</h1>
               <p> {"below are your selected items"}</p>
@@ -295,6 +320,7 @@ export class AddToListPageRestrictedItems extends Component {
           </div>
           {this.renderList()}
           <div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
+            <Ink/>
             <div className="Page-Row-Button">
               <span>Finish </span><i className="material-icons">check_circle</i>
             </div>

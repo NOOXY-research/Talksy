@@ -1,0 +1,52 @@
+{
+  "en": {
+    "channels": "channels",
+    "new_channels": "new channels",
+    "contacts": "contacts",
+    "new_contacts": "new contacts",
+    "trending": "trending",
+    "account": "account",
+    "loading": "loading",
+    "logout": "logout",
+    "switch_account": "switch account",
+    "bio": "bio",
+    "about_you": "about you",
+    "active_status": "active status",
+    "blocked_user": "blocked user",
+    "guest": "guest",
+    "account_description": "Manage your Talksy account here.",
+    "account_info": "account information",
+    "account_info_description": "Click to edit your account information. Manage your languages setting and displayname.",
+    "country": "country",
+    "email": "email",
+    "displayname": "displayname",
+    "phone": "phone",
+    "channellist_description":"Here are all of your channels. (Talksy is still under development, will be avalible about this summer.)"
+  },
+
+  "zh-tw": {
+    "channels": "群組",
+    "new_channels": "新群組",
+    "contacts": "通訊錄",
+    "new_contacts": "新增聯絡人",
+    "trending": "趨勢",
+    "account": "帳號",
+    "loading": "載入中",
+    "logout": "登出",
+    "switch_account": "切換帳號",
+    "bio": "座右銘",
+    "about_you": "關於你",
+    "active_status": "上線狀態",
+    "blocked_user": "封鎖帳戶",
+    "guest": "訪客",
+    "account_description": "你可以在這管你的talksy帳戶",
+    "account_info": "帳號資訊",
+    "account_info_description": "編輯你的帳號資訊，包括顯示名稱及語言設定等。",
+    "country": "國別",
+    "email": "電子信箱",
+    "displayname": "顯示名稱",
+    "phone": "phone",
+    "channellist_description": "底下是你所有的群組(Talksy 正在開發中大概今年夏天左右會有比較完善得功能)"
+
+  }
+}
