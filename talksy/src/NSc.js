@@ -1,14 +1,49 @@
 // NoService/clients/javascript/NSc.js
 // Description:
-// "NSc.js" is a NoService framework client.
-// Copyright 2018 NOOXY. All Rights Reserved.
+// "NSc.js" is a NoNoService framework client.
+// Copyright 2018-2019 NOOXY. All Rights Reserved.
 'use strict';
 
-function NSc() {
+// const WebSocket = require('ws');
+// const crypto = require('crypto');
 
-  let settings = {
+// initialization
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
+const setCookie = (cname, cvalue, exdays)=> {
+  console.log(cname, cvalue, exdays);
+  let d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  let expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+};
+const getCookie = (cname)=> {
+    let name = cname + "=";
+    let ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+};
+const eraseCookie = (name)=> {
+  setCookie(name,"",-1);
+};
+
+// initialization end
+
+function NSc(targetip, method, targetport) {
+
+  const settings = {
     verbose: true,
-    debug: true,
+    debug: false,
     user: null,
     secure: true,
     NSc_files_root: '/',
@@ -17,20 +52,21 @@ function NSc() {
     targetport: 43581
   };
 
-  let Vars = {
-    'version': 'aphla 0.3.0',
-    'NSP_version': 'aphla 0.4.0',
-    'copyright': 'copyright(c)2018-2019 NOOXY inc.'
+  const Constants = {
+    'version': 'aphla 0.4.0',
+    'NSP_version': 'aphla 0.4.1',
+    'copyright': 'copyright(c)2018-2019 NOOXY inc.',
+    "CONNECTION_METHOD_NAME_MAP": {
+      "TCP": "TCP",
+      "WebSocket": "WebSocket",
+      "WebSocketSecure": "WebSocketSecure",
+      "Local": "Local",
+      "TCP/IP": "TCP",
+      "ws": "WebSocket",
+      "wss": "WebSocketSecure",
+      "local": "Local"
+    }
   }
-
-  this.setDebug = (boo)=>{
-    settings.debug = boo;
-  }
-
-  String.prototype.replaceAll = function(search, replacement) {
-      var target = this;
-      return target.split(search).join(replacement);
-  };
 
   let Utils = {
     getQueryVariable: (variable)=>{
@@ -38,7 +74,7 @@ function NSc() {
            var vars = query.split("&");
            for (var i=0;i<vars.length;i++) {
                    var pair = vars[i].split("=");
-                   if(pair[0] === variable){return pair[1];}
+                   if(pair[0] == variable){return pair[1];}
            }
            return(false);
     },
@@ -82,39 +118,14 @@ function NSc() {
       console.log('88b 88  dP\'Yb   dP\'Yb  Yb  dP Yb  dP  TM')
       console.log('88Yb88 dP   Yb dP   Yb  YbdP   YbdP  ')
       console.log('88 Y88 Yb   dP Yb   dP  dPYb    88   ')
-      console.log('88  Y8  YbodP   YbodP  dP  Yb   88   Service Framework. ')
+      console.log('88  Y8  YbodP   YbodP  dP  Yb   88   NoService framework. ')
       console.log('')
       console.log('')
       console.log('ver. '+version+'. '+copyright)
       console.log('For more information or update -> www.nooxy.org')
       console.log('')
     },
-    setCookie: (cname, cvalue, exdays)=> {
-      console.log(cname, cvalue, exdays);
-      let d = new Date();
-      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-      let expires = "expires="+d.toUTCString();
-      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    },
-    getCookie: (cname)=> {
-        let name = cname + "=";
-        let ca = document.cookie.split(';');
-        for(let i = 0; i < ca.length; i++) {
-          let c = ca[i];
-          while (c.charAt(0) === ' ') {
-            c = c.substring(1);
-          }
-          if (c.indexOf(name) === 0) {
-            return c.substring(name.length, c.length);
-          }
-        }
-        return "";
-    },
-    eraseCookie: (name)=> {
-      Utils.setCookie(name,"",-1);
-    },
-
-    tagLog: (tag, logstring) => {
+    TagLog: (tag, logstring) => {
       if(typeof(logstring)!='string') {
         logstring = JSON.stringify(logstring, null, 2);
       }
@@ -130,7 +141,7 @@ function NSc() {
       }
       console.log('['+tag+'] '+logstring.replaceAll('\n', '\n['+tag+'] '));
     },
-    generateUniqueID: () => {
+    generateUniqueId: () => {
       return '_' + Math.random().toString(36).substr(2, 9);
     },
     generateGUID: () => {
@@ -151,20 +162,127 @@ function NSc() {
     },
   }
 
-  let Connection = function () {
+  // NoService Modules
+
+  let Connections = {
+    WebSocket: {
+      Client: function (ConnectionProfile) {
+        let _ws = null;
+        let _debug;
+
+        this.setDebug = (d)=> {
+          _debug = d;
+        };
+
+        this.closeConnetion = () => {
+          _ws.close();
+        };
+
+        this.onData = (connprofile, data) => {Utils.TagLog('*ERR*', 'onData not implemented');};
+
+        this.onClose = () => {Utils.TagLog('*ERR*', 'onClose not implemented');};
+
+        this.send = function(connprofile, data) {
+          _ws.send(data);
+        };
+
+        this.connect = (ip, port, callback) => {
+          let connprofile;
+          _ws = new WebSocket('ws://'+ip+':'+port);
+          connprofile = new ConnectionProfile(null, 'Server', 'WebSocket', ip, port, 'localhost', this);
+          _ws.onopen = ()=> {
+            callback(false, connprofile);
+            // ws.send('something');
+          };
+          _ws.onmessage = (event) => {
+            this.onData(connprofile, event.data);
+          };
+
+          _ws.onerror = (error) => {
+            if(_debug) {
+              Utils.TagLog('*WARN*', 'An error occured on connection module.');
+              Utils.TagLog('*WARN*', error);
+            }
+            _ws.close();
+            this.onClose(connprofile);
+          };
+
+          _ws.onclose = (error) => {
+              this.onClose(connprofile);
+          };
+
+        }
+      }
+    },
+    WebSocketSecure: {
+      Client: function (ConnectionProfile) {
+        let _ws = null;
+        let _debug;
+
+        this.setDebug = (d)=> {
+          _debug = d;
+        };
+
+        this.closeConnetion = () => {
+          _ws.close();
+        };
+
+        this.onData = (connprofile, data) => {Utils.TagLog('*ERR*', 'onData not implemented');};
+
+        this.onClose = () => {Utils.TagLog('*ERR*', 'onClose not implemented');};
+
+        this.send = function(connprofile, data) {
+          _ws.send(data);
+        };
+
+        this.connect = (ip, port, callback) => {
+          let connprofile;
+          _ws = new WebSocket('wss://'+ip+':'+port);
+          connprofile = new ConnectionProfile(null, 'Server', 'WebSocket', ip, port, 'localhost', this);
+          _ws.onopen = ()=> {
+            callback(false, connprofile);
+            // ws.send('something');
+          };
+          _ws.onmessage = (event) => {
+            this.onData(connprofile, event.data);
+          };
+
+          _ws.onerror = (error) => {
+            if(_debug) {
+              Utils.TagLog('*WARN*', 'An error occured on connection module.');
+              Utils.TagLog('*WARN*', error);
+            }
+            _ws.close();
+            this.onClose(connprofile);
+          };
+
+          _ws.onclose = (error) => {
+              this.onClose(connprofile);
+          };
+        }
+      }
+    }
+  }
+
+  function Connection(options) {
+    if(options.allow_ssl_self_signed)
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
     let _default_local_ip_and_port = '';
     let _servers = {};
     let _clients = {};
     let _have_local_server = false;
-    let _virtnet = null;
     let _blocked_ip = [];
-    let _tcp_ip_chunk_token = '}{"""}<>';
+    let ssl_priv_key;
+    let ssl_cert;
     let heartbeat_phrase = '{m:"HB"}';
-
+    let heartbeat_cycle = 60000;
+    let _debug = false;
+    let _conn_meth_name_map;
 
     // define an profile of an connection
-    function ConnectionProfile(serverID, Rpos, connMethod, hostip, hostport, clientip, conn) {
-      let _serverID = serverID;
+    function ConnectionProfile(serverId, Rpos, connMethod, hostip, hostport, clientip, conn) {
+      let _serverId = serverId;
       let _pos = Rpos;
       let _connMethod = connMethod;
       let _bundle = {};
@@ -173,16 +291,17 @@ function NSc() {
       let _hostport = hostport;
       let _clientip = clientip;
       let _conn = conn; // conn is wrapped!
+
       if(Rpos === 'Server') {
-        _clients[_GUID] = this;
+        _clients[connMethod+hostip+hostport] = this;
       }
 
       this.closeConnetion = () => {
-        // Utils.tagLog('*ERR*', 'closeConnetion not implemented. Of '+this.type);
+        // Utils.TagLog('*ERR*', 'closeConnetion not implemented. Of '+this.type);
         _conn.closeConnetion(_GUID);
       };
 
-      this.getServerID = (callback) => {callback(false, _serverID);}
+      this.getServerId = (callback) => {callback(false, _serverId);}
       this.getHostIP = (callback) => {callback(false, _hostip);}
       this.getHostPort = (callback) => {callback(false, _hostport);}
       this.getClientIP = (callback) => {callback(false, _clientip);}
@@ -193,7 +312,7 @@ function NSc() {
       this.getConn = (callback) => {callback(false, _conn)};
       this.getGUID = (callback) => {callback(false, _GUID)};
 
-      this.returnServerID = () => {return _serverID;}
+      this.returnServerId = () => {return _serverId;}
       this.returnHostIP = () => {return _hostip;}
       this.returnHostPort = () => {return _hostport;}
       this.returnClientIP = () => {return _clientip;}
@@ -204,229 +323,419 @@ function NSc() {
       this.returnGUID = () => {return _GUID};
 
       this.destroy= () => {
-        // delete this;
+        // for worker deletetion
+        this.worker_cancel_refer = true;
         delete _clients[_GUID];
       };
       // this.onConnectionDropout = () => {
-      //   Utils.tagLog('*ERR*', 'onConnectionDropout not implemented');
+      //   Utils.TagLog('*ERR*', 'onConnectionDropout not implemented');
       // }
 
     }
 
-    function WSClient() {
-      let _ws = null
+    this.addServer = (conn_method, ip, port) => {
 
-      this.closeConnetion = () => {
-        _ws.close();
-      };
-
-      this.onData = (connprofile, data) => {Utils.tagLog('*ERR*', 'onData not implemented');};
-
-      this.onClose = () => {Utils.tagLog('*ERR*', 'onClose not implemented');};
-
-      this.send = function(connprofile, data) {
-        try {
-          _ws.send(data);
+      if(conn_method === 'local'||conn_method =='Local') {
+        if(_have_local_server === false) {
+          let _serverId = "LOCAL";
+          let server = new Connections.Local.Server(_serverId, ConnectionProfile);
+          _servers[_serverId] = server;
+          server.start('LOCALIP', 'LOCALPORT');
+          server.onData = this.onData;
+          server.onClose = this.onClose;
+          _have_local_server = true;
         }
-        catch(e) {
-          this.onClose(connprofile);
-          _ws.close();
+        else {
+          Utils.TagLog('*ERR*', 'Can only exist one local server.');
         }
-      };
-
-      this.connect = (ip, port, callback) => {
-        let connprofile = null;
-
-        _ws = new WebSocket('ws://'+ip+':'+port);
-        connprofile = new ConnectionProfile(null, 'Server', 'WebSocket', ip, port, 'localhost', this);
-        setTimeout(()=> {
-            if (_ws.readyState != 1) {
-                callback(_ws.readyState);
-            }
-            else {
-              // callback(false);
-            }
-        }, 2000);
-        _ws.onopen = () => {
-          callback(false, connprofile);
-          // ws.send('something');
-        }
-        _ws.onmessage = (event) => {
-          this.onData(connprofile, event.data);
-        }
-
-        _ws.onerror =  (error) => {
-            Utils.tagLog('*ERR*', error);
-            _ws.close();
-            this.onClose(connprofile);
-        }
-
-        _ws.onclose =  () => {
-            this.onClose(connprofile);
-        }
-
       }
-    };
-
-    function WSSClient() {
-      let _ws = null
-
-      this.closeConnetion = () => {
-        _ws.close();
-      };
-
-      this.onData = (connprofile, data) => {Utils.tagLog('*ERR*', 'onData not implemented');};
-
-      this.onClose = () => {Utils.tagLog('*ERR*', 'onClose not implemented');};
-
-      this.send = function(connprofile, data) {
-        try {
-          _ws.send(data);
-        }
-        catch(e) {
-          this.onClose(connprofile);
-          _ws.close();
-        }
-      };
-
-      this.connect = (ip, port, callback) => {
-        let connprofile = null;
-        _ws = new WebSocket('wss://'+ip+':'+port);
-        connprofile = new ConnectionProfile(null, 'Server', 'WebSocket', ip, port, 'localhost', this);
-        _ws.onopen = () => {
-          callback(false, connprofile);
-          // ws.send('something');
-        }
-        _ws.onmessage = (event) => {
-          this.onData(connprofile, event.data);
-        }
-
-        _ws.onerror =  (error) => {
-            Utils.tagLog('*ERR*', error);
-            _ws.close();
-            this.onClose(connprofile);
-        }
-
-        _ws.onclose =  () => {
-            this.onClose(connprofile);
-        }
-
+      else if(_conn_meth_name_map[conn_method]) {
+        let _serverId = Utils.generateUniqueId();
+        let server = new Connections[_conn_meth_name_map[conn_method]].Server(_serverId, ConnectionProfile, ssl_priv_key, ssl_cert);
+        _servers[_serverId] = server;
+        server.start(ip, port);
+        server.onData = this.onData;
+        server.onClose = this.onClose;
       }
-    };
+      else {
+        Utils.TagLog('*ERR*', 'ConnMethod '+conn_method+' not implemented. Skipped.');
+      }
+
+      // Heartbeat
+      if(Object.keys(_servers).length==1) {
+        setInterval(()=>{
+          for(let i in _servers) {
+            try{
+              _servers[i].broadcast(heartbeat_phrase);
+            }
+            catch(e) {
+              if(_debug) {
+                Utils.TagLog('*WARN*', 'Server '+i+' occured error on heartbeat. Skipped.');
+              }
+            }
+          };
+        }, heartbeat_cycle);
+      };
+    }
 
     this.createClient = (conn_method, remoteip, port, callback) => {
-
       // Heartbeat
       let onData_wrapped = (connprofile, data)=> {
         if(data!=heartbeat_phrase) {
           this.onData(connprofile, data);
         }
+        else {
+        }
       };
 
-      if(conn_method === 'ws'||conn_method =='WebSocket') {
-        let serverID = "WebSocket";
-        let wsc = new WSClient(_virtnet);
-        wsc.onData = onData_wrapped;
-        wsc.onClose = this.onClose;
-        wsc.connect(remoteip, port, callback);
+      let _prev_client = _clients[conn_method+remoteip+port];
+
+      if(_prev_client) {
+        callback(false, _prev_client);
+      }
+      else if(conn_method === 'local'||conn_method =='Local') {
+        if(_have_local_server === false) {
+          Utils.TagLog('*ERR*', 'Local server not started.');
+        }
+        else {
+          let locc = new Connections.Local.Client(ConnectionProfile);
+          locc.setDebug(_debug);
+          locc.onData = onData_wrapped;
+          locc.onClose = this.onClose;
+          locc.connect('LOCALIP', 'LOCALPORT', callback);
+        }
       }
 
-      else if(conn_method === 'wss'||conn_method =='WebSocketSecure') {
-        let serverID = "WebSocketSecure";
-        let wssc = new WSSClient(_virtnet);
-        wssc.onData = onData_wrapped;
-        wssc.onClose = this.onClose;
-        wssc.connect(remoteip, port, callback);
+      else if(_conn_meth_name_map[conn_method]) {
+        let netc = new Connections[_conn_meth_name_map[conn_method]].Client(ConnectionProfile);
+        netc.setDebug(_debug);
+        netc.onData = onData_wrapped;
+        netc.onClose = this.onClose;
+        netc.connect(remoteip, port, callback);
       }
 
       else {
-        Utils.tagLog('*ERR*', ''+conn_method+' not implemented. Skipped.');
+        Utils.TagLog('*ERR*', 'ConnMethod '+conn_method+' not implemented. Skipped.');
       }
     };
 
+    this.addConnetionModule = (constructor)=> {
+      Connections[constructor.ConnectMethod] = constructor;
+    };
+
     this.send = (connprofile, data) => {
-      connprofile.getConn((err, conn) => {
-        conn.send(connprofile, data);
-      });
+      try {
+        connprofile.getConn((err, conn) => {
+          conn.send(connprofile, data);
+        });
+      }
+      catch (e) {
+        if(_debug) {
+          Utils.TagLog('*WARN*', 'Error occured while sending Data.');
+          console.log(e);
+        }
+      }
+    };
+
+    this.broadcast = (data) => {
+      try {
+        _servers.forEach((key, server) => {
+          server.broadcast(data);
+        });
+      }
+      catch (e) {
+        if(_debug) {
+          Utils.TagLog('*WARN*', 'Error occured while broadcasting Data.');
+          console.log(e);
+        }
+      }
     };
 
     this.onData = (conn_profile, data) => {
-      Utils.tagLog('*ERR*', 'Connection module onData not implement');
+      Utils.TagLog('*ERR*', 'Connection module onData not implement');
     };
 
     this.onClose = (connprofile) => {
-      Utils.tagLog('*ERR*', 'Connection module onClose not implement');
+      Utils.TagLog('*ERR*', 'Connection module onClose not implement');
     }
+
+    this.getServers = (callback) => {
+      callback(false, _servers);
+    };
 
     this.getClients = (callback) => {
       callback(false, _clients);
     };
 
-  }
+    this.killClient = (conn_profile) => {
 
-  function AuthorizationHandler() {
-    let _implementation_module = null;
-    let _daemon_auth_key = null;
-    let _trusted_domains = [];
-
-    let _implts_callback = {
-      // Authby password
-      'PW': (connprofile, data, data_sender) => {
-        let AuthbyPassword = _implementation_module.returnImplement('AuthbyPassword');
-        AuthbyPassword(connprofile, data, data_sender);
-      },
-
-      // Authby password failed
-      'PF': (connprofile, data, data_sender) => {
-        let AuthbyPasswordFailed = _implementation_module.returnImplement('AuthbyPasswordFailed');
-        AuthbyPasswordFailed(connprofile, data, data_sender);
-      },
-
-      // Authby token
-      'TK': (connprofile, data, data_sender) => {
-        let AuthbyToken = _implementation_module.returnImplement('AuthbyToken');
-        AuthbyToken(connprofile, data, data_sender);
-      },
-
-      // Authby token failed
-      'TF': (connprofile, data, data_sender) => {
-        let AuthbyTokenFailed = _implementation_module.returnImplement('AuthbyTokenFailed');
-        AuthbyTokenFailed(connprofile, data, data_sender);
-      },
-
-      // Sign in
-      'SI': (connprofile, data, data_sender) => {
-        let Signin = _implementation_module.returnImplement('signin');
-        Signin(connprofile, data, data_sender);
-      }
     };
 
-    this.RqRouter = (connprofile, data, data_sender) => {
-      _implts_callback[data.m](connprofile, data, data_sender);
+    this.setDebug = (bool) => {
+      _debug = bool;
     };
 
-    this.importImplementationModule = (implementation_module) => {
-      _implementation_module = implementation_module;
+    this.importSSLCert = (ssl_cert_in) => {
+      ssl_cert = ssl_cert_in;
+    };
+
+    this.importSSLPrivateKey = (ssl_priv_key_in) => {
+      ssl_priv_key = ssl_priv_key_in;
+    }
+
+    this.importHeartBeatCycle = (cycle) => {
+      heartbeat_cycle = cycle;
+    };
+
+    this.importConnectionMethodNameMap = (dict)=> {
+      _conn_meth_name_map = dict;
     };
 
     this.close = () =>{
+      this.onClose = (connprofile) => {
+        Utils.TagLog('*ERR*', 'Connection module onClose not implement');
+      };
+      this.onData = (conn_profile, data) => {
+        Utils.TagLog('*ERR*', 'Connection module onData not implement');
+      };
+      for(let i in _clients) {
+        _clients[i].closeConnetion();
+      }
+      for(let i in _servers) {
+        _servers[i].close();
+      }
+    }
+  }
+
+  let Protocols = [
+    function(coregateway, emitRouter) {
+      this.Protocol = "AU";
+
+      this.Positions = {
+        rq: "Server",
+        rs: "Client"
+      };
+
+      let Implementation = coregateway.Implementation;
+      let Utils = coregateway.Utilities;
+
+      let _queue_operation = {};
+      let _auth_timeout = 180;
+
+      this.RequestHandler = (connprofile, data, data_sender) => {
+        coregateway.AuthorizationHandler.handle(data.m, connprofile, data, data_sender);
+      };
+
+      this.ResponseHandler = (connprofile, data) => {
+        try {
+          let op = _queue_operation[data.d.t];
+          if(op) {
+            op(connprofile, data);
+            delete _queue_operation[data.d.t];
+          }
+        }
+        catch (e) {
+          console.log(e);
+        }
+      }
+    },
+    function(coregateway, emitRouter) {
+      this.Protocol = "CA";
+
+      this.Positions = {
+        rq: "Server",
+        rs: "Client"
+      };
+
+      let Activity = coregateway.Activity;
+
+      this.RequestHandler = (connprofile, data, response_emit) => {
+
+        let methods = {
+          // nooxy service protocol implementation of "Call Activity: ActivitySocket"
+          AS: () => {
+            Activity.emitASData(data.d.i, data.d.d);
+            let _data = {
+              "m": "AS",
+              "d": {
+                // status
+                "i": data.d.i,
+                "s": "OK"
+              }
+            };
+            response_emit(connprofile, 'CA', 'rs', _data);
+          },
+          // nooxy service protocol implementation of "Call Activity: Event"
+          EV: () => {
+            Activity.emitASEvent(data.d.i, data.d.n, data.d.d);
+            let _data = {
+              "m": "EV",
+              "d": {
+                // status
+                "i": data.d.i,
+                "s": "OK"
+              }
+            };
+            response_emit(connprofile, 'CA', 'rs', _data);
+          },
+          // nooxy service protocol implementation of "Call Activity: Close ActivitySocket"
+          CS: () => {
+            Activity.emitASClose(data.d.i);
+          }
+        }
+        // call the callback.
+        methods[data.m](connprofile, data.d, response_emit);
+      };
+    },
+    function(coregateway, emitRouter) {
+      this.Protocol = "CS";
+
+      this.Positions = {
+        rq: "Client",
+        rs: "Server"
+      };
+
+      let Activity = coregateway.Activity;
+      let Utils = coregateway.Utilities;
+
+      let _ActivityRsCEcallbacks = {};
+
+      Activity.on('createActivitySocketRq', (method, targetport, owner, mode, service, targetip, daemon_authkey, callback)=> {
+        let err = false;
+        let _data = {
+          "m": "CE",
+          "d": {
+            t: Utils.generateGUID(),
+            o: owner,
+            m: mode,
+            s: service,
+            od: targetip,
+            k: daemon_authkey
+          }
+        };
+        coregateway.Connection.createClient(method, targetip, targetport, (err, connprofile) => {
+
+          _ActivityRsCEcallbacks[_data.d.t] = (connprofile, data) => {
+            callback(false, connprofile, data.d.i);
+          }
+          emitRouter(connprofile, 'CS', _data);
+        });
+
+      });
+
+      coregateway.Activity.on('EmitSSDataRq', (conn_profile, entityId, d) => {
+          let _data = {
+            "m": "SS",
+            "d": {
+              "i": entityId,
+              "d": d,
+            }
+          };
+          emitRouter(conn_profile, 'CS', _data);
+
+      });
+
+      coregateway.Activity.on('EmitSSServiceFunctionRq', (conn_profile, entityId, name, data, tempid) => {
+          let _data = {
+            "m": "JF",
+            "d": {
+              "i": entityId,
+              "n": name,
+              "j": data,
+              "t": tempid
+            }
+          };
+          emitRouter(conn_profile, 'CS', _data);
+
+      });
+
+      coregateway.Activity.on('EmitASCloseRq', (conn_profile, entityId) => {
+          let _data = {
+            "m": "CS",
+            "d": {
+              "i": entityId
+            }
+          };
+          emitRouter(conn_profile, 'CS', _data);
+      });
+
+      this.ResponseHandler = (connprofile, data) => {
+        let methods = {
+          // nooxy service protocol implementation of "Call Service: Vertify Connection"
+          VE: (connprofile, data) => {
+            if(data.d.s === 'OK') {
+              Activity.launchActivitySocketByEntityId(data.d.i);
+
+            }
+            else {
+              Activity.emitASClose(data.d.i);
+
+            }
+          },
+          // nooxy service protocol implementation of "Call Service: ServiceSocket"
+          SS: (connprofile, data) => {
+
+          },
+          // nooxy service protocol implementation of "Call Service: ServiceFunction"
+          JF: (connprofile, data) => {
+            if(data.d.s === 'OK') {
+              Activity.emitSFReturn(data.d.i, false, data.d.t, data.d.r);
+            }
+            else {
+              Activity.emitSFReturn(data.d.i, true, data.d.t, data.d.r);
+            }
+          },
+          // nooxy service protocol implementation of "Call Activity: createEntity"
+          CE: (connprofile, data) => {
+            // tell server finish create
+            if(data.d.i != null) {
+              // create a description of this service entity.
+              _ActivityRsCEcallbacks[data.d.t](connprofile, data);
+              let _data = {
+                "m": "VE",
+                "d": {
+                  "i": data.d.i,
+                }
+              };
+
+              emitRouter(connprofile, 'CS', _data);
+            }
+            else {
+              _ActivityRsCEcallbacks[data.d.t](connprofile, data);
+              delete  _ActivityRsCEcallbacks[data.d.t];
+              connprofile.closeConnetion();
+            }
+          }
+        }
+
+        // call the callback.
+        methods[data.m](connprofile, data);
+      };
+    },
+    function(coregateway, emitRouter) {
+      this.Protocol = "GT";
+
+      this.Positions = {
+        rq: "Client",
+        rs: "Server"
+      };
+      this.ResponseHandler = (connprofile, data) => {
+        coregateway.Implementation.onToken(connprofile, data.s, data.t);
+      };
 
     }
-  };
+  ];
 
-  let Router = function () {
-    let _coregateway = null;
-    // nooxy service protocol sercure
+  function Router() {
+    let _coregateway;
+    // nooxy service protocol secure
     let _json_sniffers = [];
     let _raw_sniffers = [];
     // for signup timeout
     let _locked_ip = [];
-    let _debug;
+    let _debug = false;
 
     let _tellJSONSniffers = (Json) => {
-      if(settings.debug) {
-        Utils.tagLog('DEBUG', Json);
-      };
       for(let i in _json_sniffers) {
         _json_sniffers[i](false, Json);
       }
@@ -439,39 +748,46 @@ function NSc() {
     };
 
     // in case of wrong session of the position
-    let _sessionnotsupport = () => {
-      console.log('[*ERR*] session not support');
-      let err = new Error();
-      throw err;
+    let _sessionnotsupport = (protocol, session, data) => {
+      if(_debug) {
+        Utils.TagLog('*WARN*', 'session not support');
+        Utils.TagLog('*WARN*', protocol);
+        Utils.TagLog('*WARN*', session);
+        Utils.TagLog('*WARN*', data);
+      }
     }
 
     // a convinient function fo sending data
     let _senddata = (connprofile, method, session, data) => {
-      var wrapped = {
+      let wrapped = {
         m : method,
         s : session,
         d : data
       };
       let json = JSON.stringify(wrapped);
       // finally sent the data through the connection.
-      if(connprofile.returnBundle('NSPS') === true) {
-        _coregateway.NoCrypto.encryptString('AESCBC256', connprofile.returnBundle('aes_256_cbc_key'), json, (err, encrypted)=> {
-          _coregateway.Connection.send(connprofile, encrypted);
+      if(connprofile) {
+        _coregateway.NSPS.isConnectionSecured(connprofile, (secured)=> {
+          if(secured === true) {
+            _coregateway.NSPS.secure(connprofile, json, (err, encrypted)=> {
+              if(!err) {
+                _coregateway.Connection.send(connprofile, encrypted);
+              }
+              else if(_debug) {
+                Utils.TagLog('*WARN*', err.trace);
+              }
+            });
+          }
+          else {
+            _coregateway.Connection.send(connprofile, json);
+          }
         });
-      }
-      else if (connprofile.returnBundle('NSPS') === 'finalize') {
-        connprofile.setBundle('NSPS', true);
-        _coregateway.Connection.send(connprofile, json);
-
-      }
-      else {
-        _coregateway.Connection.send(connprofile, json);
       }
     }
 
     // implementations of NOOXY Service Protocol methods
     let methods = {
-      // nooxy service protocol implementation of "sercure protocol"
+      // nooxy service protocol implementation of "secure protocol"
       SP: {
         emitter : (connprofile, data) => {
           _senddata(connprofile, 'SP', 'rq', data);
@@ -484,152 +800,9 @@ function NSc() {
           }
 
           let actions = {
-            rq : _coregateway.NSPS.RqRouter,
-            rs : _coregateway.NSPS.RsRouter
+            rq : _coregateway.NSPS.RequestHandler,
+            rs : _coregateway.NSPS.ResponseHandler
           }
-          connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
-              if(session === 'rq') {
-                actions[session](connprofile, data, _senddata);
-              }
-              else {
-                actions[session](connprofile, data);
-              }
-            }
-            else {
-              _sessionnotsupport();
-            }
-          });
-        }
-      },
-
-      // nooxy service protocol implementation of "get token"
-      GT: {
-        emitter : (connprofile, data) => {
-          _senddata(connprofile, 'GT', 'rq', data);
-        },
-
-        handler : (connprofile, session, data) => {
-          let rq_rs_pos = {
-            rq: "Client",
-            rs: "Server"
-          }
-
-          let actions = {
-            rq : (connprofile, data) => {
-                let responsedata = {};
-                _coregateway.Authenticity.getUserToken(data.u, data.p, (err, token)=>{
-                  responsedata['t'] = token;
-                  if(err) {
-                    responsedata['s'] = 'Fail';
-                  }
-                  else {
-                    responsedata['s'] = 'OK';
-                  }
-                  _senddata(connprofile, 'GT', 'rs', responsedata);
-                });
-            },
-
-            rs : (connprofile, data) => {
-              _coregateway.Implementation.onToken(connprofile, data.s, data.t);
-            }
-          }
-          connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
-              if(session === 'rq') {
-                actions[session](connprofile, data, _senddata);
-              }
-              else {
-                actions[session](connprofile, data);
-              }
-            }
-            else {
-              _sessionnotsupport();
-            }
-          });
-        }
-      },
-
-      // nooxy service protocol implementation of "Authorization"
-      AU: {
-        emitter : (connprofile, data) => {
-          _senddata(connprofile, 'AU', 'rq', data);
-        },
-
-        handler : (connprofile, session, data) => {
-          let rq_rs_pos = {
-            rq: "Server",
-            rs: "Client"
-          }
-
-          let actions = {
-            rq : _coregateway.AuthorizationHandler.RqRouter,
-          }
-          connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
-              if(session === 'rq') {
-                actions[session](connprofile, data, _senddata);
-              }
-              else {
-                actions[session](connprofile, data);
-              }
-            }
-            else {
-              _sessionnotsupport();
-            }
-          });
-        }
-      },
-
-      // nooxy service protocol implementation of "Call Service"
-      CS: {
-        emitter : (connprofile, data) => {
-          _senddata(connprofile, 'CS', 'rq', data);
-        },
-
-        handler : (connprofile, session, data) => {
-          let rq_rs_pos = {
-            rq: "Client",
-            rs: "Server"
-          }
-
-          let actions = {
-            rq : _coregateway.Service.ServiceRqRouter,
-            rs : _coregateway.Service.ServiceRsRouter
-          }
-          connprofile.getRemotePosition((err, pos)=> {
-            if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
-              if(session === 'rq') {
-                actions[session](connprofile, data, _senddata);
-              }
-              else {
-                actions[session](connprofile, data);
-              }
-            }
-            else {
-              _sessionnotsupport();
-            }
-          })
-        }
-      },
-
-      // nooxy service protocol implementation of "Call Activity"
-      CA: {
-        emitter : (connprofile, data) => {
-          _senddata(connprofile, 'CA', 'rq', data);
-        },
-
-        handler : (connprofile, session, data) => {
-          let rq_rs_pos = {
-            rq: "Both",
-            rs: "Both"
-          }
-
-          let actions = {
-            rq : _coregateway.Service.ActivityRqRouter,
-            rs : _coregateway.Service.ActivityRsRouter
-          }
-
           connprofile.getRemotePosition((err, pos)=> {
             if(rq_rs_pos[session] === pos || rq_rs_pos[session] === 'Both') {
               if(session === 'rq') {
@@ -686,6 +859,9 @@ function NSc() {
                 else {
                   connprofile.closeConnetion();
                 }
+                if(err) {
+                  console.log(err);
+                }
               });
             }
             else if(connprofile.returnBundle('NSPS') != true) {
@@ -715,7 +891,7 @@ function NSc() {
         }
         catch (er) {
           if(_debug) {
-            Utils.tagLog('*ERR*', 'An error occured in router module.');
+            Utils.TagLog('*ERR*', 'An error occured in router module.');
             console.log(er);
           }
         }
@@ -723,247 +899,89 @@ function NSc() {
 
       _coregateway.Connection.onClose = (connprofile) => {
         try {
-          _coregateway.Service.onConnectionClose(connprofile, (err)=>{
-            connprofile.destroy();
-          });
+          if(connprofile.returnRemotePosition() === 'Client') {
+            _coregateway.Service.emitConnectionClose(connprofile, (err)=>{
+              connprofile.destroy();
+            });
+          }
+          else {
+            _coregateway.Activity.emitConnectionClose(connprofile, (err)=>{
+              connprofile.destroy();
+            });
+          }
+
         }
         catch (er) {
           if(_debug) {
-            Utils.tagLog('*WARN*', 'An error occured in router module.');
+            Utils.TagLog('*WARN*', 'An error occured in router module.');
             console.log(er);
           }
         }
       };
 
-      _coregateway.Service.setEmitRouter(this.emit);
-      _coregateway.Implementation.emitRouter = this.emit;
-      _coregateway.Implementation.sendRouterData = _senddata;
-      _coregateway.NSPS.emitRouter = this.emit;
-      _coregateway.Service.spwanClient = _coregateway.Connection.createClient;
+      // load protocols
+      Protocols.forEach((pt)=> {
+        let p = new pt(_coregateway, this.emit);
+        p.emitRouter = this.emit;
+        methods[p.Protocol] = {
+          emitter : (connprofile, data) => {
+            _senddata(connprofile, p.Protocol, 'rq', data);
+          },
 
+          handler : (connprofile, session, data) => {
+            connprofile.getRemotePosition((err, pos)=> {
+              if(p.Positions[session] === pos || p.Positions[session] === 'Both') {
+                if(session === 'rq') {
+                  p.RequestHandler(connprofile, data, _senddata);
+                }
+                else {
+                  p.ResponseHandler(connprofile, data);
+                }
+              }
+              else {
+                _sessionnotsupport(p, session, data);
+              }
+            });
+          }
+        };
+      });
+
+      _coregateway.Implementation.sendRouterData = _senddata;
+      _coregateway.Implementation.getClientConnProfile = _coregateway.Connection.createClient;
+      _coregateway.Implementation.emitRouter = this.emit;
+      _coregateway.NSPS.emitRouter = this.emit;
+    };
+
+    this.close = () => {
+      _coregateway = null;
+      _json_sniffers = [];
+      _raw_sniffers = [];
+      _locked_ip = [];
     };
 
   };
 
-  let Service = function () {
-    // need add service event system
-    let _activities = {};
-    let _local_services_owner = null;
-    let _ActivityRsCEcallbacks = {};
-    let _ASockets = {};
-    let _debug = false;
-    let _local_services;
-    let _entity_module;
-    let _emitRouter;
-
-    let ActivitySocketDestroyTimeout = 1000;
-
-    let _unbindActivitySocketList = (_entity_id)=> {
-      setTimeout(()=>{
-        // tell worker abort referance
-        if(_ASockets[_entity_id])
-          _ASockets[_entity_id].worker_cancel_refer = true;
-        delete _ASockets[_entity_id];
-      }, ActivitySocketDestroyTimeout);
-    };
-
-    this.setDebug = (boolean) => {
-      _debug = boolean;
-    };
-
-    this.importOwner = (owner) => {
-      _local_services_owner = owner;
-    }
-
-    this.spwanClient = () => {Utils.tagLog('*ERR*', 'spwanClient not implemented');};
-
-    this.setEmitRouter = (emitRouter) => {_emitRouter = emitRouter};
-
-    this.onConnectionClose = (connprofile, callback) => {
-
-      let _entitiesID = connprofile.returnBundle('bundle_entities');
-      if(_entitiesID === null) {
-        callback(true);
-      }
-      else if(_entitiesID.length) {
-        let Rpos = connprofile.returnRemotePosition();
-        if(connprofile.returnRemotePosition() === 'Client') {
-          let i = 0;
-          let loop = () => {
-            let theservice = _local_services[_entity_module.returnEntityValue(_entitiesID[i], 'service')];
-            _entity_module.deleteEntity(_entitiesID[i]);
-            theservice.sendSSClose(_entitiesID[i], (err)=>{
-
-            });
-            if(i < _entitiesID.length-1) {
-              i++;
-              loop();
-            }
-          };
-          loop();
-          callback(false);
-        }
-        else {
-          for(let i in _entitiesID) {
-            _ASockets[_entitiesID[i]].onClose();
-          }
-          callback(false);
-        }
-      }
-      else {
-        callback(false);
-      }
-    };
-
-    // ClientSide
-    this.ServiceRsRouter =  (connprofile, data) => {
-
-      let methods = {
-        // nooxy service protocol implementation of "Call Service: Vertify Connection"
-        VE: (connprofile, data) => {
-          if(data.d.s === 'OK') {
-            _ASockets[data.d.i].launch();
-          }
-          else {
-            _ASockets[data.d.i]._emitClose();
-          }
-        },
-        // nooxy service protocol implementation of "Call Service: ServiceSocket"
-        SS: (connprofile, data) => {
-
-        },
-        // nooxy service protocol implementation of "Call Service: JSONfunction"
-        JF: (connprofile, data) => {
-          if(data.d.s === 'OK') {
-            _ASockets[data.d.i].sendJFReturn(false, data.d.t, data.d.r);
-          }
-          else {
-            _ASockets[data.d.i].sendJFReturn(true, data.d.t, data.d.r);
-          }
-        },
-        // nooxy service protocol implementation of "Call Activity: createEntity"
-        CE: (connprofile, data) => {
-
-          // tell server finish create
-          if(data.d.i != null) {
-            // create a description of this service entity.
-            _ActivityRsCEcallbacks[data.d.t](connprofile, data);
-            let _data = {
-              "m": "VE",
-              "d": {
-                "i": data.d.i,
-              }
-            };
-
-            _emitRouter(connprofile, 'CS', _data);
-          }
-          else {
-            delete  _ActivityRsCEcallbacks[data.d.t];
-            connprofile.closeConnetion();
-          }
-        }
-      }
-
-      // call the callback.
-      methods[data.m](connprofile, data);
-    };
-
-    // Serverside implement
-    this.ActivityRqRouter = (connprofile, data, response_emit) => {
-
-      let methods = {
-        // nooxy service protocol implementation of "Call Activity: ActivitySocket"
-        AS: () => {
-          _ASockets[data.d.i]._emitData(data.d.d);
-          let _data = {
-            "m": "AS",
-            "d": {
-              // status
-              "i": data.d.i,
-              "s": "OK"
-            }
-          };
-          response_emit(connprofile, 'CA', 'rs', _data);
-        },
-        // nooxy service protocol implementation of "Call Activity: Event"
-        EV: () => {
-          _ASockets[data.d.i]._emitEvent(data.d.n, data.d.d);
-          let _data = {
-            "m": "EV",
-            "d": {
-              // status
-              "i": data.d.i,
-              "s": "OK"
-            }
-          };
-          response_emit(connprofile, 'CA', 'rs', _data);
-        },
-        // nooxy service protocol implementation of "Call Activity: Close ActivitySocket"
-        CS: () => {
-          _ASockets[data.d.i].remoteClosed = true;
-          _ASockets[data.d.i].close();
-        }
-      }
-      // call the callback.
-      methods[data.m](connprofile, data.d, response_emit);
-    }
-
-
-    function ActivitySocket(conn_profile, emitRouter, unbindActivitySocketList, debug) {
+  let SocketPair = {
+    ActivitySocket: function ActivitySocket(conn_profile, emitter, unbindActivitySocketList, debug) {
       // Service Socket callback
-      let _emitdata = (i, d) => {
-        let _data = {
-          "m": "SS",
-          "d": {
-            "i": i,
-            "d": d,
-          }
-        };
-        emitRouter(conn_profile, 'CS', _data);
-      }
+      let _emitdata = emitter.Data;
 
-      // Service Socket callback
-      let _emitclose = (i) => {
-        let _data = {
-          "m": "CS",
-          "d": {
-            "i": i
-          }
-        };
-        emitRouter(conn_profile, 'CS', _data);
-      }
+      let _emit_sfunc = emitter.ServiceFunction;
 
-      let _emitjfunc = (entity_id, name, tempid, Json)=> {
-        let _data = {
-          "m": "JF",
-          "d": {
-            "i": entity_id,
-            "n": name,
-            "j": JSON.stringify(Json),
-            "t": tempid
-          }
-        };
-        emitRouter(conn_profile, 'CS', _data);
-      }
+      let _emitclose = emitter.Close;
 
-      let _entity_id = null;
+      let _entity_id;
       let _launched = false;
 
       let wait_ops = [];
       let wait_launch_ops = [];
       let _jfqueue = {};
       let _on_dict = {
-        data: (...args)=> {
-          if(this.onData) {
-            this.onData.apply(null, args);
-          }
-          else if(debug) Utils.TagLog('*WARN*', 'ActivitySocket on "data" not implemented')
+        data: ()=> {
+          if(debug) Utils.TagLog('*WARN*', 'ActivitySocket on "data" not implemented')
         },
-        close: (...args)=> {
-          if(this.onClose) {
-            this.onClose.apply(null, args);
-          }
-          else if(debug) Utils.TagLog('*WARN*', 'ActivitySocket on "close" not implemented')
+        close: ()=> {
+          if(debug) Utils.TagLog('*WARN*', 'ActivitySocket on "close" not implemented')
         }
       };
 
@@ -988,7 +1006,7 @@ function NSc() {
         }
       };
 
-      this.setEntityID = (id) => {
+      this.setEntityId = (id) => {
         _entity_id = id;
         let entities_prev = conn_profile.returnBundle('bundle_entities');
         if(entities_prev != null) {
@@ -999,34 +1017,34 @@ function NSc() {
         }
       };
 
-      this.sendJFReturn = (err, tempid, returnvalue) => {
+      this.emitSFReturn = (err, tempid, returnvalue) => {
         if(err) {
           _jfqueue[tempid](err);
         }
         else {
-          _jfqueue[tempid](err, JSON.parse(returnvalue));
+          _jfqueue[tempid](err, returnvalue);
         }
       };
 
-      // JSONfunction call
+      // ServiceFunction call
       this.call = (name, Json, callback) => {
         let op = ()=> {
-          let tempid = Utils.generateUniqueID();
+          let tempid = Utils.generateUniqueId();
           _jfqueue[tempid] = (err, returnvalue) => {
             callback(err, returnvalue);
           };
-          _emitjfunc(_entity_id, name, tempid, Json);
+          _emit_sfunc(conn_profile, _entity_id, name, Json, tempid);
         };
         exec(op);
       }
 
-      this.getEntityID = (callback) => {
+      this.getEntityId = (callback) => {
         callback(false, _entity_id);
       };
 
       this.sendData = (data) => {
         let op = ()=> {
-          _emitdata(_entity_id, data);
+          _emitdata(conn_profile, _entity_id, data);
         };
         exec(op);
       };
@@ -1061,7 +1079,7 @@ function NSc() {
       this.close = () => {
         let op = ()=> {
           if(!this.remoteClosed)
-            _emitclose(_entity_id);
+            _emitclose(conn_profile, _entity_id);
           this._emitClose();
           let bundle = conn_profile.returnBundle('bundle_entities');
           for (let i=bundle.length-1; i>=0; i--) {
@@ -1077,145 +1095,244 @@ function NSc() {
         }
         exec(op);
       };
-    };
+    }
+  }
 
 
-    // Service module launch
-    this.launch = () => {
+  function Activity() {
+    let ActivitySocketDestroyTimeout = 1000;
+    let _ASockets = {};
+    let _admin_name = 'admin';
+    let _daemon_auth_key;
+    let _debug = false;
+    let _on_handler = {};
 
-    };
+    let _emmiter;
 
-    // Service module Owner
-    this.setupOwner = (username) => {
-      _local_services_owner = username;
+
+
+    let _unbindActivitySocketList = (_entity_id)=> {
+      setTimeout(()=>{
+        // tell worker abort referance
+        if(_ASockets[_entity_id])
+          _ASockets[_entity_id].worker_cancel_refer = true;
+        delete _ASockets[_entity_id];
+      }, ActivitySocketDestroyTimeout);
     };
 
     // Service module create activity socket
-    this.createActivitySocket = (method, targetip, targetport, service, callback) => {
-      let err = false;
-      let _data = {
-        "m": "CE",
-        "d": {
-          t: Utils.generateGUID(),
-          o: _local_services_owner,
-          m: 'normal',
-          s: service,
-          od: targetip,
+    this.createActivitySocket = (method, targetip, targetport, service, owner, callback) => {
+      _emmiter = {
+        Data: _on_handler['EmitSSDataRq'],
+        ServiceFunction: _on_handler['EmitSSServiceFunctionRq'],
+        Close: _on_handler['EmitASCloseRq'],
+      }
+      _on_handler['createActivitySocketRq'](method, targetport, owner, 'normal', service, targetip, false, (err, connprofile, entityId)=> {
+        let _as = new SocketPair.ActivitySocket(connprofile, _emmiter, _unbindActivitySocketList, _debug);
+        if(entityId) {
+          _as.setEntityId(entityId);
+          connprofile.setBundle('entityId', entityId);
+          _ASockets[entityId] = _as;
+          callback(false, _ASockets[entityId]);
         }
-      };
-
-      this.spwanClient(method, targetip, targetport, (err, connprofile) => {
-        if(err) {
-          callback(err);
-        }
-        else {
-          let _as = new ActivitySocket(connprofile, _emitRouter, _unbindActivitySocketList, _debug);
-          _ActivityRsCEcallbacks[_data.d.t] = (connprofile, data) => {
-            if(data.d.i != "FAIL") {
-              _as.setEntityID(data.d.i);
-              connprofile.setBundle('entityID', data.d.i);
-              _ASockets[data.d.i] = _as;
-              callback(false, _ASockets[data.d.i]);
-            }
-            else{
-              callback(true, _ASockets[data.d.i]);
-            }
-
-          }
-          _emitRouter(connprofile, 'CS', _data);
+        else{
+          delete  _ASockets[entityId];
+          callback(new Error('Could not create this entity for some reason.'));
         }
       });
     };
+
+    this.createAdminDaemonActivitySocket = (method, targetip, targetport, service, callback) => {
+      this.createDaemonActivitySocket(method, targetip, targetport, service, _admin_name, callback);
+    };
+
+    this.createDaemonActivitySocket = (method, targetip, targetport, service, owner, callback) => {
+      _emmiter = {
+        Data: _on_handler['EmitSSDataRq'],
+        ServiceFunction: _on_handler['EmitSSServiceFunctionRq'],
+        Close: _on_handler['EmitASCloseRq'],
+      }
+      _on_handler['createActivitySocketRq'](method, targetport, owner, 'daemon', service, targetip, _daemon_auth_key, (err, connprofile, entityId)=> {
+        let _as = new SocketPair.ActivitySocket(connprofile, _emmiter, _unbindActivitySocketList, _debug);
+        if(entityId) {
+          _as.setEntityId(entityId);
+          connprofile.setBundle('entityId', entityId);
+          _ASockets[entityId] = _as;
+          callback(false, _ASockets[entityId]);
+        }
+        else{
+          delete  _ASockets[entityId];
+          callback(new Error('Could not create this entity for some reason.'));
+        }
+      });
+    };
+
+    this.emitASClose = (entityId)=> {
+      _ASockets[entityId].remoteClosed = true;
+      _ASockets[entityId]._emitClose();
+    };
+
+    this.emitASData = (entityId, data)=> {
+      _ASockets[entityId]._emitData(data);
+    };
+
+    this.emitSFReturn = (entityId, err, tempid, returnvalue)=> {
+      _ASockets[entityId].emitSFReturn(err, tempid, returnvalue);
+    };
+
+    this.emitASData = (entityId, data)=> {
+      _ASockets[entityId]._emitData(data);
+    };
+
+    this.emitASEvent = (entityId, event, data)=> {
+      _ASockets[entityId]._emitEvent(event, data);
+    };
+
+    this.launchActivitySocketByEntityId = (entityId)=> {
+      _ASockets[entityId].launch();
+    };
+
+    this.emitConnectionClose = (connprofile, callback) => {
+      let _entitiesId = connprofile.returnBundle('bundle_entities');
+      for(let i in _entitiesId) {
+        _ASockets[_entitiesId[i]]._emitClose();
+        setTimeout(()=>{
+          // for worker abort referance
+          if(_ASockets[_entitiesId[i]]) {
+            _ASockets[_entitiesId[i]].worker_cancel_refer = true;
+            delete _ASockets[_entitiesId[i]];
+          }
+        }, ActivitySocketDestroyTimeout);
+      }
+      callback(false);
+    };
+
+    this.setDefaultUsername = (username)=> {
+      _admin_name = username;
+    };
+
+    this.setDebug = (debug)=> {
+      _debug = debug;
+    };
+
+    this.importDaemonAuthKey = (key) => {
+      _daemon_auth_key = key;
+    };
+
+    this.on = (event, callback)=> {
+      _on_handler[event] = callback;
+    };
+
+    this.close = ()=> {
+      ActivitySocketDestroyTimeout = 1000;
+      for(let i in _ASockets) {
+        _ASockets[i].worker_cancel_refer = true;
+        delete _ASockets[i];
+      }
+      _ASockets = {};
+      _emmiter = null;
+      _admin_name = 'admin';
+      _daemon_auth_key = null;
+      _debug = false;
+       _on_handler = {};
+    };
   };
 
-  let Implementation = function() {
-    let _support_secure = false;
-    let _connection_module = null;
+  // Handling responses to authorization requests.
+  function AuthorizationHandler() {
+    let Implementation;
 
-    // NOOXY service protocol secure list
-    let _nsps_list = ['generateAESCBC256KeyByHash', 'encryptString', 'decryptString'];
+    // Handling responses to authorization requests.
+    let _handler = {
+      // Authby password
+      'PW': (connprofile, data, data_sender) => {
+        let AuthbyPassword = Implementation.returnImplement('AuthbyPassword');
+        AuthbyPassword(connprofile, data, data_sender);
+      },
+
+      // Authby password failed
+      'PF': (connprofile, data, data_sender) => {
+        let AuthbyPasswordFailed = Implementation.returnImplement('AuthbyPasswordFailed');
+        AuthbyPasswordFailed(connprofile, data, data_sender);
+      },
+
+      // Authby token
+      'TK': (connprofile, data, data_sender) => {
+        let AuthbyToken = Implementation.returnImplement('AuthbyToken');
+        AuthbyToken(connprofile, data, data_sender);
+      },
+
+      // Authby token failed
+      'TF': (connprofile, data, data_sender) => {
+        let AuthbyTokenFailed = Implementation.returnImplement('AuthbyTokenFailed');
+        AuthbyTokenFailed(connprofile, data, data_sender);
+      },
+
+      // Sign in
+      'SI': (connprofile, data, data_sender) => {
+        let Signin = Implementation.returnImplement('signin');
+        Signin(connprofile, data, data_sender);
+      },
+
+      'AF': ()=>{
+
+      }
+    };
+
+    this.importImplementation = (module)=> {
+      Implementation = module;
+    };
+
+    this.handle = (method, connprofile, data, data_sender)=> {
+      _handler[method](connprofile, data, data_sender);
+    };
+
+    this.close = () =>{
+
+    }
+  };
+
+  function Implementation() {
 
     let _implts = {
-
-      // NOOXY service protocol sercure
-
-        // hashing two string (host and client pub key)by SHA256 to get AES-CBC 256 key 32 char
-        generateAESCBC256KeyByHash: (string1, string2, callback) => {
-          Utils.tagLog('*ERR*', 'generateAESCBC256KeyByHash not implemented');
-          callback(true, 'hash 32 char');
-        },
-
-        encryptString: (key, toEncrypt, callback) => {
-          Utils.tagLog('*ERR*', 'generateAESCBC256KeyByHash not implemented');
-          callback(true, 'encrypted');
-        },
-
-        decryptString: (key, toEncrypt, callback) => {
-          Utils.tagLog('*ERR*', 'generateAESCBC256KeyByHash not implemented');
-          callback(true, 'decrypted');
-        },
-
-        saveRSA2048KeyPair: (priv, pub) => {
-          Utils.tagLog('*ERR*', 'saveRSA2048KeyPair not implemented');
-        },
-
-        loadRSA2048KeyPair: (callback) => {
-          Utils.tagLog('*ERR*', 'loadRSA2048KeyPair not implemented');
-          callback(true, 'priv', 'pub');
-        },
-
       // NOOXY service protocol sercure end
-
       // return for Server
       AuthbyToken: (callback) => {
-        Utils.tagLog('*ERR*', 'AuthbyToken not implemented');
+        Utils.TagLog('*ERR*', 'AuthbyToken not implemented');
         callback(true, 'token');
       },
 
       AuthbyTokenFailed: () => {
-        Utils.tagLog('*ERR*', 'AuthbyTokenFailed not implemented');
+        Utils.TagLog('*ERR*', 'AuthbyTokenFailed not implemented');
       },
 
       // return for Server
       AuthbyPassword: (callback) => {
-        Utils.tagLog('*ERR*', 'AuthbyPassword not implemented');
+        Utils.TagLog('*ERR*', 'AuthbyPassword not implemented');
         callback(true, 'password');
       },
 
       AuthbyPasswordFailed: () => {
-        Utils.tagLog('*ERR*', 'AuthbyPasswordFailed not implemented');
+        Utils.TagLog('*ERR*', 'AuthbyPasswordFailed not implemented');
       },
 
       // return for Client
       signin: (conn_method, remoteip, port, username, password, callback) => {
-        Utils.tagLog('*ERR*', 'signin not implemented');
+        Utils.TagLog('*ERR*', 'signin not implemented');
         callback(true, 'token');
       },
 
       // return for Client
       signup: (conn_method, remoteip, port, username, password, callback) => {
-        Utils.tagLog('*ERR*', 'signup not implemented');
+        Utils.TagLog('*ERR*', 'signup not implemented');
         callback(true, 'token');
       },
 
       onToken: (err, token) => {
-        Utils.tagLog('*ERR*', 'onToken not implemented');
-      },
-
-      // for Server
-      noti: () => {
-
-      },
-
-      AuthbyPassword: null,
-
-      AuthbyAction: null
+        Utils.TagLog('*ERR*', 'onToken not implemented');
+      }
     };
 
-    // Nooxy service protocol sercure request
-    this.NSPSRqRouter = (connprofile, data, data_sender) => {
-
-    };
 
     this.onToken = (connprofile, status, token)=> {
       if(status === 'OK') {
@@ -1226,30 +1343,6 @@ function NSc() {
       }
     };
 
-    this.emitRouter = () => {Utils.tagLog('*ERR*', 'emitRouter not implemented');};
-
-    this.sendRouterData = () => {Utils.tagLog('*ERR*', 'sendRouterData not implemented');};
-    // get a temporary ConnectionProfile
-    this.getClientConnProfile = (conn_method, remoteip, port, callback) => {
-      _connection_module.createClient(conn_method, remoteip, port, callback);
-    }
-
-    this.getDefaultClientConnProfile = (callback) => {
-      _connection_module.createClient(settings.connmethod, settings.targetip, settings.targetport, callback);
-    }
-
-    this.importConnectionModule = (connection_module) => {
-      _connection_module = connection_module;
-    };
-
-    this.setSecure = (boolean)=>{
-
-    };
-
-    this.isSecure = (boolean)=>{
-
-    };
-
     this.setImplement = (name, callback) => {
       _implts[name] = callback;
     };
@@ -1258,29 +1351,72 @@ function NSc() {
       return _implts[name];
     };
 
+    this.getImplementationModule = (name, callback) => {
+      callback(false, _implts[name]);
+    };
+
     this.returnImplementBundle = () => {
       return _implts;
     };
 
-    this.returnNSPSModule = () =>{
-
-    };
-
     this.close = () => {};
-  }
+  };
 
-  let NSPS = function () {
-    let _rsa_pub = null;
-    let _rsa_priv = null;
+  // NOOXY service protocol secure
+  function NSPS() {
+    let _rsa_pub;
+    let _rsa_priv;
     let _resumes = {};
-    let _crypto_module = null;
+    let _crypto_module;
+    let _operation_timeout = 60; // seconds
 
     this.emitRouter = () => {console.log('[*ERR*] emit not implemented');};
 
-    // Nooxy service protocol sercure request ClientSide
-    // in client need to be in implementation module
-    this.RqRouter = (connprofile, data, data_sender) => {
+    // daemon side
+    this.ResponseHandler = (connprofile, data) => {
+      let resume = _resumes[connprofile.returnGUID()];
+      if(resume) {
+        try{
+          _crypto_module.decryptString('RSA2048', _rsa_priv, data, (err, decrypted) => {
+            if(err) {
+              resume(err);
+            }
+            else {
+              let json;
+              try {
+                json = JSON.parse(decrypted);
+                let host_rsa_pub = _rsa_pub;
+                let client_random_num = json.r;
+                _crypto_module.generateAESCBC256KeyByHash(host_rsa_pub, client_random_num, (err, aes_key) => {
+                  if(aes_key === json.a) {
+                    connprofile.setBundle('aes_256_cbc_key', aes_key);
+                    connprofile.setBundle('NSPS', true);
+                    connprofile.setBundle('NSPSremote', true);
+                    resume(err, true);
+                  }
+                  else {
+                    resume(err, false);
+                  }
 
+                });
+              }
+              catch (err) {
+                resume(err, false);
+              }
+            }
+          });
+        }
+        catch(er) {
+          console.log(er);
+          connprofile.closeConnetion();
+          resume(true, false);
+        }
+      };
+    };
+
+    // Nooxy service protocol secure request ClientSide
+    // in client need to be in implementation module
+    this.RequestHandler = (connprofile, data, data_sender) => {
       let host_rsa_pub = data.p;
       let client_random_num = _crypto_module.returnRandomInt(99999);
       connprofile.setBundle('host_rsa_pub_key', host_rsa_pub);
@@ -1297,14 +1433,43 @@ function NSc() {
       });
     };
 
+    this.secure = (connprofile, data, callback)=> {
+      connprofile.getBundle('aes_256_cbc_key', (err, key)=>{
+        _crypto_module.encryptString('AESCBC256', key, data, (err, encrypted)=> {
+          callback(err, encrypted);
+        });
+      });
+    };
+
+    this.isConnectionSecured = (connprofile, callback)=> {
+      connprofile.getBundle('NSPS', (err, NSPS)=>{
+        if(NSPS === 'finalize') {
+          connprofile.setBundle('NSPS', true);
+          callback(false);
+        }
+        else {
+          callback(NSPS);
+        }
+      });
+    };
+
     this.upgradeConnection = (connprofile, callback) => {
       _resumes[connprofile.returnGUID()] = callback;
+      // operation timeout
+      setTimeout(()=>{
+        delete _resumes[connprofile.returnGUID()];
+      }, _operation_timeout*1000);
+
       let _data = {
         p: _rsa_pub// RSA publicKey
       };
       connprofile.setBundle('NSPS', 'pending');
       this.emitRouter(connprofile, 'SP', _data);
     }
+
+    this.importOperationTimeout = (timeout) => {
+      _operation_timeout = timeout;
+    };
 
     this.importCryptoModule = (crypto_module) => {
       _crypto_module = crypto_module;
@@ -1314,183 +1479,194 @@ function NSc() {
       _rsa_priv = rsa_priv;
       _rsa_pub = rsa_pub;
     };
+
+    this.close = () => {
+      _rsa_pub = null;
+      _rsa_priv = null;
+      _resumes = {};
+      _crypto_module = null;
+    };
   };
 
-  let Core = function() {
+  // NOOXY crypto Client version
+  function NoCrypto() {
+    // to base64
+    let _algo = {
+      // key is in length 32 char
+      AESCBC256: {
+        encryptString: (keystr, toEncrypt, callback) => {
+          window.crypto.subtle.importKey(
+              "raw", //can be "jwk" or "raw"
+              new TextEncoder('utf-8').encode(keystr),
+              {   //this is the algorithm options
+                  name: "AES-CBC",
+              },
+              false, //whether the key is extractable (i.e. can be used in exportKey)
+              ["encrypt", "decrypt"] //can be "encrypt", "decrypt", "wrapKey", or "unwrapKey"
+          )
+          .then((key)=>{
+            let iv = new Uint8Array(16);
+            window.crypto.getRandomValues(iv);
+            toEncrypt = new TextEncoder('utf-8').encode(toEncrypt);
+            window.crypto.subtle.encrypt(
+              {
+                  name: "AES-CBC",
+                  iv: iv, //The initialization vector you used to encrypt
+              },
+              key, //from generateKey or importKey above
+              toEncrypt //ArrayBuffer of the data
+            )
+            .then((encrypted)=>{;
+              callback(false, Utils.ArrayBuffertoBase64(iv)+Utils.ArrayBuffertoBase64(encrypted));
+            })
+            .catch((err2)=>{
+              console.error(err2);
+            });
+          })
+          .catch((err)=>{
+              console.error(err);
+          });
+        },
+        decryptString: (keystr, toDecrypt, callback) => {
+          window.crypto.subtle.importKey(
+              "raw", //can be "jwk" or "raw"
+              new TextEncoder('utf-8').encode(keystr),
+              {   //this is the algorithm options
+                  name: "AES-CBC",
+              },
+              false, //whether the key is extractable (i.e. can be used in exportKey)
+              ["encrypt", "decrypt"] //can be "encrypt", "decrypt", "wrapKey", or "unwrapKey"
+          )
+          .then((key)=>{
+            let iv = Utils.Base64toArrayBuffer(toDecrypt.substring(0, 24));
+            toDecrypt = Utils.Base64toArrayBuffer(toDecrypt.substring(24));
+            window.crypto.subtle.decrypt(
+              {
+                  name: "AES-CBC",
+                  iv: iv, //The initialization vector you used to encrypt
+              },
+              key, //from generateKey or importKey above
+              toDecrypt //ArrayBuffer of the data
+            )
+            .then((decrypted)=>{;
+              callback(false, new TextDecoder('utf-8').decode(decrypted));
+            })
+            .catch((err2)=>{
+              console.error(err2);
+            });
+          })
+          .catch((err)=>{
+              console.error(err);
+          });
+        }
+      },
+
+      // Keys is in pem format
+      RSA2048: {
+        encryptString: (publicKey, toEncrypt, callback) => {
+          window.crypto.subtle.importKey(
+            "spki", //can be "jwk" (public or private), "spki" (public only), or "pkcs8" (private only)
+            Utils.convertPemToBinary(publicKey),
+            {   //these are the algorithm options
+                name: "RSA-OAEP",
+                hash: {name: "SHA-1"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+            },
+            false, //whether the key is extractable (i.e. can be used in exportKey)
+            ["encrypt"] //"encrypt" or "wrapKey" for public key import or
+                        //"decrypt" or "unwrapKey" for private key imports
+          )
+          .then((key)=> {
+              //returns a publicKey (or privateKey if you are importing a private key)
+            window.crypto.subtle.encrypt({"name": "RSA-OAEP"}, key, new TextEncoder('utf-8').encode(toEncrypt)).then((encrypted)=>{
+              callback(false, Utils.ArrayBuffertoBase64(encrypted));
+            });
+
+          })
+          .catch((err)=>{
+              console.log(err);
+          });
+
+        }
+      },
+
+    };
+
+    this.returnRandomInt = (max) => {
+      return Math.floor(Math.random() * Math.floor(max));
+    }
+
+    // hashing two string (host and client pub key)by SHA256 to get AES-CBC 256 key 32 char
+    this.generateAESCBC256KeyByHash = (string1, string2, callback) => {
+      window.crypto.subtle.digest("SHA-256", new TextEncoder('utf-8').encode(string1+string2)).then((hash)=> {
+        callback(false, (Utils.ArrayBuffertoBase64(hash)).substring(0, 32));
+      });
+    };
+
+    this.encryptString = (algo, key, toEncrypt, callback) => {
+      try{
+        _algo[algo].encryptString(key, toEncrypt, callback);
+      }
+      catch(e) {
+        callback(e);
+      }
+
+    };
+
+    this.decryptString = (algo, key, toDecrypt, callback) => {
+      try {
+        _algo[algo].decryptString(key, toDecrypt, callback);
+      }
+      catch(e) {
+        callback(e);
+      }
+
+    };
+
+    this.close = () => {};
+  }
+
+  function NoServiceClientCore() {
     let verbose = (tag, log) => {
       if(settings.verbose||settings.debug) {
-        Utils.tagLog(tag, log);
+        Utils.TagLog(tag, log);
       };
     };
     // setup variables
-    verbose('Daemon', 'Setting up variables.')
-    let _connection = new Connection();
+    verbose('Core', 'Setting up variables.')
+    let _connection = new Connection({allow_ssl_self_signed: false});
     let _authorizationhandler = new AuthorizationHandler();
     let _router = new Router();
-    let _service = new Service();
+    let _activity = new Activity();
     let _implementation = new Implementation();
-    let _nsps;
+    let _nsps = new NSPS();
+    let _nocrypto = new NoCrypto;
 
-    let _nocrypto = {
-      returnRandomInt: (max)=>{
-        let f = _implementation.returnImplement('returnRandomInt');
-        return f(max);
-      },
-      generateAESCBC256KeyByHash: (string1, string2, callback) => {
-        let f = _implementation.returnImplement('generateAESCBC256KeyByHash');
-        f(string1, string2, callback);
-      },
-      encryptString: (algo, key, toEncrypt, callback)=>{
-        let f = _implementation.returnImplement('encryptString');
-        f(algo, key, toEncrypt, callback);
-      },
-      decryptString: (algo, key, toDecrypt, callback) => {
-        let f = _implementation.returnImplement('decryptString');
-        f(algo, key, toDecrypt, callback);
-      }
-    };
-    _nsps = new NSPS();
-
-    this.launch = () => {
-      Utils.printLOGO(Vars.version, Vars.copyright);
-
-      let _cry_algo = {
-        // key is in length 32 char
-        AESCBC256: {
-          encryptString: (keystr, toEncrypt, callback) => {
-            window.crypto.subtle.importKey(
-                "raw", //can be "jwk" or "raw"
-                new TextEncoder('utf-8').encode(keystr),
-                {   //this is the algorithm options
-                    name: "AES-CBC",
-                },
-                false, //whether the key is extractable (i.e. can be used in exportKey)
-                ["encrypt", "decrypt"] //can be "encrypt", "decrypt", "wrapKey", or "unwrapKey"
-            )
-            .then((key)=>{
-              let iv = new Uint8Array(16);
-              window.crypto.getRandomValues(iv);
-              toEncrypt = new TextEncoder('utf-8').encode(toEncrypt);
-              window.crypto.subtle.encrypt(
-                {
-                    name: "AES-CBC",
-                    iv: iv, //The initialization vector you used to encrypt
-                },
-                key, //from generateKey or importKey above
-                toEncrypt //ArrayBuffer of the data
-              )
-              .then((encrypted)=>{;
-                callback(false, Utils.ArrayBuffertoBase64(iv)+Utils.ArrayBuffertoBase64(encrypted));
-              })
-              .catch((err2)=>{
-                console.error(err2);
-              });
-            })
-            .catch((err)=>{
-                console.error(err);
-            });
-          },
-          decryptString: (keystr, toDecrypt, callback) => {
-            window.crypto.subtle.importKey(
-                "raw", //can be "jwk" or "raw"
-                new TextEncoder('utf-8').encode(keystr),
-                {   //this is the algorithm options
-                    name: "AES-CBC",
-                },
-                false, //whether the key is extractable (i.e. can be used in exportKey)
-                ["encrypt", "decrypt"] //can be "encrypt", "decrypt", "wrapKey", or "unwrapKey"
-            )
-            .then((key)=>{
-              let iv = Utils.Base64toArrayBuffer(toDecrypt.substring(0, 24));
-              toDecrypt = Utils.Base64toArrayBuffer(toDecrypt.substring(24));
-              window.crypto.subtle.decrypt(
-                {
-                    name: "AES-CBC",
-                    iv: iv, //The initialization vector you used to encrypt
-                },
-                key, //from generateKey or importKey above
-                toDecrypt //ArrayBuffer of the data
-              )
-              .then((decrypted)=>{;
-                callback(false, new TextDecoder('utf-8').decode(decrypted));
-              })
-              .catch((err2)=>{
-                console.error(err2);
-              });
-            })
-            .catch((err)=>{
-                console.error(err);
-            });
-          }
-        },
-
-        // Keys is in pem format
-        RSA2048: {
-          encryptString: (publicKey, toEncrypt, callback) => {
-            window.crypto.subtle.importKey(
-              "spki", //can be "jwk" (public or private), "spki" (public only), or "pkcs8" (private only)
-              Utils.convertPemToBinary(publicKey),
-              {   //these are the algorithm options
-                  name: "RSA-OAEP",
-                  hash: {name: "SHA-1"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
-              },
-              false, //whether the key is extractable (i.e. can be used in exportKey)
-              ["encrypt"] //"encrypt" or "wrapKey" for public key import or
-                          //"decrypt" or "unwrapKey" for private key imports
-            )
-            .then((key)=> {
-                //returns a publicKey (or privateKey if you are importing a private key)
-              window.crypto.subtle.encrypt({"name": "RSA-OAEP"}, key, new TextEncoder('utf-8').encode(toEncrypt)).then((encrypted)=>{
-                callback(false, Utils.ArrayBuffertoBase64(encrypted));
-              });
-
-            })
-            .catch((err)=>{
-                console.log(err);
-            });
-
-          }
-        },
-
-      }
-
-      _implementation.setImplement('returnRandomInt', (max)=>{
-        return Math.floor(Math.random() * Math.floor(max));
-      });
-      _implementation.setImplement('generateAESCBC256KeyByHash', (string1, string2, callback)=>{
-        window.crypto.subtle.digest("SHA-256", new TextEncoder('utf-8').encode(string1+string2)).then((hash)=> {
-          callback(false, (Utils.ArrayBuffertoBase64(hash)).substring(0, 32));
-        });
-      });
-      _implementation.setImplement('encryptString', (algo, key, toEncrypt, callback)=>{
-        _cry_algo[algo].encryptString(key, toEncrypt, callback);
-      });
-      _implementation.setImplement('decryptString', (algo, key, toDecrypt, callback)=>{
-        _cry_algo[algo].decryptString(key, toDecrypt, callback);
-      });
+    this.setupDefaultImplementation = ()=> {
+      verbose('Core', 'Setting up DefaultImplementation.');
+      this.importOwner(getCookie('NSUser'));
       // setup NoService Auth implementation
       _implementation.setImplement('signin', (connprofile, data, data_sender)=>{
-        // top.location.replace(settings.NSc_files_root+'login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+top.window.location.href);
+        window.location.replace(settings.NSc_files_root+'login.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&redirect='+window.location.href);
         // window.open('.html.html?conn_method='+conn_method+'&remote_ip='+remote_ip+'&port='+port);
       });
 
       _implementation.setImplement('onToken', (err, token)=>{
-        Utils.setCookie('NSToken', token, 7);
+        setCookie('NSToken', token, 7);
         if(Utils.getQueryVariable('redirect')) {
           window.location.replace(Utils.getQueryVariable('redirect'));
         }
       });
 
       _implementation.setImplement('setUser', (err, username)=>{
-        Utils.setCookie('NSUser', username, 365);
+        setCookie('NSUser', username, 365);
         if(!username) {
-          Utils.eraseCookie('NSUser');
+          eraseCookie('NSUser');
         }
       });
 
       _implementation.setImplement('logout', (err, Username)=>{
-        Utils.eraseCookie('NSUser');
-        Utils.eraseCookie('NSToken');
+        eraseCookie('NSUser');
+        eraseCookie('NSToken');
         window.location.reload();
       });
 
@@ -1512,11 +1688,11 @@ function NSc() {
         };
 
         let pass = true;
-        if(Utils.getCookie('NSToken') === null) {
+        if(!getCookie('NSToken')) {
           _implementation.returnImplement('signin')(connprofile, data, data_sender, 'token');
         }
         else {
-          callback(false, Utils.getCookie('NSToken'));
+          callback(false, getCookie('NSToken'));
         }
 
       });
@@ -1526,105 +1702,108 @@ function NSc() {
         window.open(settings.NSc_files_root+'password.html?conn_method='+settings.connmethod+'&remote_ip='+settings.targetip+'&port='+settings.targetport+'&username='+settings.user+'&authtoken='+data.d.t+'&redirect='+window.location.href);
       });
 
-        // create gateway
-        verbose('Daemon', 'Creating coregateway...')
-        let coregateway = {
-            Settings: settings,
-            AuthorizationHandler: _authorizationhandler,
-            Service : _service,
-            Connection: _connection,
-            Router: _router,
-            Implementation: _implementation,
-            NoCrypto: _nocrypto,
-            NSPS: _nsps
-          };
-        verbose('Daemon', 'Creating coregateway done.')
-
-      for(let i in settings.connection_servers) {
-        settings.trusted_domains.push(settings.connection_servers[i].ip);
+      _implementation.getDefaultClientConnProfile = (callback) => {
+        _connection.createClient(settings.connmethod, settings.targetip, settings.targetport, callback);
       }
+
+      verbose('Core', 'Setting up DefaultImplementation done.');
+
+    };
+
+    this.logout = ()=> {
+      _implementation.returnImplement('logout')();
+    };
+
+    this.launch = () => {
+      // create gateway
+      verbose('Core', 'Creating coregateway...')
+      let coregateway = {
+          Settings: settings,
+          AuthorizationHandler: _authorizationhandler,
+          Activity : _activity,
+          Connection: _connection,
+          Router: _router,
+          Utilities: Utils,
+          Implementation: _implementation,
+          NoCrypto: _nocrypto,
+          NSPS: _nsps
+        };
+      verbose('Core', 'Creating coregateway done.');
+
+      _connection.setDebug(settings.debug);
+      _connection.importConnectionMethodNameMap(Constants.CONNECTION_METHOD_NAME_MAP);
 
       // setup NOOXY Service protocol secure
       _nsps.importCryptoModule(_nocrypto);
+
       // setup router
+      if(settings.debug) {
+        _router.addJSONSniffer((err, json)=> {
+          Utils.TagLog('DEBUG', json);
+        });
+      }
       _router.importCore(coregateway);
 
-      // setup connection
-      for(var server in settings.connection_servers) {
-        _connection.addServer(settings.connection_servers[server].type,
-           settings.connection_servers[server].ip, settings.connection_servers[server].port);
-      }
-
-      // setup implementation
-      _implementation.importConnectionModule(_connection);
-
       // setup AuthorizationHandler
-      _authorizationhandler.importImplementationModule(_implementation);
+      _authorizationhandler.importImplementation(_implementation);
 
       // setup service
-      _service.setDebug(settings.debug);
-      _service.importOwner(settings.user);
+      _activity.setDebug(settings.debug);
 
-
-      verbose('Daemon', 'Setting up variables done.');
-
-      // launch services
-      verbose('Daemon', 'Launching service module...');
-      _service.launch();
-      verbose('Daemon', 'Launching service module done.');
+      verbose('Core', 'Setting up variables done.');
       //
-      verbose('Daemon', 'NOOXY Service Framework successfully started.');
-
+      verbose('Core', 'NoService client started.');
     }
 
-    this.getImplement = (callback) => {
+    this.getImplementationModule = (callback) => {
       callback(false, _implementation);
     };
 
     this.createActivitySocket = (method, targetip, targetport, service, callback) => {
-      _service.createActivitySocket(method, targetip, targetport, service, callback);
+      _activity.createActivitySocket(method, targetip, targetport, service, settings.user, callback);
     };
 
+    this.importOwner = (uname)=> {
+      settings.user = uname;
+    };
   }
 
-  let _core = new Core();
+  // NoService Modules end
 
+  let _core = new NoServiceClientCore();
+
+  // NSc methods
+  this.setDebug = (boo)=>{
+    settings.debug = boo;
+  }
   this.createActivitySocket = (service, callback) => {
     _core.createActivitySocket(settings.connmethod, settings.targetip, settings.targetport, service, callback);
   };
-
-  this.getImplement = (callback)=>{
-    _core.getImplement(callback);
+  this.setUsername = (uname)=>{
+    _core.importOwner(uname);
+  }
+  this.returnUsername = ()=>{
+    return _core.returnOwner();
+  }
+  this.logout = ()=> {
+    _core.logout();
   };
-
-  this.returnUserName = ()=>{
-    return settings.user;
-  }
-
-  this.logout = () => {
-    _core.getImplement((err, implement_module)=>{
-      implement_module.returnImplement('logout')();
-    });
-  }
-
-  this.connect = (targetip, method, targetport) => {
+  this.getImplementationModule = (callback)=> {
+    _core.getImplementationModule(callback);
+  };
+  this.init = (targetip, method, targetport) => {
     if(targetip) {
       settings.targetip = targetip;
-    }
-
-    if(settings.debug) {
-      settings.connmethod = 'WebSocket';
-      settings.targetport = 43582;
     }
 
     if(method) {
       settings.connmethod = method;
     }
 
-    if(method=='WebSocketSecure') {
+    if(method === 'WebSocketSecure') {
       settings.targetport = 43581;
     }
-    else if (method=='WebSocket') {
+    else if (method ==='WebSocket') {
       settings.targetport = 43582;
     }
 
@@ -1632,10 +1811,16 @@ function NSc() {
       settings.targetport = targetport;
     }
 
-    settings.user = Utils.getCookie('NSUser');
-    if(settings.user == "") {
-      settings.user = null;
-    };
+    if(settings.debug) {
+      settings.connmethod = 'WebSocket';
+      settings.targetport = 43582;
+    }
+
+    Utils.printLOGO(Constants.version, Constants.copyright);
+
+    Utils.TagLog('Init', 'host: nsp('+settings.connmethod+')://'+targetip+':'+settings.targetport);
+    _core.setupDefaultImplementation();
+
     try {
       _core.launch();
     }
@@ -1643,8 +1828,10 @@ function NSc() {
       settings.connmethod = 'WebSocket';
       _core.launch();
     }
+
   };
-}
+  this.init(targetip, method, targetport);
+};
 
 // module.exports = NSc;
 export default NSc;

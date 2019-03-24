@@ -1,5 +1,5 @@
 .tooltip {
-    position: relative!important;
+    position: relative;
     display: inline-block!important;
     zcursor: help!important;
 }

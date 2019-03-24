@@ -36,7 +36,7 @@ export class SigninPage extends Component {
 
     this.Signin = ()=>{
       try{
-        this.props.NSc.getImplement((err, implement_module)=>{
+        this.props.NSc.getImplementationModule((err, implement_module)=>{
           implement_module.getDefaultClientConnProfile((err, connprofile) => {
             let _data = {
               u: this.state.username,
@@ -120,7 +120,7 @@ export class SigninPage extends Component {
               <p> {"sign me in"}</p>
             </div>
           </div>
-          <a href={this.props.SignupURL}>
+          <a href={this.props.SignupURL} target="_blank">
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h2>{"Siginup"}</h2>
@@ -141,7 +141,7 @@ export class PasswordPage extends Component {
       password: null
     }
     this.Signin = ()=> {
-      this.props.NSc.getImplement((err, implement_module)=>{
+      this.props.NSc.getImplementationModule((err, implement_module)=>{
       implement_module.getDefaultClientConnProfile((err, connprofile) => {
         let _data = {
           m: 'PW',

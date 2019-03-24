@@ -15,7 +15,6 @@ import logo from './logo.png';
 import './App.css';
 import './tooltip.css';
 
-const NoService = new NSClient();
 const VERSION = "alpha 2019.1.23"
 
 const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
@@ -24,6 +23,9 @@ const NOSERVICE_SIGNUPURL = "https://nooxy.org/static/NoService/signup.html";
 const nshost = 'nooxy.org';
 const debug = false;
 const nsport = null;
+
+const NoService = new NSClient(nshost);
+NoService.setDebug(debug);
 
 let NoTalk;
 let NoUser;
@@ -450,8 +452,7 @@ class App extends Component {
 
   componentDidMount() {
     this.log('NoService', 'Setting up NOOXY service implementations.');
-    NoService.getImplement((err, NSimplementation)=>{
-      NoService.connect(nshost);
+    NoService.getImplementationModule((err, NSimplementation)=>{
       this.log('NoService', 'Connecting to NOOXY service.');
       NSimplementation.setImplement('signin', (connprofile, data, data_sender)=>{
         this.log('NoService Auth', 'NOOXY service signin emitted.');

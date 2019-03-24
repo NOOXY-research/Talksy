@@ -317,7 +317,7 @@ img {
   position: absolute;
   height: calc(100% - 100px);
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   right: 0;
   list-style: none;
   margin: 0;
@@ -361,14 +361,17 @@ img {
 
 .ChPage-Bubble-Other + .ChPage-Bubble-Me{
   border-bottom-right-radius: 5px;
+  margin-top: 10px;
 }
 
 .ChPage-Bubble-Me + .ChPage-Bubble-Other{
   border-bottom-left-radius: 5px;
+  margin-top: 10px;
 }
 
 .ChPage-Bubble-Other + .ChPage-Bubble-Other{
   border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .ChPage-Bubble-Me + .ChPage-Bubble-Me{

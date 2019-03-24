@@ -67,6 +67,7 @@ export class ChannelPage extends Component {
   }
 
   resetInput() {
+    this.ToBeSent = '';
     this.TextInput.value = '';
   }
 
