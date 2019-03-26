@@ -53,7 +53,7 @@ export class SigninPage extends Component {
                 this.setState({status:'Wrong username or password!'});
               }
             });
-            implement_module.emitRouter(connprofile, 'GT', _data);
+            implement_module.emitRequest(connprofile, 'GT', _data);
 
           });
         });
