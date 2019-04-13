@@ -1,0 +1,102 @@
+
+.HeaderPage {
+  text-align: center;
+  position: absolute;
+  background-color: #eceff1;
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  /* overflow-y:hidden; */
+}
+
+.HeaderPage-logo {
+  animation: HeaderPage-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.HeaderPage-header {
+  flex: 0 1 auto;
+  width: 100%;
+  /* min-height: 60px; */
+  background-color: #00838F;
+  height: auto;
+  padding: 18px 0 0  0;
+  color: white;
+  box-sizing: border-box;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  z-index: 999;
+  user-select: none;
+}
+
+.HeaderPage-Container {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+.HeaderPage-Contain {
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.HeaderPage-header-bar {
+  display: inline-block;
+  height: 43px;
+  line-height: 40px;
+  width: auto;
+  margin: 0 10px;
+  color: white;
+  font-size: 28px;
+  /* overflow: scroll; */
+  /* display: none; */
+}
+
+.HeaderPage-header-bar-button {
+  display: inline-block;
+  position: relative;
+  height: inherit;
+  width: 50px;
+  margin: 0;
+  cursor: pointer;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.0);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-sizing: border-box;
+  transition: .3s;
+}
+
+.HeaderPage-header-bar-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.HeaderPage-header-bar-button-selected {
+  position: relative;
+  display: inline-block;
+  height: inherit;
+  width: 80px;
+  margin: 0;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  cursor: pointer;
+  border-bottom: 3px solid;
+  box-sizing: border-box;
+  transition: .3s;
+}
+
+.HeaderPage-header-bar-button-selected:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.HeaderPage-title {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.HeaderPage-intro {
+  font-size: large;
+}

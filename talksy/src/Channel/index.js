@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
+import { Box, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
 import Ink from 'react-ink';
 import './channel.css';
 
@@ -355,7 +355,7 @@ export class NewChannelPage extends Component {
 
           <Route exact path="/channels/new/users" render={(props)=>{
             return(
-              <BoxComp history={props.history}>
+              <Box history={props.history}>
                 <BackPage history={props.history} title="add users">
                   <AddToListPageRestrictedItems title="Add users" onChange={(name, prev)=>{
                     let list = [];
@@ -385,7 +385,7 @@ export class NewChannelPage extends Component {
                     this.props.history.push("/channels/new");
                   }} description="Add users for your channels." restricteditems={this.state.searchusers} list={this.state.userlist}/>
                 </BackPage>
-              </BoxComp>
+              </Box>
             );
           }}/>
         </div>
@@ -589,7 +589,7 @@ export class ChannelSettingsPage extends Component {
         ,
         <Route exact path={'/channels/'+this.props.channelid+'/settings/addusers'} render={(props)=>{
           return(
-            <BoxComp history={props.history}>
+            <Box history={props.history}>
                 <AddToListPageRestrictedItems title="Add users" onChange={(name, prev)=>{
                   let list = [];
                   if(name=="") {
@@ -616,7 +616,7 @@ export class ChannelSettingsPage extends Component {
                   this.setState({userlist: list});
                   this.props.history.push('/channels/'+this.props.channelid+'/settings');
                 }} description="Add users for your channels." restricteditems={this.state.searchusers} list={this.state.userlist}/>
-            </BoxComp>
+            </Box>
           );
         }}/>
       ]

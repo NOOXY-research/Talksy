@@ -6,13 +6,15 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { SigninPage, PasswordPage } from "./NScReact.js";
-import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
+import {Box, Split, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
 import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "../Channel";
 import {ContactsPage, NewContactsPage} from "../Contact";
 import {MyAccountPage, UserAccountPage} from "../Account";
+import DebugPage from './DebugPage';
+import HeaderPage from './HeaderPage';
+import TrendingPage from '../TrendingPage';
 import Ink from 'react-ink';
 import NSClient from '../flux/NSc.js';
-import logo from '../pics/logo.png';
 import './App.css';
 import './tooltip.css';
 
@@ -35,209 +37,7 @@ NoService.setDebug(debug);
 let NoTalk;
 let NoUser;
 
-
 NoService.setDebug(debug);
-// EditListPage
-class MainCtrlComp extends Component {
-  constructor (props) {
-    super(props);
-    let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
-    this.state = {
-      headertitle: "NOTalk alpha (avalible 2019 summer, still in development)",
-      buttons: {
-        'channels': [ '/channels/', 'chat', this.props.langs['channels']],
-        'contacts': [ '/contacts/', 'people', this.props.langs['contacts']],
-        'trending': ['/trending/', 'trending_up', this.props.langs['trending']],
-        'account': ['/account/', 'account_circle', this.props.langs['account']],
-        // 'debug': ['/debug/', 'bug_report']
-      },
-      selectedbutton: regex_result?regex_result[3]:'channels'
-    }
-  };
-
-  renderButton() {
-    return(
-      Object.keys(this.state.buttons).map((key, index)=>{
-        return(
-            <div key={key}
-              className={key===this.state.selectedbutton?"MainCtrlComp-button-selected":"MainCtrlComp-button"}
-              onClick={()=>{
-                this.setState({selectedbutton: key});
-                this.props.history.push(this.state.buttons[key][0]);
-              }}
-            >
-              <i className="material-icons">{this.state.buttons[key][1]}</i>
-            </div>
-        );
-      })
-    );
-  };
-
-  render() {
-    if(this.props.debug) {
-      this.state.buttons['debug'] = ['/debug/', 'bug_report'];
-    }
-    else {
-      delete this.state.buttons['debug'];
-    }
-    return (
-      <div className="MainCtrlComp">
-          <div className="MainCtrlComp-buttons">
-
-            {this.renderButton()}
-            <div className="MainCtrlComp-button">
-              <i className="material-icons">unfold_more</i>
-            </div>
-          </div>
-      </div>
-    );
-  }
-}
-
-class SettingsPage extends Component {
-  render() {
-    return(
-      <div className="">
-        {"settings"}
-      </div>
-    );
-  }
-};
-
-class TrendingPage extends Component {
-  render() {
-    return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h1>{this.props.langs.trending}</h1>
-              <p> {"Knowing what's people are taking about. (Not avalible now)"}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{"Global"}</h1>
-              <p> {"Knowing what's people are taking about."}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"#Whatever"}</h2>
-              <p> {"some talk."}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"#Whatever"}</h2>
-              <p> {"some talk."}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{"Your Contacts"}</h1>
-              <p> {"Knowing what's people are taking about."}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"#Whatever"}</h2>
-              <p> {"some talk."}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h2>{"#Whatever"}</h2>
-              <p> {"some talk."}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-};
-
-class DebugPage extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  renderLogs() {
-    let elems = [];
-    for(let key in this.props.logs) {
-      elems.push(
-          <div key={key} className="Page-Row">
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{'ln['+key+'] '+(this.props.logs[key])[0]}</h2>
-              <p>{(this.props.logs[key])[1]}</p>
-            </div>
-          </div>
-      );
-    }
-    return (elems);
-  }
-
-  render() {
-    return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h1>{"Debug Component"}</h1>
-              <p> {"here are the debug components."}</p>
-            </div>
-          </div>
-          <div className="Page-Row">
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{"NoService Daemon"}</h2>
-              <p> {'Host: '+nshost+', Debug: '+debug}</p>
-            </div>
-          </div>
-          <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/noservice/signin');
-          }}>
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{"NoService signin"}</h2>
-              <p> {"NOOXY service SigninPage"}</p>
-            </div>
-          </div>
-          <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/noservice/password');
-          }}>
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{"NoService Password"}</h2>
-              <p> {"NOOXY service auth by password"}</p>
-            </div>
-          </div>
-
-        </div>
-
-        <div className="Page-Block">
-        <div className="Page-Row">
-        <Ink/>
-          <div className="Page-Row-Text">
-            <h1>{"Debug Logs"}</h1>
-            <p> {"below are the debug logs."}</p>
-          </div>
-        </div>
-        {this.renderLogs()}
-        </div>
-      </div>
-    );
-  }
-};
 
 class FailedPage extends Component {
   constructor(props) {
@@ -266,79 +66,6 @@ class FailedPage extends Component {
     );
   }
 };
-
-class HeaderPage extends Component {
-  constructor (props) {
-    super(props);
-    let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
-    this.state = {
-      headertitle: "Talksy",
-      headerbuttons: [
-        ['channels', '/channels/', 'chat'],
-        ['contacts', '/contacts/', 'people'],
-        ['trending', '/trending/', 'trending_up'],
-        ['account', '/account/', 'account_circle'],
-        // ['debug', '/debug/', 'bug_report']
-      ],
-      selectedheaderbuttons: regex_result?regex_result[3]:'channels'
-    }
-  };
-
-  renderHeaderBar() {
-    return(
-      this.state.headerbuttons.map((button)=>{
-        return(
-            <div key={button[0]}
-              className={(button[0]===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
-              onClick={()=>{
-                this.setState({selectedheaderbuttons: button[0]});
-                this.props.history.push(button[1]);
-              }}
-            >
-              <i className="material-icons">{button[2]}</i>
-              <span className="tooltiptext tooltip-bottom">{this.props.langs[button[0]]}</span>
-            </div>
-        );
-      })
-    );
-  };
-
-  renderDebugButton() {
-    if(this.props.debug) {
-      return (
-        <div key='debug'
-        className={('debug'===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
-        onClick={()=>{
-          this.setState({selectedheaderbuttons: 'debug'});
-          this.props.history.push('/debug/');
-        }}
-        >
-          <i className="material-icons">{'bug_report'}</i>
-            <span className="tooltiptext tooltip-bottom">{"Debug components"}</span>
-        </div>
-      )
-    }
-  }
-
-  render() {
-    return (
-      <div className="HeaderPage">
-        <header className="HeaderPage-header">
-          <h1 className="HeaderPage-title"><img height="32px" src={logo}/> {this.state.headertitle} </h1>
-          <div className="HeaderPage-header-bar">
-            {this.renderHeaderBar()}
-            {this.renderDebugButton()}
-          </div>
-        </header>
-        <div className="HeaderPage-Container">
-        <div className="HeaderPage-Contain">
-        {this.props.children}
-        </div>
-        </div>
-      </div>
-    );
-  }
-}
 
 class App extends Component {
   constructor (props) {
@@ -518,9 +245,6 @@ class App extends Component {
       });
     }
   }
-
-
-
 
   componentDidMount() {
     this.log('NoService', 'Setting up NOOXY service implementations.');
@@ -705,8 +429,6 @@ class App extends Component {
     });
   }
 
-
-
   renderConnectionFailed() {
     if(this.state.connectionfailed) {
       return <FailedPage/>;
@@ -789,7 +511,7 @@ class App extends Component {
     // let ChannelPageReg = '/channels/:id([0-9]+)';
     let HeaderPageReg = ':page(.*)';
     return (
-      <Router>
+      <Router basename='/'>
         <div className="App">
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
@@ -811,7 +533,7 @@ class App extends Component {
                 }}/>
                 <Route exact path={this.state.channelroot+':id([^/]+):more(.*)'} render={(props)=>{
                   return(
-                    <SplitComp show={true}>
+                    <Split show={true}>
                       <SplitLeft>
                         <ChannelList
                         loadUserMeta={this.loadUserMeta}
@@ -839,7 +561,7 @@ class App extends Component {
                         />
                         {this.renderChannels(props)}
                       </SplitRight>
-                    </SplitComp>
+                    </Split>
                   )
                 }}/>
                 <Route exact path='/contacts:path(/|/.*)' render={(props)=> {
@@ -860,7 +582,7 @@ class App extends Component {
                       }}/>
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
-                          <BoxComp history={props.history}>
+                          <Box history={props.history}>
                             <BackPage title={this.state.langs.new_contacts} history={props.history}>
                               <NewContactsPage
                                 searchUsers={this.searchUsers}
@@ -870,7 +592,7 @@ class App extends Component {
                                 history={props.history}
                               />
                             </BackPage>
-                          </BoxComp>
+                          </Box>
                         )
                       }}/>
                     </div>
@@ -889,15 +611,14 @@ class App extends Component {
                         history={props.history}
                         langs={this.state.langs}
                       />
-                      <BoxComp history={props.history}>
+                      <Box history={props.history}>
                         <BackPage title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'} history={props.history}>
                           <UserAccountPage langs={this.state.langs} addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
                         </BackPage>
-                      </BoxComp>
+                      </Box>
                     </div>
                   )
                 }}/>
-                <Route exact path='/settings:path(/|/.*)' component={SettingsPage}/>
                 <Route exact path='/trending:path(/|/.*)'  component={(props)=> {
                   return(
                     <TrendingPage langs={this.state.langs}/>

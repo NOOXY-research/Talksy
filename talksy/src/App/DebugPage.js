@@ -1,0 +1,82 @@
+import React, { Component } from 'react';
+import Ink from 'react-ink';
+
+const CONSTANTS = require('../constants.json');
+
+const nshost = CONSTANTS.NOSERVICE_HOST;
+const debug = CONSTANTS.DEBUG;
+
+export default class DebugPage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  renderLogs() {
+    let elems = [];
+    for(let key in this.props.logs) {
+      elems.push(
+          <div key={key} className="Page-Row">
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h2>{'ln['+key+'] '+(this.props.logs[key])[0]}</h2>
+              <p>{(this.props.logs[key])[1]}</p>
+            </div>
+          </div>
+      );
+    }
+    return (elems);
+  }
+
+  render() {
+    return(
+      <div className="Page">
+        <div className="Page-Block">
+          <div className="Page-Row">
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h1>{"Debug Component"}</h1>
+              <p> {"here are the debug components."}</p>
+            </div>
+          </div>
+          <div className="Page-Row">
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h2>{"NoService Daemon"}</h2>
+              <p> {'Host: '+nshost+', Debug: '+debug}</p>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{
+            this.props.history.push('/noservice/signin');
+          }}>
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h2>{"NoService signin"}</h2>
+              <p> {"NOOXY service SigninPage"}</p>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{
+            this.props.history.push('/noservice/password');
+          }}>
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h2>{"NoService Password"}</h2>
+              <p> {"NOOXY service auth by password"}</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="Page-Block">
+        <div className="Page-Row">
+        <Ink/>
+          <div className="Page-Row-Text">
+            <h1>{"Debug Logs"}</h1>
+            <p> {"below are the debug logs."}</p>
+          </div>
+        </div>
+        {this.renderLogs()}
+        </div>
+      </div>
+    );
+  }
+};

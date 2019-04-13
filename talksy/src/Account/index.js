@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, PageRow, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
+import { Box, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
 import Ink from 'react-ink';
 
 const CONSTANTS = require('../constants.json');
@@ -127,18 +127,18 @@ export class MyAccountPage extends Component {
         </div>
         <Route exact path="/account/editbio" render={(props)=>{
           return(
-            <BoxComp history={props.history}>
+            <Box history={props.history}>
             <BackPage title="New Bio" history={props.history}>
                 <EditTextPage title={this.props.langs.bio} description="Enter your bio to let people know what you are thinking." text={this.props.mymeta.b} onFinish={this.updateBio}/>
             </BackPage>
-            </BoxComp>
+            </Box>
           );
         }}/>
 
         <Route exact path="/account/more" render={(props)=>{
           console.log(this.props.mymeta);
           return(
-            <BoxComp history={props.history}>
+            <Box history={props.history}>
               <BackPage title={this.props.langs.about_you} history={props.history}>
                 <div className="Page">
                   <div className="Page-Block">
@@ -201,7 +201,7 @@ export class MyAccountPage extends Component {
                   </div>
                 </div>
               </BackPage>
-            </BoxComp>
+            </Box>
           );
         }}/>
       </div>
