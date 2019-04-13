@@ -12,6 +12,7 @@ import {ContactsPage, NewContactsPage} from "../Contact";
 import {MyAccountPage, UserAccountPage} from "../Account";
 import DebugPage from './DebugPage';
 import HeaderPage from './HeaderPage';
+import FailedPage from './FailedPage';
 import TrendingPage from '../TrendingPage';
 import Ink from 'react-ink';
 import NSClient from '../flux/NSc.js';
@@ -38,34 +39,6 @@ let NoTalk;
 let NoUser;
 
 NoService.setDebug(debug);
-
-class FailedPage extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return(
-      <div className="NotificationPage">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
-              <h1>{"Disconnected"}</h1>
-              <p> {"Error occured while connecting to NoService. We are trying to reconnect."}</p>
-            </div>
-          </div>
-          <div className="Page-Row" onClick={()=> {window.location.reload();}}>
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{"Retry now"}</h2>
-              <p> {'Click this buttom to reload the page now.'}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-};
 
 class App extends Component {
   constructor (props) {
@@ -520,11 +493,11 @@ class App extends Component {
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChannelList
+                    {...props}
                     loadUserMeta={this.loadUserMeta}
                     users={this.state.users}
                     onSelect={this.onSelectCh}
                     channels={this.state.channels}
-                    history={props.history}
                     selected={props.match.params.id}
                     rootpath={this.state.channelroot}
                     langs={this.state.langs}
@@ -536,11 +509,11 @@ class App extends Component {
                     <Split show={true}>
                       <SplitLeft>
                         <ChannelList
+                        {...props}
                         loadUserMeta={this.loadUserMeta}
                         users={this.state.users}
                         onSelect={this.onSelectCh}
                         channels={this.state.channels}
-                        history={props.history}
                         selected={props.match.params.id}
                         rootpath={this.state.channelroot}
                         langs={this.state.langs}
@@ -548,10 +521,10 @@ class App extends Component {
                       </SplitLeft>
                       <SplitRight>
                         <NewChannelPage
+                        {...props}
                         langs={this.state.langs}
                         show={this.state.channelnow=='new'}
                         createChannel={this.createChannel.bind(this)}
-                        history={props.history}
                         setDebug={this.setDebug}
                         returnUserNameToId={this.returnUserNameToId}
                         users={this.state.users}
@@ -570,26 +543,26 @@ class App extends Component {
                       <Route exact path="/contacts/:path(.*)" render={(props)=>{
                         return(
                           <ContactsPage
+                            {...props}
                             key={props.match.params.path}
                             users={this.state.users}
                             contacts={this.state.contacts}
                             getUserMetaByUserId={this.getUserMetaByUserId}
                             loadUserMeta={this.loadUserMeta.bind(this)}
-                            history={props.history}
                             langs={this.state.langs}
                           />
                         )
                       }}/>
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
-                          <Box history={props.history}>
-                            <BackPage title={this.state.langs.new_contacts} history={props.history}>
+                          <Box {...props}>
+                            <BackPage title={this.state.langs.new_contacts} {...props}>
                               <NewContactsPage
+                                {...props}
                                 searchUsers={this.searchUsers}
                                 addContacts={this.addContacts}
                                 setUserNameToId={this.setUserNameToId}
                                 returnUserNameToId={this.returnUserNameToId}
-                                history={props.history}
                               />
                             </BackPage>
                           </Box>
@@ -605,14 +578,14 @@ class App extends Component {
                   return(
                     <div className="Page">
                       <ContactsPage
+                        {...props}
                         users={this.state.users}
                         contacts={this.state.contacts}
                         loadUserMeta={this.loadUserMeta.bind(this)}
-                        history={props.history}
                         langs={this.state.langs}
                       />
                       <Box history={props.history}>
-                        <BackPage title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'} history={props.history}>
+                        <BackPage {...props} title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'}>
                           <UserAccountPage langs={this.state.langs} addContacts={this.addContacts} contacts={this.state.contacts} loadUserMeta={this.loadUserMeta.bind(this)} usermeta={this.state.users[props.match.params.id]}/>
                         </BackPage>
                       </Box>
@@ -626,12 +599,12 @@ class App extends Component {
                 }}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
                   return(
-                    <MyAccountPage langs={this.state.langs} version={VERSION} history={props.history} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
+                    <MyAccountPage {...props} langs={this.state.langs} version={VERSION} logout={this.logout} mymeta={this.state.mymeta} updateMyMeta={this.updateMyMeta}/>
                   );
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
                   return(
-                    <DebugPage history={props.history} logs={this.state.debuglogs}/>
+                    <DebugPage {...props} logs={this.state.debuglogs}/>
                   );
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{
