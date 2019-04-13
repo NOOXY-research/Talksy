@@ -2,7 +2,11 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Box, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
+
 import Ink from 'react-ink';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+
 import './channel.css';
 
 const READ_NEW_LINE = 20;
@@ -73,7 +77,7 @@ export class ChannelPage extends Component {
         me = true;
       }
       elems.push(
-        <li className={(me?"ChPage-Bubble-Me":"ChPage-Bubble-Other")+" tooltip"} >
+        <li key={i} className={(me?"ChPage-Bubble-Me":"ChPage-Bubble-Other")+" tooltip"} >
         <Ink />
           <div className="ChPage-Bubble-Title">{me?null:this.renderUserName(key)}</div>
           <div className="ChPage-Bubble-Text">{this.props.channelmeta.Messages[key][2]}</div>
@@ -209,16 +213,18 @@ export class NewChannelPage extends Component {
     let i=0;
     for(let key in this.state.types) {
       elems.push(
-          <option key={key} value={i++}>{this.state.types[key]}</option>
+          <MenuItem key={key} value={i++}>{this.state.types[key]}</MenuItem>
       );
     }
-    return (<select onChange={evt => {
+    return (
+      <Select value={this.state.channelmeta.t} onChange={evt => {
       let value = evt.target.value;
       this.setState(prevState=> {
         prevState.channelmeta.t = parseInt(value);
         return prevState;
       })
-    }}>{elems}</select>);
+      }}>{elems}</Select>
+    );
   }
 
   renderLevels() {
@@ -226,16 +232,16 @@ export class NewChannelPage extends Component {
     let i=0;
     for(let key in this.state.levels) {
       elems.push(
-        <option key={key} value={i++}>{this.state.levels[key]}</option>
+        <MenuItem key={key} value={i++}>{this.state.levels[key]}</MenuItem>
       );
     }
-    return (<select value={this.state.channelmeta.a} onChange={evt => {
+    return (<Select value={this.state.channelmeta.a} onChange={evt => {
       let value = evt.target.value;
       this.setState(prevState=> {
         prevState.channelmeta.a = parseInt(value);
         return prevState;
       })
-    }}>{elems}</select>);
+    }}>{elems}</Select>);
   }
 
   render() {
@@ -430,16 +436,17 @@ export class ChannelSettingsPage extends Component {
     let i=0;
     for(let key in this.state.types) {
       elems.push(
-          <option key={key} value={key}>{this.state.types[key]}</option>
+          <MenuItem key={key} value={key}>{this.state.types[key]}</MenuItem>
       );
     }
-    return (<select value={this.state.channelmeta.t} onChange={evt => {
-      let value = evt.target.value;
-      this.setState(prevState=> {
-        prevState.channelmeta.t = parseInt(value);
-        return prevState
-      })
-    }}>{elems}</select>);
+    return (
+      <Select value={this.state.channelmeta.t} onChange={evt => {
+        let value = evt.target.value;
+        this.setState(prevState=> {
+          prevState.channelmeta.t = parseInt(value);
+          return prevState
+        })
+      }}>{elems}</Select>);
   }
 
   renderLevels() {
@@ -447,17 +454,17 @@ export class ChannelSettingsPage extends Component {
     let i=0;
     for(let key in this.state.levels) {
       elems.push(
-        <option key={key} value={key}>{this.state.levels[key]}</option>
+        <MenuItem key={key} value={key}>{this.state.levels[key]}</MenuItem>
       );
     }
-    return (<select value={this.state.channelmeta.a} onChange={evt => {
+    return (<Select value={this.state.channelmeta.a} onChange={evt => {
       let value = evt.target.value;
       this.setState(prevState=> {
         prevState.channelmeta.a = parseInt(value);
         return prevState;
       });
 
-    }}>{elems}</select>);
+    }}>{elems}</Select>);
   }
 
   render() {

@@ -414,7 +414,7 @@ export class Main extends Component {
     let elems = [];
     for(let key in this.state.channels) {
       elems.push(
-        <Route exact path={this.state.channelroot+':id([^/]+):more(/?)'} render={(props)=>{
+        <Route key={key} exact path={this.state.channelroot+':id([^/]+):more(/?)'} render={(props)=>{
           return(
             <ChannelPage
               readChannelLine = {this.readChannelLine}
@@ -438,7 +438,7 @@ export class Main extends Component {
 
       );
       elems.push(
-        <Route exact path={this.state.channelroot+':id([^/]+)/settings:more(.*)'} render={(props)=>{
+        <Route key={key+'more'} exact path={this.state.channelroot+':id([^/]+)/settings:more(.*)'} render={(props)=>{
           if(this.state.channelnow==key) {
             return(
               <BackPage title="Channel Settings" history={props.history}>

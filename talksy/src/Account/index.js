@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Box, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
 import Ink from 'react-ink';
 
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+
 const CONSTANTS = require('../constants.json');
 
 const NOSERVICE_NOUSER_URL = CONSTANTS.NOSERVICE_NOUSER_URL;
@@ -61,12 +64,12 @@ export class MyAccountPage extends Component {
           <div className="Page-Row">
             <div className="Page-Row-Text">
               <h2>{this.props.langs.active_status}</h2>
-              <select value={this.props.mymeta.a} onChange={evt => {
+              <Select value={this.props.mymeta.a} onChange={evt => {
                 this.updateActivity(evt.target.value);
               }}>
-                <option key={0} value={0}>{"active"}</option>
-                <option key={1} value={1}>{"deactive"}</option>
-              </select>
+                <MenuItem key={0} value={0}>{"active"}</MenuItem>
+                <MenuItem key={1} value={1}>{"deactive"}</MenuItem>
+              </Select>
             </div>
           </div>
           <div className="Page-Row">
