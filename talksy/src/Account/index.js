@@ -1,10 +1,10 @@
 
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { BoxComp, PageRow, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
+import { BoxComp, PageRow, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
 import Ink from 'react-ink';
 
-const CONSTANTS = require('./constants.json');
+const CONSTANTS = require('../constants.json');
 
 const NOSERVICE_NOUSER_URL = CONSTANTS.NOSERVICE_NOUSER_URL;
 

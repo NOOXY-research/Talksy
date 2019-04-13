@@ -1,0 +1,334 @@
+.ChList-Header {
+  color: #263238;
+  height: 50px;
+  line-height: 50px;
+  background: white;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ECEFF1;
+  user-select: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.ChList-Header >i {
+  top: 50px;
+  font-size: 20px;
+}
+
+
+.ChList-Row {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: left;
+  height: 70px;
+  border-bottom: 1px solid #ECEFF1;
+  background: inherit;
+  color: #37474F;
+  user-select: none;
+  cursor: pointer;
+  transition: .3s;
+  display: flex;
+  flex-direction: row;
+}
+.ChList-Row-ChPhoto {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  border: 1px solid #263238;
+  margin: 0;
+}
+
+.ChList-Row:hover {
+  background: #ECEFF1!important;
+}
+.ChList-Row-selected {
+  position: relative;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: left;
+  height: 70px;
+  border-bottom: 1px solid #ECEFF1;
+  color: white;
+  background: #00838F !important;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+}
+
+.ChList-Row-ChName {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ChList-Row-ChMore {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.ChList-Rows > *:nth-child(odd) {
+  background: #FAFAFA;
+}
+
+.ChList-Rows {
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  min-width: 250px;
+}
+
+.ChList-Row-ChUnread{
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+  margin-right: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  height: 20px;
+  width: auto;
+  background-color: #FF4081;
+  border-radius: 20px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  color: white;
+}
+
+.ChPage {
+  display: inline-block;
+  position: relative;
+  background: #ECEFF1;
+  height: 100%;
+  width: 100%;
+}
+
+.ChPage-Header {
+  color: white;
+  top: 0;
+  height: 50px;
+  line-height: 50px;
+  border-bottom: 1px solid #ECEFF1;
+  box-sizing: border-box;
+  position: relative;
+  background: #37474F;
+  user-select: none;
+}
+
+.ChPage-Header-Title {
+  position: relative;
+  float: left;
+  height: auto;
+  width: auto;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
+.ChPage-Header-left-Button {
+  position: relative;
+  float: left;
+  height: inherit;
+  padding: 0;
+  width: 50px;
+  box-sizing: border-box;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.ChPage-Header-right-Button {
+  float: right;
+  position: relative;
+  height: inherit;
+  padding: 0;
+  width: 50px;
+  box-sizing: border-box;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.ChPage-Messages{
+  position: absolute;
+  height: calc(100% - 100px);
+  width: 100%;
+  overflow-x: hidden;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.ChPage-Bubble-Me{
+  display:inline-block;
+  clear: both;
+  position: relative;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin-bottom: 2px;
+  font-family: Helvetica, Arial, sans-serif;
+  float: right;
+  background: #00838F;
+  text-align: left;
+  color: #fff;
+}
+
+.ChPage-Bubble-Other{
+  position: relative;
+  display:inline-block;
+  clear: both;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin-bottom: 2px;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #5f6569;
+  color: white;
+  text-align: left;
+  float: left;
+}
+
+.ChPage-Bubble-Other:first-of-type {
+  border-bottom-left-radius: 5px;
+}
+
+.ChPage-Bubble-Me:first-of-type {
+  border-bottom-right-radius: 5px;
+}
+
+.ChPage-Bubble-Other + .ChPage-Bubble-Me{
+  border-bottom-right-radius: 5px;
+  margin-top: 10px;
+}
+
+.ChPage-Bubble-Me + .ChPage-Bubble-Other{
+  border-bottom-left-radius: 5px;
+  margin-top: 10px;
+}
+
+.ChPage-Bubble-Other + .ChPage-Bubble-Other{
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.ChPage-Bubble-Me + .ChPage-Bubble-Me{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.ChPage-Bubble-Me:last-of-type {
+  border-bottom-right-radius: 15px;
+}
+
+.ChPage-Bubble-Other:last-of-type {
+  border-bottom-left-radius: 15px;
+}
+
+/*
+.ChPage-Bubble-Me{
+  margin: 0 10px;
+  position: relative;
+  vertical-align: middle;
+  background-color: #006064;
+  border-radius: 15px;
+  min-height: 30px;
+  color: white;
+  padding: 8px;
+  box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  max-width: 300px;
+  min-width: 100px;
+}
+
+.ChPage-Bubble-Other{
+  margin: 0 10px;
+  position: relative;
+  vertical-align: middle;
+  background-color: #006064;
+  border-radius: 15px;
+  min-height: 30px;
+  color: white;
+  padding: 8px;
+  box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  max-width: 300px;
+  min-width: 100px;
+} */
+.ChPage-Bubble-Title {
+  position: relative;
+  font-size: 13px;
+  margin-bottom: 3px;
+  font-weight: 400;
+}
+.ChPage-Bubble-Text {
+  position: relative;
+  font-size: 15px;
+  margin-bottom: 3px;
+  font-weight: 100;
+}
+.ChPage-Bubble-Date {
+  position: relative;
+  width: 100%;
+  text-align: right!important;
+  font-size: 8px;
+  font-weight: 100;
+  user-select: none;
+}
+.ChPage-Bubble > div{
+  text-align: left;
+  display: block;
+  vertical-align: middle;
+}
+
+.ChPage-Sender {
+  background: white;
+  position: absolute;
+  bottom: 0;
+  height: 50px;
+  line-height: 50px;
+  border-top: 1px solid #ECEFF1;
+  box-sizing: border-box;
+  z-index: 999;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  vertical-align: middle;
+}
+
+.ChPage-Sender-Input {
+  display: flex;
+  flex-grow: 1;
+  outline: none;
+  font-size: 18px;
+  border: none;
+  padding: 3px 16px;
+}
+
+.ChPage-Sender-Buttons {
+  display: inline-block;
+  /* cursor: pointer; */
+  user-select: none;
+}
+
+.ChPage-Sender-Button {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 16px;
+  margin-right: 16px;
+  min-width: 50px;
+  height: 32px;
+  background-color: #ECEFF1;
+  cursor: pointer;
+  line-height: 32px;
+  margin-bottom: 5px;
+  user-select: none;
+  transition: .3s;
+}
+
+.ChPage-Sender-Button:hover {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}

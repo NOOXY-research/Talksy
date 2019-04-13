@@ -6,17 +6,17 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { SigninPage, PasswordPage } from "./NScReact.js";
-import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "./BaseComponent";
-import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "./channel";
-import {ContactsPage, NewContactsPage} from "./contact";
-import {MyAccountPage, UserAccountPage} from "./account";
+import { BoxComp, SplitComp, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
+import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "../Channel";
+import {ContactsPage, NewContactsPage} from "../Contact";
+import {MyAccountPage, UserAccountPage} from "../Account";
 import Ink from 'react-ink';
-import NSClient from './NSc.js';
-import logo from './logo.png';
+import NSClient from '../flux/NSc.js';
+import logo from '../pics/logo.png';
 import './App.css';
 import './tooltip.css';
 
-const CONSTANTS = require('./constants.json');
+const CONSTANTS = require('../constants.json');
 
 const VERSION = CONSTANTS.VERSION;
 const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
