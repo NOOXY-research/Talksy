@@ -19,6 +19,28 @@ import NSClient from '../flux/NSc.js';
 import './App.css';
 import './tooltip.css';
 
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { palette } from '@material-ui/system';
+import { createMuiTheme } from '@material-ui/core/styles';
+
+import Snackbar from '@material-ui/core/Snackbar';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#00838F',
+    },
+    secondary: {
+      main: '#AD1457',
+    },
+    error: {
+      main: '#FDD835',
+    },
+  },
+
+});
+
 const CONSTANTS = require('../constants.json');
 
 const VERSION = CONSTANTS.VERSION;
@@ -58,7 +80,8 @@ export class Main extends Component {
         }
       },
       contacts: {},
-      users:{}
+      users:{},
+      loading: true
     }
 
     this.UserNameToId = {};
@@ -234,6 +257,7 @@ export class Main extends Component {
 
       let _startup = ()=> {
         this.log('NoService', 'Starting up.');
+        this.setState({loading: true});
         NoService.createActivitySocket('NoTalk', (err, as)=>{
           NoTalk = as;
           if(err) {
@@ -244,14 +268,14 @@ export class Main extends Component {
           }
           else {
             NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
-              let newmeta = json;
+              console.log(json);
               for(let i in this.state.mymeta) {
-                if(!newmeta[i]) {
-                  newmeta[i] = this.state.mymeta[i];
+                if(typeof(json[i]) === 'undefined') {
+                  json[i] = this.state.mymeta[i];
                 }
               }
               this.log('MyMetaUpdated event', json);
-              this.setState({mymeta: newmeta});
+              this.setState({mymeta: json});
             });
             NoTalk.onEvent('Message', (err, json)=> {
               this.log('message event', json);
@@ -379,21 +403,17 @@ export class Main extends Component {
                       });
                     });
                   }
+                  this.setState({loading: false});
                 });
               });
             });
 
-            as.onData = (data) => {
-              this.log('NSActivity onData', data);
-              // this.setState({debuglogs: this.state.debuglogs.push(['NoService', data])}) ;
-            }
-
-            as.onClose = ()=> {
+            as.on('close', ()=> {
               this.log('NSActivity onClose', 'Activity closed.');
               this.setState({connectionfailed: true});
               NoTalk = NoUser = null;
               setTimeout(_startup, RETRY_INTERVAL);
-            }
+            });
           }
         });
       }
@@ -485,10 +505,12 @@ export class Main extends Component {
     return (
       <Router basename='/'>
         <div className="App">
+        <MuiThemeProvider theme={theme}>
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
             return(
               <HeaderPage langs={this.state.langs} history={props.history} debug={this.state.debug}>
+              {this.state.loading?<LinearProgress color='primary'/>:null}
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
                     <ChannelList
@@ -621,6 +643,7 @@ export class Main extends Component {
               </HeaderPage>
             );
           }}/>
+        </MuiThemeProvider>
         </div>
       </Router>
     );
