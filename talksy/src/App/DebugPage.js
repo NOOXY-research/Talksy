@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
 
+import {Link } from "react-router-dom";
+
 const CONSTANTS = require('../constants.json');
 
 const nshost = CONSTANTS.NOSERVICE_HOST;
@@ -45,25 +47,24 @@ export default class DebugPage extends Component {
               <p> {'Host: '+nshost+', Debug: '+debug}</p>
             </div>
           </div>
-          <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/noservice/signin');
-          }}>
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{"NoService signin"}</h2>
-              <p> {"NOOXY service SigninPage"}</p>
+          <Link to='/noservice/signin'>
+            <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h2>{"NoService signin"}</h2>
+                <p> {"NOOXY service SigninPage"}</p>
+              </div>
             </div>
-          </div>
-          <div className="Page-Row" onClick={()=>{
-            this.props.history.push('/noservice/password');
-          }}>
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h2>{"NoService Password"}</h2>
-              <p> {"NOOXY service auth by password"}</p>
+          </Link>
+          <Link to='/noservice/password'>
+            <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h2>{"NoService Password"}</h2>
+                <p> {"NOOXY service auth by password"}</p>
+              </div>
             </div>
-          </div>
-
+          </Link>
         </div>
 
         <div className="Page-Block">

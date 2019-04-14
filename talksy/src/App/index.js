@@ -1,2 +1,2 @@
-import {Main} from './Main';
-export default Main;
+import {App} from './Main';
+export default App;

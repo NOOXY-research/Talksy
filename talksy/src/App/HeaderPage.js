@@ -25,16 +25,17 @@ export default class HeaderPage extends Component {
     return(
       this.state.headerbuttons.map((button)=>{
         return(
+          <Link to={button[1]}>
             <div key={button[0]}
               className={(button[0]===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
               onClick={()=>{
                 this.setState({selectedheaderbuttons: button[0]});
-                this.props.history.push(button[1]);
               }}
             >
               <i className="material-icons">{button[2]}</i>
               <span className="tooltiptext tooltip-bottom">{this.props.langs[button[0]]}</span>
             </div>
+          </Link>
         );
       })
     );
@@ -43,16 +44,17 @@ export default class HeaderPage extends Component {
   renderDebugButton() {
     if(this.props.debug) {
       return (
-        <div key='debug'
-        className={('debug'===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
-        onClick={()=>{
-          this.setState({selectedheaderbuttons: 'debug'});
-          this.props.history.push('/debug/');
-        }}
-        >
-          <i className="material-icons">{'bug_report'}</i>
-            <span className="tooltiptext tooltip-bottom">{"Debug components"}</span>
-        </div>
+        <Link to={'/debug/'}>
+          <div key='debug'
+          className={('debug'===this.state.selectedheaderbuttons?"HeaderPage-header-bar-button-selected":"HeaderPage-header-bar-button")+" tooltip"}
+          onClick={()=>{
+            this.setState({selectedheaderbuttons: 'debug'});
+          }}
+          >
+            <i className="material-icons">{'bug_report'}</i>
+              <span className="tooltiptext tooltip-bottom">{"Debug components"}</span>
+          </div>
+        </Link>
       )
     }
   }

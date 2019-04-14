@@ -677,7 +677,7 @@ export class ChannelList extends Component {
       let _ll = this.props.channels[key]['Messages']?Object.keys(this.props.channels[key]['Messages']).sort((a,b)=>{return b - a;})[0]:0;
       let _lrl = this.props.channels[key]['LatestReadline']?this.props.channels[key]['LatestReadline']:0;
       elems.push(
-          <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.onSelect(key, this.props.history)}}>
+          <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.selectCh(key);history.push(this.rootpath+'/channels/'+chid);}}>
             <Ink />
             <figure className="Page-Row-ThumbnailText-Head">
             </figure>
@@ -732,7 +732,7 @@ export class ChannelList extends Component {
               <p> {this.props.langs.channellist_description}</p>
             </div>
           </div>
-          <div className="Page-Row" onClick={()=>{this.props.onSelect('new', this.props.history)}}>
+          <div className="Page-Row" onClick={()=>{this.props.selectCh('new', this.props.history)}}>
             <Ink />
             <div className="Page-Row-Button">
               <span>{this.props.langs.new_channels}</span><i className="material-icons">add_circle</i>
