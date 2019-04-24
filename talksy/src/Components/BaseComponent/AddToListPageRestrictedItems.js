@@ -88,7 +88,7 @@ export class AddToListPageRestrictedItems extends Component {
               <input placeholder="search your item" className="ChPage-Sender-Input" ref={el => this.TextInput = el}
                 onKeyPress= {
                   (event)=> {
-                    if(event.key == 'Enter'){
+                    if(event.key === 'Enter'){
                       this.addItem()
                     }
                   }

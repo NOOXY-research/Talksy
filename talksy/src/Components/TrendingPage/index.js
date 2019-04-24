@@ -10,7 +10,7 @@ export default class TrendingPage extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h1>{this.props.langs.trending}</h1>
+              <h1>{this.props.localize.trending}</h1>
               <p> {"Knowing what's people are taking about. (Not avalible now)"}</p>
             </div>
           </div>

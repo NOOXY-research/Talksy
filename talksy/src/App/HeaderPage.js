@@ -33,7 +33,7 @@ export default class HeaderPage extends Component {
               }}
             >
               <i className="material-icons">{button[2]}</i>
-              <span className="tooltiptext tooltip-bottom">{this.props.langs[button[0]]}</span>
+              <span className="tooltiptext tooltip-bottom">{this.props.localize[button[0]]}</span>
             </div>
           </Link>
         );

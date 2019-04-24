@@ -17,7 +17,7 @@ export class ChannelPage extends Component {
     this.ToBeSent = null;
     this.sendNewMessage =()=> {
       if(this.ToBeSent&&this.ToBeSent.length>0)
-        this.props.sendNewMessage(this.props.channelid, [0, this.ToBeSent, null], (err, meta)=> {
+        this.props.actions.sendNewMessage(this.props.channelid, [0, this.ToBeSent, null], (err, meta)=> {
           this.resetInput();
       });
     };
@@ -55,7 +55,7 @@ export class ChannelPage extends Component {
       }
       else if(this.props.channelmeta.Messages[msgidx][0]) {
         if(!this.requestedUsers.includes(this.props.channelmeta.Messages[msgidx][0])) {
-          this.props.loadUserMeta(this.props.channelmeta.Messages[msgidx][0]);
+          this.props.actions.loadUserMeta(this.props.channelmeta.Messages[msgidx][0]);
           this.requestedUsers.push(this.props.channelmeta.Messages[msgidx][0]);
         }
 
@@ -73,7 +73,7 @@ export class ChannelPage extends Component {
     for(let i in keys) {
       let key = keys[i];
       let me  = false;
-      if(this.props.channelmeta.Messages[key][0]==this.props.mymeta.i) {
+      if(this.props.channelmeta.Messages[key][0]==this.props.my_user_meta.i) {
         me = true;
       }
       elems.push(
@@ -127,7 +127,7 @@ export class ChannelPage extends Component {
   render() {
     let _ll = this.hasUnread();
     if(_ll) {
-      this.props.readChannelLine(this.props.channelid, _ll, ()=>{  });
+      this.props.actions.readChannelLine(this.props.channelid, _ll, ()=>{  });
     }
     if(this.Init==false&&this.props.channelmeta.Messages!=null) {
       this.Scroll=true;
@@ -255,7 +255,7 @@ export class NewChannelPage extends Component {
                   <div className="Page-Row">
                   <Ink/>
                     <div className="Page-Row-Text">
-                      <h1>{this.props.langs.new_channels}</h1>
+                      <h1>{this.props.localize.new_channels}</h1>
                       <p> {this.state.status}</p>
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export class NewChannelPage extends Component {
                         for(let i in this.state.userlist) {
                           list.push(this.props.returnUserNameToId(this.state.userlist[i]));
                         }
-                        this.props.addUsersToChannel(meta.i, list, ()=>{
+                        this.props.actions.addUsersToChannel(meta.i, list, ()=>{
                           this.props.history.push('/channels/'+meta.i);
                           this.setState(prevState=> {
                             prevState.channelmeta = {t:0,a:1};
@@ -378,7 +378,7 @@ export class NewChannelPage extends Component {
                           }
                         }
                         else {
-                          this.props.loadUserMeta(this.props.contacts[i].ToUserId);
+                          this.props.actions.loadUserMeta(this.props.contacts[i].ToUserId);
                         }
                         // console.log(this.props.users[this.props.contacts[i].ToUserId].username);
                       }
@@ -556,13 +556,13 @@ export class ChannelSettingsPage extends Component {
               <div className="Page-Block">
                 <div className="Page-Row"  onClick={()=>{
                   this.state.channelmeta.i = this.props.channelid;
-                  this.props.updateChannel(this.state.channelmeta, (err, meta)=> {
+                  this.props.actions.updateChannel(this.state.channelmeta, (err, meta)=> {
                     if(meta.s=='OK') {
                       let list=[];
                       for(let i in this.state.userlist) {
                         list.push(this.props.returnUserNameToId(this.state.userlist[i]));
                       }
-                      this.props.addUsersToChannel(this.props.channelid, list, ()=>{
+                      this.props.actions.addUsersToChannel(this.props.channelid, list, ()=>{
                         this.props.history.push('/channels/'+this.props.channelid);
                         this.setState(prevState=> {
                           prevState.channelmeta = {a:1, t:0};
@@ -612,7 +612,7 @@ export class ChannelSettingsPage extends Component {
                         }
                       }
                       else {
-                        this.props.loadUserMeta(this.props.contacts[i].ToUserId);
+                        this.props.actions.loadUserMeta(this.props.contacts[i].ToUserId);
                       }
                       // console.log(this.props.users[this.props.contacts[i].ToUserId].username);
                     }
@@ -659,7 +659,7 @@ export class ChannelList extends Component {
         return(this.props.users[lastmsg[0]].username+': '+lastmsg[2])
       }
       else {
-        this.props.loadUserMeta(lastmsg[0]);
+        this.props.actions.loadUserMeta(lastmsg[0]);
         return(lastmsg[2])
       }
     }
@@ -677,16 +677,18 @@ export class ChannelList extends Component {
       let _ll = this.props.channels[key]['Messages']?Object.keys(this.props.channels[key]['Messages']).sort((a,b)=>{return b - a;})[0]:0;
       let _lrl = this.props.channels[key]['LatestReadline']?this.props.channels[key]['LatestReadline']:0;
       elems.push(
-          <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"} onClick={()=>{this.props.selectCh(key);history.push(this.rootpath+'/channels/'+chid);}}>
-            <Ink />
-            <figure className="Page-Row-ThumbnailText-Head">
-            </figure>
-            <div className="Page-Row-ThumbnailText-Text">
-              <h2>{this.props.channels[key].Displayname}</h2>
-              <p>{this.renderLastMessages(this.props.channels[key])}</p>
+          <Link to={'/channels/'+key}>
+            <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"}>
+              <Ink />
+              <figure className="Page-Row-ThumbnailText-Head">
+              </figure>
+              <div className="Page-Row-ThumbnailText-Text">
+                <h2>{this.props.channels[key].Displayname}</h2>
+                <p>{this.renderLastMessages(this.props.channels[key])}</p>
+              </div>
+              {this.renderUnreadCount(_ll-_lrl)}
             </div>
-            {this.renderUnreadCount(_ll-_lrl)}
-          </div>
+          </Link>
       );
     }
     if(!this.props.channels||Object.keys(this.props.channels).length == 0) {
@@ -728,14 +730,14 @@ export class ChannelList extends Component {
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
-              <h1>{this.props.langs.channels}</h1>
-              <p> {this.props.langs.channellist_description}</p>
+              <h1>{this.props.localize.channels}</h1>
+              <p> {this.props.localize.channellist_description}</p>
             </div>
           </div>
-          <div className="Page-Row" onClick={()=>{this.props.selectCh('new', this.props.history)}}>
+          <div className="Page-Row" onClick={()=>{this.props.actions.selectCh('new', this.props.history)}}>
             <Ink />
             <div className="Page-Row-Button">
-              <span>{this.props.langs.new_channels}</span><i className="material-icons">add_circle</i>
+              <span>{this.props.localize.new_channels}</span><i className="material-icons">add_circle</i>
             </div>
           </div>
         </div>

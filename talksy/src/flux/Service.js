@@ -3,36 +3,30 @@
 // "service.js"
 // Copyright 2018-2019 NOOXY. All Rights Reserved.
 
+import Constants from '../constants.json';
+
+const READ_NEW_LINE = Constants.READ_NEW_LINE;
+const RETRY_INTERVAL= Constants.RETRY_INTERVAL;
+const Localizes = require('./data/localizes.json');
+
 function Service(NoService, Dispatcher) {
   let Services = {
     NoTalk: null,
     gotoandplay: null
   };
 
-  this.Actions = {
-    getMyContacts: (err, contacts)=>{
-      this.setState(prevState=> {
-        for(let i in contacts) {
-          prevState.contacts[contacts[i].ToUserId] = contacts[i];
-        }
-        return prevState;
-      })
-      setInterval(()=> {
-        let contacts = this.state.contacts;
-        for(let i in contacts) {
-          this.getUserActivity(contacts[i].ToUserId, (err, active)=> {
-            this.setState(prevState=> {
-              if(prevState.users[contacts[i].ToUserId])
-                prevState.users[contacts[i].ToUserId].active = active;
-              return prevState;
-            });
-          });
-        }
-      }, REFRESH_ACTIVITY_INTERVAL);
+  let UserNameToId = {};
+
+  this.actions = {
+    importLocalize: (data)=> {
+      Dispatcher.dispatch({type: 'updateLocalizes', data: data});
+    },
+    updateLang: (lang)=> {
+      Dispatcher.dispatch({type: 'updateLang', data: lang});
     },
     updateMyMeta: (newmeta)=> {
-      as.call('updateMyMeta', newmeta, ()=>{
-        this.log('updateMyMeta', 'OK');
+      Services.NoTalk.call('updateMyMeta', newmeta, ()=>{
+        this.actions.log('updateMyMeta', 'OK');
       })
     },
     selectCh: (chid)=> {
@@ -40,7 +34,7 @@ function Service(NoService, Dispatcher) {
     },
 
     log: (title, contain)=> {
-      if(typeof(contain)!= 'string') {
+      if(typeof(contain)!== 'string') {
         contain = JSON.stringify(contain);
       }
       Dispatcher.dispatch({type: 'append-log', data: [title, contain]});
@@ -48,14 +42,14 @@ function Service(NoService, Dispatcher) {
 
     setDebug: (bool)=> {
       console.log('DEBUG MODE ON');
-      this.Actions.log('DEBUG MODE ON');
+      this.actions.log('DEBUG MODE ON');
       Dispatcher.dispatch({type: 'update-debug', data: bool});
     },
 
     searchUsers: (username, callback)=> {
       if(Services.NoUser)
         Services.NoUser.call("searchUsersByUsername", {n:username}, (err, json)=> {
-          this.Actions.log("searchUsers", json);
+          this.actions.log("searchUsers", json);
           callback(err, json.r);
         });
     },
@@ -63,44 +57,48 @@ function Service(NoService, Dispatcher) {
     addContacts: (contacts, type, callback)=> {
       if(Services.NoTalk)
         Services.NoTalk.call("addConts", {c:contacts, t:type}, (err, json)=> {
-          this.Actions.log("addConts", json);
+          this.actions.log("addConts", json);
           if(callback)
             callback(err, json);
         });
     },
 
     getMyContacts: (callback)=> {
-      if(NoTalk)
-        NoTalk.call("getMyConts", null, (err, json)=> {
-          this.log("getMyConts", json);
-          callback(err, json.r);
+      if(Services.NoTalk)
+        Services.NoTalk.call("getMyConts", null, (err, json)=> {
+          this.actions.log("getMyConts", json);
+          Dispatcher.dispatch({type: 'updateContacts', data: json.r});
+          if(callback)
+            callback(err, json.r);
         });
     },
 
-    getUserActivity: (userid, callback)=> {
-      if(NoTalk)
-        NoTalk.call("getUserAct", {i: userid}, (err, json)=> {
-          this.log("getUserAct("+userid+")", json);
+    getUserActivity: (user_id, callback)=> {
+      if(Services.NoTalk)
+        Services.NoTalk.call("getUserAct", {i: user_id}, (err, json)=> {
+          this.actions.log("getUserAct("+user_id+")", json);
+          Dispatcher.dispatch({type: 'updateUserActivity', data: {user_id: user_id, active: json.r}});
           callback(err, json.r);
         });
     },
 
     addUsersToChannel: (chid, users, callback)=> {
-      if(NoTalk)
-        NoTalk.call("addUsersToCh", {c:chid,i:users}, (err, json)=> {
-          this.log("addUsersToChannel", json);
+      if(Services.NoTalk)
+        Services.NoTalk.call("addUsersToCh", {c:chid,i:users}, (err, json)=> {
+          this.actions.log("addUsersToChannel", json);
           callback(err, json);
         });
     },
 
     readChannelLine: (chid, line, callback)=> {
-      if(NoTalk)
-        NoTalk.call("readChLine", {i:chid,l:line}, (err, json)=> {
-          this.log("readChannelLine", json);
-          this.setState(prevState=>{
-            prevState.channels[chid]['LatestReadline'] = line;
-            return prevState;
-          });
+      if(Services.NoTalk)
+        Services.NoTalk.call("readChLine", {i:chid,l:line}, (err, json)=> {
+          this.actions.log("readChannelLine", json);
+          Dispatcher.dispatch({type: 'updateChannelLatestReadline', data: {
+            channel_id: chid,
+            line: line
+          }});
+
           callback(err, json);
         });
     },
@@ -108,11 +106,11 @@ function Service(NoService, Dispatcher) {
     getMoreMessages: (chid, callback)=> {
       let _fl = Object.keys(this.state.channels[chid]['Messages']).sort((a,b)=>{return a - b;})[0];
 
-      if(_fl!=1) {
+      if(_fl!==1) {
         let begin=(_fl-READ_NEW_LINE)>=0?(_fl-READ_NEW_LINE):0;
         let rows =READ_NEW_LINE;
-        NoTalk.call('getMsgs', {i: chid, b:begin, r:rows}, (err, json)=> {
-          this.log('getMsgs ('+chid+')', JSON.stringify(json));
+        Services.NoTalk.call('getMsgs', {i: chid, b:begin, r:rows}, (err, json)=> {
+          this.actions.log('getMsgs ('+chid+')', JSON.stringify(json));
           this.setState(prevState=> {
             prevState.channels[chid]['Messages'] = Object.assign({}, json.r, prevState.channels[chid]['Messages']);
             callback(false);
@@ -124,44 +122,38 @@ function Service(NoService, Dispatcher) {
 
     deleteChannel: (chid, callback)=> {
       // return status
-      if(NoTalk)
-        NoTalk.call('delCh', {i:chid}, (err, meta)=> {
-          this.log('delete Channel', meta);
+      if(Services.NoTalk)
+        Services.NoTalk.call('delCh', {i:chid}, (err, meta)=> {
+          this.actions.log('delete Channel', meta);
           if(callback)
             callback(err, meta);
       });
     },
 
     setUserNameToId: (name, id)=> {
-      this.UserNameToId[name] = id;
+      UserNameToId[name] = id;
     },
 
     returnUserNameToId: (name)=> {
-      return this.UserNameToId[name];
+      return UserNameToId[name];
     },
 
-    loadUserMeta: (userid)=> {
-      if(NoTalk&&userid) {
-        if(!Object.keys(this.state.users).includes(userid)&&userid!=null) {
-          this.setState(prevState=> {
-            prevState.users[userid] = {};
-            return prevState;
-          }, ()=> {
-            NoTalk.call("getUserMeta", {i:userid}, (err, meta)=> {
-              this.log("loadUserMeta", meta);
-              this.setState(prevState=> {
-                prevState.users[userid] = meta;
-                this.setUserNameToId(meta.username, userid);
-                this.getUserActivity(userid, (err, active)=> {
-                  this.setState(prevState=> {
-                    prevState.users[userid].active = active;
-                    return prevState;
-                  });
+    loadUserMeta: (user_id)=> {
+      if(Services.NoTalk&&user_id) {
+        if(user_id!==null) {
+          // hacks
+          setTimeout(()=> {
+            Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:{}}, callback: ()=> {
+              Services.NoTalk.call("getUserMeta", {i:user_id}, (err, meta)=> {
+                this.actions.log("loadUserMeta", meta);
+                Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:meta}}, ()=> {
+                  this.actions.setUserNameToId(meta.username, user_id);
+                  this.getUserActivity(user_id);
                 });
-                return prevState;
               });
-            });
-          });
+            }});
+
+          }, 1);
         }
       }
     },
@@ -172,115 +164,114 @@ function Service(NoService, Dispatcher) {
 
     sendNewMessage: (chid, meta, callback)=> {
       // return status
-      NoTalk.call('sendMsg', {i:chid, c:meta}, (err, json)=> {
-        this.log('sendMsg ('+chid+')', json);
+      Services.NoTalk.call('sendMsg', {i:chid, c:meta}, (err, json)=> {
+        this.actions.log('sendMsg ('+chid+')', json);
         callback(err);
       });
     },
 
     createChannel: (meta, callback)=> {
       // return status
-      if(NoTalk)
-        NoTalk.call('createCh', meta, (err, meta)=> {
-          this.log('createCh', meta);
+      if(Services.NoTalk)
+        Services.NoTalk.call('createCh', meta, (err, meta)=> {
+          this.actions.log('createCh', meta);
           callback(err, meta);
         });
     },
 
     updateChannel: (meta, callback)=> {
       // return status
-      if(NoTalk)
-        NoTalk.call('updateCh', meta, (err, meta)=> {
-          this.log('updateCh', meta);
+      if(Services.NoTalk)
+        Services.NoTalk.call('updateCh', meta, (err, meta)=> {
+          this.actions.log('updateCh', meta);
           callback(err, meta);
       });
     }
-  },
+  };
 
   this.setupDispatchers = ()=> {
-    if(Service.NoTalk) {
-      Services.NoTalk.onEvent('whatever', ()=> {
-        NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
-          console.log(json);
-          for(let i in this.state.mymeta) {
-            if(typeof(json[i]) === 'undefined') {
-              json[i] = this.state.mymeta[i];
-            }
+    if(Services.NoTalk) {
+      Services.NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
+        console.log(json);
+        for(let i in this.state.my_user_meta) {
+          if(typeof(json[i]) === 'undefined') {
+            json[i] = this.state.my_user_meta[i];
           }
-          this.log('MyMetaUpdated event', json);
-          this.setState({mymeta: json});
+        }
+        this.actions.log('MyMetaUpdated event', json);
+        this.setState({my_user_meta: json});
+      });
+      Services.NoTalk.onEvent('Message', (err, json)=> {
+        this.actions.log('message event', json);
+        this.setState(prevState=> {
+          let beadded ={};
+          // add to last index
+          if(prevState.channels[json.i]['Messages']&&Object.keys(prevState.channels[json.i]['Messages']).length!==0) {
+            beadded[parseInt(Object.keys(prevState.channels[json.i]['Messages']).sort((a,b)=>{return b - a;})[0])+1] = json.r;
+            prevState.channels[json.i]['Messages'] = Object.assign({}, beadded, prevState.channels[json.i]['Messages']);
+          }
+          else {
+            prevState.channels[json.i]['Messages'] ={1: json.r};
+          }
+          return prevState;
         });
-        NoTalk.onEvent('Message', (err, json)=> {
-          this.log('message event', json);
-          this.setState(prevState=> {
-            let beadded ={};
-            // add to last index
-            if(prevState.channels[json.i]['Messages']&&Object.keys(prevState.channels[json.i]['Messages']).length!=0) {
-              beadded[parseInt(Object.keys(prevState.channels[json.i]['Messages']).sort((a,b)=>{return b - a;})[0])+1] = json.r;
-              prevState.channels[json.i]['Messages'] = Object.assign({}, beadded, prevState.channels[json.i]['Messages']);
-            }
-            else {
-              prevState.channels[json.i]['Messages'] ={1: json.r};
-            }
-            return prevState;
-          });
-        });
+      });
 
-        NoTalk.onEvent('AddedContacts', (err, json)=> {
-          this.log('AddedContacts event', json);
-          this.setState(prevState=> {
-            for(let i in json.r) {
-              prevState.contacts[json.r[i].ToUserId] = json.r[i];
-            }
-            return prevState;
-          });
+      Services.NoTalk.onEvent('AddedContacts', (err, json)=> {
+        this.actions.log('AddedContacts event', json);
+        this.setState(prevState=> {
+          for(let i in json.r) {
+            prevState.contacts[json.r[i].ToUserId] = json.r[i];
+          }
+          return prevState;
         });
+      });
 
-        NoTalk.onEvent('ChannelUpdated', (err, json)=> {
-          this.log('ChannelUpdated event', json);
-          this.setState(prevState=> {
-            for(let key in json.r) {
-              prevState.channels[json.i][key] = json.r[key];
-            }
-            return prevState;
-          });
+      Services.NoTalk.onEvent('ChannelUpdated', (err, json)=> {
+        this.actions.log('ChannelUpdated event', json);
+        this.setState(prevState=> {
+          for(let key in json.r) {
+            prevState.channels[json.i][key] = json.r[key];
+          }
+          return prevState;
         });
+      });
 
-        NoTalk.onEvent('ChannelDeleted', (err, json)=> {
-          this.log('ChannelDeleted event', json);
-          this.setState(prevState=> {
-            delete prevState.channels[json.i];
-            return prevState;
-          });
+      Services.NoTalk.onEvent('ChannelDeleted', (err, json)=> {
+        this.actions.log('ChannelDeleted event', json);
+        this.setState(prevState=> {
+          delete prevState.channels[json.i];
+          return prevState;
         });
+      });
 
-        NoTalk.onEvent('AddedToChannel', (err, json)=> {
-          this.log('AddedToChannel event', json);
-          this.setState(prevState=> {
-            prevState.channels[json.i] = json.r;
-            return prevState;
-          }, ()=> {
-            NoTalk.call('bindChs', {i: [json.i]}, (err, json2)=> {
-              json2['ChIds'] = Object.keys(json);
-              this.log('bindCh', JSON.stringify(json2));
-            });
+      Services.NoTalk.onEvent('AddedToChannel', (err, json)=> {
+        this.actions.log('AddedToChannel event', json);
+        this.setState(prevState=> {
+          prevState.channels[json.i] = json.r;
+          return prevState;
+        }, ()=> {
+          Services.NoTalk.call('bindChs', {i: [json.i]}, (err, json2)=> {
+            json2['ChIds'] = Object.keys(json);
+            this.actions.log('bindCh', JSON.stringify(json2));
           });
         });
       });
     }
-    if(Service.NoUser) {
-      Services.gotoandplay.onEvent();
+    if(Services.NoUser) {
+      // Services.NoUser.onEvent();
     }
   };
 
   this.start = (next)=> {
-    this.log('NoService', 'Starting up.');
-    this.setState({loading: true});
+    this.actions.log('NoService', 'Starting up.');
+    this.actions.importLocalize(Localizes);
+    Dispatcher.dispatch({type: 'updateLoading', data: true});
     NoService.createActivitySocket('NoTalk', (err1, as1)=>{
       NoService.createActivitySocket('NoUser', (err2, as2)=>{
         if(err1||err2) {
-          this.log('NoService', 'Connection Failed.');
-          this.setState({connectionfailed: true});
+          this.actions.log('NoService', 'Connection Failed.');
+          this.setState({connection_failed: true});
           Services.NoTalk = Services.NoUser = null;
           setTimeout(this.start, RETRY_INTERVAL);
         }
@@ -289,63 +280,60 @@ function Service(NoService, Dispatcher) {
           Services.NoUser = as2;
 
           Services.NoTalk.on('close', ()=> {
-            this.log('NSActivity onClose', 'Activity closed.');
-            this.setState({connectionfailed: true});
-            NoTalk = NoUser = null;
-            setTimeout(_startup, RETRY_INTERVAL);
+            this.actions.log('NSActivity onClose', 'Activity closed.');
+            this.setState({connection_failed: true});
+            Services.NoTalk = Services.NoUser = null;
+            setTimeout(this.start, RETRY_INTERVAL);
           });
           Services.NoUser.on('close', ()=> {
-            this.log('NSActivity onClose', 'Activity closed.');
-            this.setState({connectionfailed: true});
-            NoTalk = NoUser = null;
-            setTimeout(_startup, RETRY_INTERVAL);
+            this.actions.log('NSActivity onClose', 'Activity closed.');
+            this.setState({connection_failed: true});
+            Services.NoTalk = Services.NoUser = null;
+            setTimeout(this.start, RETRY_INTERVAL);
           });
 
-          this.log('NoService', 'Connected to the Service.');
+          this.actions.log('NoService', 'Connected to the Service.');
 
           Services.NoTalk.call('getMyMeta', null, (err, json)=> {
-            this.log('getMyMeta', JSON.stringify(json));
+            this.actions.log('getMyMeta', JSON.stringify(json));
             if(json.i) {
-              this.setState({mymeta: json});
+              Dispatcher.dispatch({type: 'updateMyUserMeta', data: json})
             }
             else {
               this.updateMyMeta({a:0});
             }
 
             //
-            this.setState({connectionfailed: false});
+            Dispatcher.dispatch({type: 'updateConnectionFail', data: false});
             //
             Services.NoUser.call('returnUserMeta', null, (err, json2)=> {
-              this.setState({mymeta: Object.assign({}, json, json2)});
-              this.log('NoUser', JSON.stringify(json2));
-              if(json2.country&&json2.country.toLowerCase()=="taiwan") {
-                this.setState({langs: require('./langs.json')['zh-tw']});
+              Dispatcher.dispatch({type: 'updateMyUserMeta', data: Object.assign({}, json, json2)});
+              this.actions.log('NoUser', JSON.stringify(json2));
+              if(json2.country&&json2.country.toLowerCase() === "taiwan") {
+                this.actions.updateLang('zh-tw');
               }
             });
             Services.NoTalk.call('getMyChs', null, (err, json)=> {
-              this.setState((prevState)=> {
-                prevState.channels = json;
-                return prevState;
-              });
-              this.log('getMyChs', JSON.stringify(json));
+              Dispatcher.dispatch({type: 'updateChannels', data: json});
+              this.actions.log('getMyChs', JSON.stringify(json));
 
               Services.NoTalk.call('bindChs', {i: Object.keys(json)}, (err, json2)=> {
                 json2['ChIds'] = Object.keys(json);
-                this.log('bindCh', JSON.stringify(json2));
+                this.actions.log('bindCh', JSON.stringify(json2));
               });
 
               for(let chid in json) {
                 Services.NoTalk.call('getMsgs', {i: chid, r:30}, (err, json)=> {
-                  this.log('getMsgs ('+chid+')', JSON.stringify(json));
-                  this.setState(prevState=> {
-                    prevState.channels[chid]['Messages'] = json.r;
-                    prevState.channels[chid]['LatestReadline'] = json.l;
-                    return prevState;
-                  });
+                  this.actions.log('getMsgs ('+chid+')', JSON.stringify(json));
+                  json.channel_id = chid;
+                  json.latest_read_line = json.l;
+                  json.messages = json.r;
+                  Dispatcher.dispatch({type: 'updateMesseges', data: json});
                 });
               }
+              this.actions.getMyContacts();
               this.setupDispatchers();
-              this.setState({loading: false});
+              Dispatcher.dispatch({type: 'updateLoading', data: false});
             });
           });
         }

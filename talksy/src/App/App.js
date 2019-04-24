@@ -3,24 +3,17 @@
 // "APP.js" is a NOOXY NoTalk Service client.
 // Copyright 2019-2019 NOOXY. All Rights Reserved.
 
-const CONSTANTS = require('../constants.json');
-
-const VERSION = CONSTANTS.VERSION;
-const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
-const RETRY_INTERVAL= CONSTANTS.RETRY_INTERVAL;
-const READ_NEW_LINE = CONSTANTS.READ_NEW_LINE;
-
-const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
-
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Ink from 'react-ink';
+
+import Constants from '../constants.json';
 
 import Snackbar from '@material-ui/core/Snackbar';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 // Flux
-import Flux from './flux';
+import Flux from '../flux';
 
 import Theme from './Theme';
 import { SigninPage, PasswordPage } from "./NScReact.js";
@@ -34,21 +27,32 @@ import {ContactsPage, NewContactsPage} from "../Components/Contact";
 import {MyAccountPage, UserAccountPage} from "../Components/Account";
 import TrendingPage from '../Components/TrendingPage';
 
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+
 
 import './App.css';
 import './tooltip.css';
 
+const CONSTANTS = require('../constants.json');
+
+const VERSION = CONSTANTS.VERSION;
+const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
+const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
+
+let channelroot = "/channels/";
 
 export class App extends Component {
   constructor (props) {
-    let channelroot = "/channels/";
+
     super(props);
     this.state = {
-      langs: require('./langs.json')['en'],
-      debug: debug,
-      mymeta: {},
+      localizes: {
+        'en': {}
+      },
+      lang: 'en',
+      debug: CONSTANTS.DEBUG,
+      my_user_meta: {},
       debuglogs: [['debug', 'debug']],
-      channelnow: window.location.href.split(channelroot)[1]?window.location.href.split(channelroot)[1].split('/')[0]: null,
       channels: {
         'loading': {
           Displayname: "Loading...",
@@ -60,31 +64,38 @@ export class App extends Component {
       loading: true
     }
 
-    this.controller = new Flux(this.setState);
+    this.controller = new Flux(this.setState.bind(this));
+    this.actions = this.controller.actions;
     this.UserNameToId = {};
-  }
 
-  componentDidMount() {
-    this.log('NoService', 'Setting up NOOXY service implementations.');
+    this.actions.log('NoService', 'Setting up NOOXY service implementations.');
     this.controller.NoService.getImplementationModule((err, NSimplementation)=>{
-      this.log('NoService', 'Connecting to NOOXY service.');
+      this.actions.log('NoService', 'Connecting to NOOXY service.');
       NSimplementation.setImplement('signin', (connprofile, data, data_sender)=>{
-        this.log('NoService Auth', 'NOOXY service signin emitted.');
+        this.actions.log('NoService Auth', 'NOOXY service signin emitted.');
         this.history.push('/noservice/signin');
       });
       NSimplementation.setImplement('AuthbyPassword', (connprofile, data, data_sender) => {
-        this.log('NoService Auth', 'NOOXY service Authby Password emitted.');
+        this.actions.log('NoService Auth', 'NOOXY service Authby Password emitted.');
         this.history.push('/noservice/password?authtoken='+data.d.t);
-      });
-      this.log('NoService', 'Have set up NOOXY service implementations.');
-      this.controller.start(()=> {
-
       });
     });
   }
 
+  componentDidMount() {
+    this.actions.log('NoService', 'Have set up NOOXY service implementations.');
+    this.controller.start(()=> {
+      setInterval(()=> {
+        let contacts = this.state.contacts;
+        for(let i in contacts) {
+          this.actions.getUserActivity(contacts[i].ToUserId);
+        }
+      }, Constants.REFRESH_ACTIVITY_INTERVAL);
+    });
+  }
+
   renderConnectionFailed() {
-    if(this.state.connectionfailed) {
+    if(this.state.connection_failed) {
       return <FailedPage/>;
     }
     else {
@@ -93,22 +104,23 @@ export class App extends Component {
   }
 
   renderChannels(props) {
+    console.log('ch', props.match.params.id);
     let elems = [];
     for(let key in this.state.channels) {
       elems.push(
-        <Route key={key} exact path={this.state.channelroot+':id([^/]+):more(/?)'} render={(props)=>{
+        <Route key={key} exact path={channelroot+':id([^/]+):more(/?)'} render={(props)=>{
           return(
             <ChannelPage
               actions={this.actions}
               contacts={this.state.contacts}
-              mymeta={this.state.mymeta}
+              my_user_meta={this.state.my_user_meta}
               channelid={key}
               channelmeta={this.state.channels[key]}
-              show={this.state.channelnow==key}
+              show={props.match.params.id === key}
               match={props.match}
               users={this.state.users}
               onSettingsClick={()=> {
-                props.history.push(this.state.channelroot+props.match.params.id+'/settings');
+                props.history.push(channelroot+props.match.params.id+'/settings');
               }}
             />
           )
@@ -116,14 +128,14 @@ export class App extends Component {
 
       );
       elems.push(
-        <Route key={key+'more'} exact path={this.state.channelroot+':id([^/]+)/settings:more(.*)'} render={(props)=>{
-          if(this.state.channelnow==key) {
+        <Route key={key+'more'} exact path={channelroot+':id([^/]+)/settings:more(.*)'} render={(props)=>{
+          if(props.match.params.id === key) {
             return(
               <BackPage title="Channel Settings" history={props.history}>
                 <ChannelSettingsPage
                   actions={this.actions}
                   contacts={this.state.contacts}
-                  mymeta={this.state.mymeta}
+                  my_user_meta={this.state.my_user_meta}
                   channelid={key}
                   channelmeta={this.state.channels[key]}
                   users={this.state.users}
@@ -142,17 +154,18 @@ export class App extends Component {
 
 
   render() {
+
     // let HeaderPageReg = '/:page([^/]*)';
     // let ChannelPageReg = '/channels/:id([0-9]+)';
     let HeaderPageReg = ':page(.*)';
     return (
       <Router basename='/'>
         <div className="App">
-        <MuiThemeProvider Theme={Theme}>
+        <MuiThemeProvider theme={Theme}>
           <Route exact path={HeaderPageReg} render={(props)=>{
             this.history = props.history;
             return(
-              <HeaderPage {...props} langs={this.state.langs} debug={this.state.debug}>
+              <HeaderPage {...props} localize={this.state.localizes[this.state.lang]} debug={this.state.debug}>
               {this.state.loading?<LinearProgress color='primary'/>:null}
                 <Route exact path=":path(/|/channels/)" render={(props)=>{
                   return (
@@ -162,11 +175,11 @@ export class App extends Component {
                     users={this.state.users}
                     channels={this.state.channels}
                     selected={props.match.params.id}
-                    langs={this.state.langs}
+                    localize={this.state.localizes[this.state.lang]}
                     />
                   )
                 }}/>
-                <Route exact path={this.state.channelroot+':id([^/]+):more(.*)'} render={(props)=>{
+                <Route exact path={channelroot+':id([^/]+):more(.*)'} render={(props)=>{
                   return(
                     <Split show={true}>
                       <SplitLeft>
@@ -176,15 +189,15 @@ export class App extends Component {
                         users={this.state.users}
                         channels={this.state.channels}
                         selected={props.match.params.id}
-                        langs={this.state.langs}
+                        localize={this.state.localizes[this.state.lang]}
                         />
                       </SplitLeft>
                       <SplitRight>
                         <NewChannelPage
                         {...props}
                         actions={this.actions}
-                        langs={this.state.langs}
-                        show={this.state.channelnow=='new'}
+                        localize={this.state.localizes[this.state.lang]}
+                        show={props.match.params.id === 'new'}
                         users={this.state.users}
                         contacts={this.state.contacts}
                         />
@@ -204,14 +217,14 @@ export class App extends Component {
                             key={props.match.params.path}
                             users={this.state.users}
                             contacts={this.state.contacts}
-                            langs={this.state.langs}
+                            localize={this.state.localizes[this.state.lang]}
                           />
                         )
                       }}/>
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
                           <Box {...props}>
-                            <BackPage title={this.state.langs.new_contacts} {...props}>
+                            <BackPage title={this.state.localizes[this.state.lang].new_contacts} {...props}>
                               <NewContactsPage
                                 {...props}
                                 actions={this.actions}
@@ -225,7 +238,7 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/users/:id(.*)' render={(props)=> {
                   if(!Object.keys(this.state.users).includes(props.match.params.id)) {
-                    this.loadUserMeta(props.match.params.id);
+                    this.actions.loadUserMeta(props.match.params.id);
                   }
                   return(
                     <div className="Page">
@@ -234,13 +247,13 @@ export class App extends Component {
                         actions={this.actions}
                         users={this.state.users}
                         contacts={this.state.contacts}
-                        langs={this.state.langs}
+                        localize={this.state.localizes[this.state.lang]}
                       />
                       <Box history={props.history}>
                         <BackPage {...props} title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'}>
                           <UserAccountPage
                           actions={this.actions}
-                          langs={this.state.langs}
+                          localize={this.state.localizes[this.state.lang]}
                           contacts={this.state.contacts}
                           usermeta={this.state.users[props.match.params.id]}/>
                         </BackPage>
@@ -250,7 +263,7 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/trending:path(/|/.*)'  component={(props)=> {
                   return(
-                    <TrendingPage langs={this.state.langs}/>
+                    <TrendingPage localize={this.state.localizes[this.state.lang]}/>
                   )
                 }}/>
                 <Route exact path='/account:path(/|/.*)' render={(props)=>{
@@ -258,9 +271,9 @@ export class App extends Component {
                     <MyAccountPage
                     {...props}
                     actions={this.actions}
-                    langs={this.state.langs}
+                    localize={this.state.localizes[this.state.lang]}
                     version={VERSION}
-                    mymeta={this.state.mymeta}
+                    my_user_meta={this.state.my_user_meta}
                     />
                   );
                 }}/>
@@ -271,12 +284,12 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{
                   return(
-                    <SigninPage SignupURL={NOSERVICE_SIGNUP_URL} NSc={NoService} onFinish={window.location.reload}/>
+                    <SigninPage SignupURL={NOSERVICE_SIGNUP_URL} NSc={this.controller.NoService} onFinish={window.location.reload}/>
                   );
                 }}/>
                 <Route exact path='/noservice/password' render={(props)=>{
                   return(
-                    <PasswordPage NSc={NoService} onFinish={props.history.goBack}/>
+                    <PasswordPage NSc={this.controller.NoService} onFinish={props.history.goBack}/>
                   );
                 }}/>
                 {this.renderConnectionFailed()}

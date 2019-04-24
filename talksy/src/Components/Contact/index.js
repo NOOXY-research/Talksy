@@ -67,19 +67,19 @@ export class ContactsPage extends Component {
       if(this.props.contacts[key].Type == 0) {
         let usermeta = this.props.users[this.props.contacts[key].ToUserId];
         if(!Object.keys(this.props.users).includes(this.props.contacts[key].ToUserId)) {
-          this.props.loadUserMeta(this.props.contacts[key].ToUserId);
+          this.props.actions.loadUserMeta(this.props.contacts[key].ToUserId);
         }
         elems.push(
           <div key={key} className="Page-Row" onClick={()=>{
-            this.props.history.push('/users/'+usermeta.userid);
+            this.props.history.push('/users/'+usermeta.user_id);
           }}>
           <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
             {this.renderActiveIcon(usermeta)}
             </figure>
             <div className="Page-Row-ThumbnailText-Text">
-              <h2>{usermeta?usermeta.username:this.props.langs.loading+"..."}</h2>
-              <p>{usermeta?usermeta.b:this.props.langs.loading+"l..."}</p>
+              <h2>{usermeta?usermeta.username:this.props.localize.loading+"..."}</h2>
+              <p>{usermeta?usermeta.b:this.props.localize.loading+"l..."}</p>
             </div>
           </div>
         );
@@ -106,7 +106,7 @@ export class ContactsPage extends Component {
             <div className="Page-Row">
             <Ink/>
               <div className="Page-Row-Text">
-                <h1>{this.props.langs.contacts}</h1>
+                <h1>{this.props.localize.contacts}</h1>
                 <p> {"Start a new Talksy channel with your contacts or see who are online."}</p>
               </div>
             </div>
@@ -115,7 +115,7 @@ export class ContactsPage extends Component {
             }}>
             <Ink />
               <div className="Page-Row-Button">
-                <span>{this.props.langs.new_contacts}</span><i className="material-icons">add_circle</i>
+                <span>{this.props.localize.new_contacts}</span><i className="material-icons">add_circle</i>
               </div>
             </div>
           </div>
@@ -144,16 +144,16 @@ export class NewContactsPage extends Component {
             let list = [];
             for(let i in rows) {
               list.push(rows[i].username);
-              this.props.setUserNameToId(rows[i].username, rows[i].userid);
+              this.props.setUserNameToId(rows[i].username, rows[i].user_id);
             }
             this.setState({searchusers: list});
           })
         }} description="Add friends for your contact." restricteditems={this.state.searchusers} list={this.state.userlist} onFinish={(list)=> {
-          let userids = [];
+          let user_ids = [];
           for(let i in list) {
-            userids.push(this.props.returnUserNameToId(list[i]))
+            user_ids.push(this.props.returnUserNameToId(list[i]))
           }
-          this.props.addContacts(userids, 0, (err)=> {
+          this.props.actions.addContacts(user_ids, 0, (err)=> {
             this.props.history.push('/contacts/');
           });
         }}/>

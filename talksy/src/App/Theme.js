@@ -2,7 +2,7 @@ import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { palette } from '@material-ui/system';
 import { createMuiTheme } from '@material-ui/core/styles';
 
-export default Theme = createMuiTheme({
+export default createMuiTheme({
   palette: {
     primary: {
       main: '#00838F',
