@@ -50,11 +50,28 @@ function generateDispatcher(setState) {
     else if (payload.type === 'updateChannels') {
       setState({channels:payload.data}, payload.callback);
     }
+    else if (payload.type === 'updateChannel') {
+      setState(prevState=> {
+        if(!prevState.channels[payload.data.channel_id]) {
+          prevState.channels[payload.data.channel_id] = {};
+        }
+        for(let key in payload.data.meta) {
+          prevState.channels[payload.data.channel_id][key] = payload.data.meta[key];
+        }
+        return prevState;
+      }, payload.callback);
+    }
+    else if (payload.type === 'deleteChannel') {
+      setState(prevState=> {
+        delete prevState.channels[payload.data];
+        return prevState;
+      }, payload.callback);
+    }
     else if (payload.type === 'updateContacts') {
       setState({contacts:payload.data}, payload.callback);
     }
     else if (payload.type === 'updateChannelLatestReadline') {
-      this.setState(prevState=>{
+      setState(prevState=>{
         prevState.channels[payload.data.channel_id]['LatestReadline'] = payload.data.line;
         return prevState;
       });
@@ -84,7 +101,29 @@ function generateDispatcher(setState) {
         }
         prevState.users[payload.data.user_id].active = payload.data.active;
         return prevState;
-      });
+      }, payload.callback);
+    }
+    else if (payload.type === 'appendMessege') {
+      setState(prevState=> {
+        let beadded ={};
+        // add to last index
+        if(prevState.channels[payload.data.channel_id]['Messages']&&Object.keys(prevState.channels[payload.data.channel_id]['Messages']).length!==0) {
+          beadded[parseInt(Object.keys(prevState.channels[payload.data.channel_id]['Messages']).sort((a,b)=>{return b - a;})[0])+1] = payload.data.message;
+          prevState.channels[payload.data.channel_id]['Messages'] = Object.assign({}, beadded, prevState.channels[payload.data.channel_id]['Messages']);
+        }
+        else {
+          prevState.channels[payload.data.channel_id]['Messages'] ={1: payload.data.message};
+        }
+        return prevState;
+      }, payload.callback);
+    }
+    else if (payload.type === 'appendMesseges') {
+      setState(prevState=> {
+        setState(prevState=> {
+          prevState.channels[payload.data.channel_id]['Messages'] = Object.assign({}, payload.data.messages, prevState.channels[payload.data.channel_id]['Messages']);
+          return prevState;
+        });
+      }, payload.callback);
     }
   });
 

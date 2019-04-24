@@ -66,12 +66,13 @@ export class ContactsPage extends Component {
     for(let key in this.props.contacts) {
       if(this.props.contacts[key].Type == 0) {
         let usermeta = this.props.users[this.props.contacts[key].ToUserId];
+        // console.log(usermeta);
         if(!Object.keys(this.props.users).includes(this.props.contacts[key].ToUserId)) {
           this.props.actions.loadUserMeta(this.props.contacts[key].ToUserId);
         }
         elems.push(
           <div key={key} className="Page-Row" onClick={()=>{
-            this.props.history.push('/users/'+usermeta.user_id);
+            this.props.history.push('/users/'+usermeta.userid);
           }}>
           <Ink/>
             <figure className="Page-Row-ThumbnailText-Head">
@@ -140,18 +141,18 @@ export class NewContactsPage extends Component {
   render() {
     return(
         <AddToListPageRestrictedItems title="Add contacts" onChange={(name, prev)=>{
-          this.props.searchUsers(name, (err, rows)=> {
+          this.props.actions.searchUsers(name, (err, rows)=> {
             let list = [];
             for(let i in rows) {
               list.push(rows[i].username);
-              this.props.setUserNameToId(rows[i].username, rows[i].user_id);
+              this.props.actions.setUserNameToId(rows[i].username, rows[i].userid);
             }
             this.setState({searchusers: list});
           })
         }} description="Add friends for your contact." restricteditems={this.state.searchusers} list={this.state.userlist} onFinish={(list)=> {
           let user_ids = [];
           for(let i in list) {
-            user_ids.push(this.props.returnUserNameToId(list[i]))
+            user_ids.push(this.props.actions.returnUserNameToId(list[i]))
           }
           this.props.actions.addContacts(user_ids, 0, (err)=> {
             this.props.history.push('/contacts/');

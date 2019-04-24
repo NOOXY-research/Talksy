@@ -103,8 +103,8 @@ export class ChannelPage extends Component {
   handleScroll(e) {
     const bottom = e.target.scrollTop === 0;
     if (bottom) {
-      let _fl = Object.keys(this.props.channelmeta['Messages']).sort((a,b)=>{return a - b;})[0];
-      this.props.getMoreMessages(this.props.channelid,()=> {
+      let first_index = Object.keys(this.props.channelmeta['Messages']).sort((a,b)=>{return a - b;})[0];
+      this.props.actions.loadMoreMessages(this.props.channelid, first_index, ()=> {
         this.scrollToTop("smooth");
       });
     }

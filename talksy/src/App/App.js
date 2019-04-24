@@ -4,7 +4,7 @@
 // Copyright 2019-2019 NOOXY. All Rights Reserved.
 
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Redirect, Switch } from "react-router-dom";
 import Ink from 'react-ink';
 
 import Constants from '../constants.json';
@@ -128,6 +128,7 @@ export class App extends Component {
             return(
               <BackPage title="Channel Settings" history={props.history}>
                 <ChannelSettingsPage
+                  {...props}
                   actions={this.actions}
                   contacts={this.state.contacts}
                   my_user_meta={this.state.my_user_meta}
@@ -162,6 +163,7 @@ export class App extends Component {
             return(
               <HeaderPage {...props} localize={this.state.localizes[this.state.lang]} debug={this.state.debug}>
               {this.state.loading?<LinearProgress color='primary'/>:null}
+              <Switch>
                 <Route exact path="/" render={() => {
                   return(<Redirect to="/channels/"/>)
                 }}/>
@@ -177,7 +179,7 @@ export class App extends Component {
                     />
                   )
                 }}/>
-                <Route exact path={':channel_root(/channels/):channel_id([^/]+):more(.*)'} render={(props)=>{
+                <Route exact path=':channel_root(/channels/):channel_id([^/]+):more(.*)' render={(props)=>{
                   return(
                     <Split show={true}>
                       <SplitLeft>
@@ -230,9 +232,9 @@ export class App extends Component {
                     </div>
                   )
                 }}/>
-                <Route exact path='/users/:id(.*)' render={(props)=> {
-                  if(!Object.keys(this.state.users).includes(props.match.params.id)) {
-                    this.actions.loadUserMeta(props.match.params.id);
+                <Route exact path='/users/:user_id(.*)' render={(props)=> {
+                  if(!Object.keys(this.state.users).includes(props.match.params.user_id)) {
+                    this.actions.loadUserMeta(props.match.params.user_id);
                   }
                   return(
                     <div className="Page">
@@ -243,13 +245,13 @@ export class App extends Component {
                         contacts={this.state.contacts}
                         localize={this.state.localizes[this.state.lang]}
                       />
-                      <Box history={props.history}>
-                        <BackPage {...props} title={this.state.users[props.match.params.id]?this.state.users[props.match.params.id].username:'User'}>
+                      <Box {...props}>
+                        <BackPage {...props} title={this.state.users[props.match.params.user_id]?this.state.users[props.match.params.user_id].username:'User'}>
                           <UserAccountPage
                           actions={this.actions}
                           localize={this.state.localizes[this.state.lang]}
                           contacts={this.state.contacts}
-                          usermeta={this.state.users[props.match.params.id]}/>
+                          usermeta={this.state.users[props.match.params.user_id]}/>
                         </BackPage>
                       </Box>
                     </div>
@@ -286,6 +288,13 @@ export class App extends Component {
                     <PasswordPage NSc={this.controller.NoService} onFinish={props.history.goBack}/>
                   );
                 }}/>
+                <Route path=':badurl(.*)' render={(props)=>{
+                  return([
+                    <h3>{'The requested URL "'+props.match.params.badurl+'" does not exist.'}</h3>,
+                    <p>Please check your link is a valid link.</p>
+                  ]);
+                }}/>
+              </Switch>
                 {this.renderConnectionFailed()}
 
               </HeaderPage>

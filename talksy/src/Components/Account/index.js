@@ -80,7 +80,7 @@ export class MyAccountPage extends Component {
           </div>
 
         </div>
-        <div className="Page-Block" onClick={()=> {this.props.logout()}}>
+        <div className="Page-Block" onClick={()=> {this.props.actions.logout()}}>
           <div className="Page-Row">
           <Ink/>
             <div className="Page-Row-Text">
@@ -294,10 +294,10 @@ export class UserAccountPage extends Component {
   }
 
   renderRelation(r) {
-    if(r==0) {
+    if(r===0) {
       return("This account is in your contact.")
     }
-    else if (r==2) {
+    else if (r===2) {
       return("Blocked.")
     }
     else {
@@ -306,13 +306,17 @@ export class UserAccountPage extends Component {
   }
 
   renderOptions() {
+    console.log(this.props.contacts);
+    console.log(this.props.usermeta);
+
     let rows = [];
     let has_relation = false;
     for(let i in this.props.contacts) {
-      if(this.props.usermeta&&this.props.contacts&&this.props.contacts[i].ToUserId==this.props.usermeta.user_id) {
-        if(this.props.contacts[i].Type==0) {
+      if(this.props.usermeta&&this.props.contacts&&this.props.contacts[i].ToUserId===this.props.usermeta.userid) {
+        if(this.props.contacts[i].Type===0) {
           has_relation = true;
         }
+        console.log(this.props.contacts[i]);
         rows.push(
           <div className="Page-Row">
           <Ink/>
@@ -327,7 +331,7 @@ export class UserAccountPage extends Component {
 
     if(!has_relation) {
       rows.push(
-        <div className="Page-Row" onClick={()=> {this.props.actions.addContacts([this.props.usermeta.user_id], 0)}}>
+        <div className="Page-Row" onClick={()=> {this.props.actions.addContacts([this.props.usermeta.userid], 0)}}>
         <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Add to contact"}</h2>
@@ -338,7 +342,7 @@ export class UserAccountPage extends Component {
     }
     else {
       rows.push(
-        <div className="Page-Row" onClick={()=> {this.props.actions.addContacts([this.props.usermeta.user_id], 1)}}>
+        <div className="Page-Row" onClick={()=> {this.props.actions.addContacts([this.props.usermeta.userid], 1)}}>
         <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Remove from contact"}</h2>
