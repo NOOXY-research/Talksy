@@ -136,16 +136,21 @@ export class ChannelPage extends Component {
     return(
       <div className="ChPage" style={this.props.show?null:{ display:"none"}}>
         <div className="ChPage-Header">
-          <div className="ChPage-Header-left-Button"
-          onClick={()=>{this.props.history.push(this.props.rootpath)}}>
-          <Ink />
-            <i className="material-icons">arrow_back</i>
-          </div>
-          <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onSettingsClick()}}>
-          <Ink/>
-            <i className="material-icons">settings</i>
-            <span className="tooltiptext tooltip-left">Manage your channel settings</span>
-          </div>
+          <Link to={this.props.match.params.channel_root}>
+            <div className="ChPage-Header-left-Button">
+            <Ink />
+              <i className="material-icons">arrow_back</i>
+            </div>
+          </Link >
+
+          <Link to={this.props.match.params.channel_root+this.props.match.params.channel_id+'/settings'}>
+            <div className="tooltip ChPage-Header-right-Button">
+            <Ink/>
+              <i className="material-icons">settings</i>
+              <span className="tooltiptext tooltip-left">Manage your channel settings</span>
+            </div>
+          </Link>
+
           <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onPeopleClick()}}>
           <Ink/>
             <i className="material-icons">people</i>
@@ -515,7 +520,7 @@ export class ChannelSettingsPage extends Component {
                 <div className="Page-Row">
                   <div className="Page-Row-Text">
                     <h2 className="">{"Access Level"}</h2>
-                    <p> {this.renderLevels()}</p>
+                    <p>{this.renderLevels()}</p>
                   </div>
                 </div>
                 <div className="Page-Row">
@@ -677,7 +682,7 @@ export class ChannelList extends Component {
       let _ll = this.props.channels[key]['Messages']?Object.keys(this.props.channels[key]['Messages']).sort((a,b)=>{return b - a;})[0]:0;
       let _lrl = this.props.channels[key]['LatestReadline']?this.props.channels[key]['LatestReadline']:0;
       elems.push(
-          <Link to={'/channels/'+key}>
+          <Link to={this.props.match.params.channel_root+key}>
             <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"}>
               <Ink />
               <figure className="Page-Row-ThumbnailText-Head">
@@ -734,15 +739,17 @@ export class ChannelList extends Component {
               <p> {this.props.localize.channellist_description}</p>
             </div>
           </div>
-          <div className="Page-Row" onClick={()=>{this.props.actions.selectCh('new', this.props.history)}}>
-            <Ink />
-            <div className="Page-Row-Button">
-              <span>{this.props.localize.new_channels}</span><i className="material-icons">add_circle</i>
+          <Link to={this.props.match.params.channel_root+'new'}>
+            <div className="Page-Row">
+              <Ink />
+              <div className="Page-Row-Button">
+                <span>{this.props.localize.new_channels}</span><i className="material-icons">add_circle</i>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
         <div className="Page-Block">
-          {this.renderRows()}
+          {this.renderRows(this.props)}
         </div>
       </div>
     );

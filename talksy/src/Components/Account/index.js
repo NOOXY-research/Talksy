@@ -28,7 +28,6 @@ export class MyAccountPage extends Component {
   };
 
   render() {
-    console.log(NOSERVICE_NOUSER_URL);
     return(
       <div className="Page">
         <div className="Page-Block">

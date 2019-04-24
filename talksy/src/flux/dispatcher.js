@@ -29,7 +29,12 @@ function generateDispatcher(setState) {
     }
     else if (payload.type === 'updateMyUserMeta') {
       setState(prevstate=>{
-        return({ my_user_meta: payload.data });
+        for(let i in prevstate.my_user_meta) {
+          if(typeof(payload.data[i]) === 'undefined') {
+            payload.data[i] = prevstate.my_user_meta[i];
+          }
+        }
+        return {my_user_meta: payload.data};
       }, payload.callback)
     }
     else if (payload.type === 'updateMyUserMeta') {
@@ -63,12 +68,20 @@ function generateDispatcher(setState) {
     }
     else if (payload.type === 'updateUserMeta') {
       setState(prevState=> {
-        prevState.users[payload.data.user_id] = payload.data.meta;
+        if(!prevState.users[payload.data.user_id]) {
+          prevState.users[payload.data.user_id] = {};
+        }
+        for(let i in payload.data.meta) {
+          prevState.users[payload.data.user_id][i] = payload.data.meta[i];
+        }
         return prevState;
       }, payload.callback);
     }
     else if (payload.type === 'updateUserActivity') {
       setState(prevState=> {
+        if(!prevState.users[payload.data.user_id]) {
+          prevState.users[payload.data.user_id] = {};
+        }
         prevState.users[payload.data.user_id].active = payload.data.active;
         return prevState;
       });

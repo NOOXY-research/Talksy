@@ -78,7 +78,8 @@ function Service(NoService, Dispatcher) {
         Services.NoTalk.call("getUserAct", {i: user_id}, (err, json)=> {
           this.actions.log("getUserAct("+user_id+")", json);
           Dispatcher.dispatch({type: 'updateUserActivity', data: {user_id: user_id, active: json.r}});
-          callback(err, json.r);
+          if(callback)
+            callback(err, json.r);
         });
     },
 
@@ -138,22 +139,19 @@ function Service(NoService, Dispatcher) {
       return UserNameToId[name];
     },
 
-    loadUserMeta: (user_id)=> {
+    loadUserMeta: (user_id, callback)=> {
       if(Services.NoTalk&&user_id) {
         if(user_id!==null) {
-          // hacks
-          setTimeout(()=> {
-            Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:{}}, callback: ()=> {
-              Services.NoTalk.call("getUserMeta", {i:user_id}, (err, meta)=> {
-                this.actions.log("loadUserMeta", meta);
-                Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:meta}}, ()=> {
-                  this.actions.setUserNameToId(meta.username, user_id);
-                  this.getUserActivity(user_id);
-                });
+          Services.NoTalk.call("getUserMeta", {i:user_id}, (err, meta)=> {
+            this.actions.log("loadUserMeta", meta);
+            Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:meta}, callback: ()=> {
+              this.actions.setUserNameToId(meta.username, user_id);
+              this.actions.getUserActivity(user_id, ()=> {
+                if(callback)
+                  callback(false);
               });
             }});
-
-          }, 1);
+          });
         }
       }
     },
@@ -193,13 +191,8 @@ function Service(NoService, Dispatcher) {
     if(Services.NoTalk) {
       Services.NoTalk.onEvent('MyMetaUpdated', (err, json)=> {
         console.log(json);
-        for(let i in this.state.my_user_meta) {
-          if(typeof(json[i]) === 'undefined') {
-            json[i] = this.state.my_user_meta[i];
-          }
-        }
+        Dispatcher.dispatch({type: 'updateMyUserMeta', data: json});
         this.actions.log('MyMetaUpdated event', json);
-        this.setState({my_user_meta: json});
       });
       Services.NoTalk.onEvent('Message', (err, json)=> {
         this.actions.log('message event', json);
@@ -331,16 +324,34 @@ function Service(NoService, Dispatcher) {
                   Dispatcher.dispatch({type: 'updateMesseges', data: json});
                 });
               }
-              this.actions.getMyContacts();
-              this.setupDispatchers();
-              Dispatcher.dispatch({type: 'updateLoading', data: false});
+              this.actions.getMyContacts((err, contacts)=> {
+                // let users = Object.keys(contacts);
+                // let i = 0;
+                // let next_step = ()=> {
+                //   this.actions.loadUserMeta(contacts[users[i]].ToUserId, ()=> {
+                //     console.log(1);
+                //     if(i<users.length-1) {
+                //       i++
+                //       next_step();
+                //     }
+                //     else {
+                //       this.setupDispatchers();
+                //       Dispatcher.dispatch({type: 'updateLoading', data: false});
+                //       next();
+                //     }
+                //   });
+                // };
+                // next_step();
+                this.setupDispatchers();
+                Dispatcher.dispatch({type: 'updateLoading', data: false});
+                next();
+              });
             });
           });
         }
       });
     });
-    this.setupDispatchers();
-    next();
+
   };
 }
 

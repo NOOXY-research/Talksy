@@ -4,7 +4,7 @@
 // Copyright 2019-2019 NOOXY. All Rights Reserved.
 
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
 import Ink from 'react-ink';
 
 import Constants from '../constants.json';
@@ -39,7 +39,6 @@ const VERSION = CONSTANTS.VERSION;
 const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
 const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
 
-let channelroot = "/channels/";
 
 export class App extends Component {
   constructor (props) {
@@ -104,32 +103,28 @@ export class App extends Component {
   }
 
   renderChannels(props) {
-    console.log('ch', props.match.params.id);
     let elems = [];
     for(let key in this.state.channels) {
       elems.push(
-        <Route key={key} exact path={channelroot+':id([^/]+):more(/?)'} render={(props)=>{
-          return(
-            <ChannelPage
-              actions={this.actions}
-              contacts={this.state.contacts}
-              my_user_meta={this.state.my_user_meta}
-              channelid={key}
-              channelmeta={this.state.channels[key]}
-              show={props.match.params.id === key}
-              match={props.match}
-              users={this.state.users}
-              onSettingsClick={()=> {
-                props.history.push(channelroot+props.match.params.id+'/settings');
-              }}
-            />
-          )
+        <Route key={key} exact path={':channel_root(/channels/):channel_id([^/]+)/'} render={(props)=> {
+          return <ChannelPage
+            {...props}
+            actions={this.actions}
+            contacts={this.state.contacts}
+            my_user_meta={this.state.my_user_meta}
+            channelid={key}
+            channelmeta={this.state.channels[key]}
+            show={props.match.params.channel_id === key}
+            users={this.state.users}
+            onSettingsClick={()=> {
+              props.history.push(props.match.params.channel_root+props.match.params.id+'/settings');
+            }}
+          />
         }}/>
-
       );
       elems.push(
-        <Route key={key+'more'} exact path={channelroot+':id([^/]+)/settings:more(.*)'} render={(props)=>{
-          if(props.match.params.id === key) {
+        <Route key={key+'more'} exact path={':channel_root(/channels/):channel_id([^/]+)/settings:more(.*)'} render={(props)=>{
+          if(props.match.params.channel_id === key) {
             return(
               <BackPage title="Channel Settings" history={props.history}>
                 <ChannelSettingsPage
@@ -167,7 +162,10 @@ export class App extends Component {
             return(
               <HeaderPage {...props} localize={this.state.localizes[this.state.lang]} debug={this.state.debug}>
               {this.state.loading?<LinearProgress color='primary'/>:null}
-                <Route exact path=":path(/|/channels/)" render={(props)=>{
+                <Route exact path="/" render={() => {
+                  return(<Redirect to="/channels/"/>)
+                }}/>
+                <Route exact path=":channel_root(/channels/)" render={(props)=>{
                   return (
                     <ChannelList
                     {...props}
@@ -179,7 +177,7 @@ export class App extends Component {
                     />
                   )
                 }}/>
-                <Route exact path={channelroot+':id([^/]+):more(.*)'} render={(props)=>{
+                <Route exact path={':channel_root(/channels/):channel_id([^/]+):more(.*)'} render={(props)=>{
                   return(
                     <Split show={true}>
                       <SplitLeft>
@@ -188,7 +186,7 @@ export class App extends Component {
                         actions={this.actions}
                         users={this.state.users}
                         channels={this.state.channels}
-                        selected={props.match.params.id}
+                        selected={props.match.params.channel_id}
                         localize={this.state.localizes[this.state.lang]}
                         />
                       </SplitLeft>
@@ -197,7 +195,7 @@ export class App extends Component {
                         {...props}
                         actions={this.actions}
                         localize={this.state.localizes[this.state.lang]}
-                        show={props.match.params.id === 'new'}
+                        show={props.match.params.channel_id === 'new'}
                         users={this.state.users}
                         contacts={this.state.contacts}
                         />
@@ -206,21 +204,17 @@ export class App extends Component {
                     </Split>
                   )
                 }}/>
-                <Route exact path='/contacts:path(/|/.*)' render={(props)=> {
+                <Route exact path='/contacts/:path(.*)' render={(props)=> {
                   return(
                     <div className="Page">
-                      <Route exact path="/contacts/:path(.*)" render={(props)=>{
-                        return(
-                          <ContactsPage
-                            {...props}
-                            actions={this.actions}
-                            key={props.match.params.path}
-                            users={this.state.users}
-                            contacts={this.state.contacts}
-                            localize={this.state.localizes[this.state.lang]}
-                          />
-                        )
-                      }}/>
+                      <ContactsPage
+                        {...props}
+                        actions={this.actions}
+                        key={props.match.params.path}
+                        users={this.state.users}
+                        contacts={this.state.contacts}
+                        localize={this.state.localizes[this.state.lang]}
+                      />
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
                           <Box {...props}>
