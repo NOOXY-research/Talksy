@@ -100,7 +100,8 @@ export class ContactsPage extends Component {
   }
 
   render() {
-      return([
+      return(
+        <div className="Page Page-Root">
           <div className="Page-Block">
             <div className="Page-Row">
             <Ink/>
@@ -118,10 +119,10 @@ export class ContactsPage extends Component {
               </div>
             </div>
           </div>
-          ,
           <div className="Page-Block">
             {this.renderContacts()}
           </div>
-      ])
+        </div>
+      )
   }
 };

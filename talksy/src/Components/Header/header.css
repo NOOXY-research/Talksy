@@ -35,8 +35,8 @@
 }
 
 .HeaderPage-Contain {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  /* overflow-y: auto;
+  -webkit-overflow-scrolling: touch; */
   display: inline-block;
   position: absolute;
   left: 0;

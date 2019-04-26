@@ -17,6 +17,9 @@ export class AddToListPageRestrictedItems extends Component {
           this.resetInput();
           this.setState(prevState=> {
             return prevState.list.push(item);
+          }, ()=> {
+            if(this.props.onItemsChange)
+              this.props.onItemsChange(this.state.list);
           })
       }
     }
@@ -72,7 +75,7 @@ export class AddToListPageRestrictedItems extends Component {
 
   render() {
     return(
-      <div className="Page">
+      <div className="Page Page-Root">
         <div className="Page-Block">
           <div className="Page-Row">
           <Ink/>
@@ -110,12 +113,14 @@ export class AddToListPageRestrictedItems extends Component {
             </div>
           </div>
           {this.renderList()}
-          <div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
-            <Ink/>
-            <div className="Page-Row-Button">
-              <span>Finish </span><i className="material-icons">check_circle</i>
-            </div>
-          </div>
+          {
+            this.props.onFinish?<div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
+              <Ink/>
+              <div className="Page-Row-Button">
+                <span>Finish </span><i className="material-icons">check_circle</i>
+              </div>
+            </div>:null
+          }
         </div>
 
       </div>

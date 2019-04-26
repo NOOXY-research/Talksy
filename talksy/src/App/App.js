@@ -213,7 +213,7 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/:contacts_users(contacts|users)/:more(.*)' render={(props)=> {
                   return(
-                    <div className="Page">
+                    [
                       <ContactsPage
                         {...props}
                         actions={this.actions}
@@ -222,6 +222,7 @@ export class App extends Component {
                         contacts={this.state.contacts}
                         localize={this.state.localizes[this.state.lang]}
                       />
+                      ,
                       <Route exact path="/contacts/new" render={(props)=>{
                         return(
                           <Box {...props}>
@@ -234,6 +235,7 @@ export class App extends Component {
                           </Box>
                         )
                       }}/>
+                      ,
                       <Route exact path='/users/:user_id(.*)' render={(props)=> {
                         if(!Object.keys(this.state.users).includes(props.match.params.user_id)) {
                           this.actions.getUserMeta(props.match.params.user_id);
@@ -250,7 +252,7 @@ export class App extends Component {
                           </Box>
                         )
                       }}/>
-                    </div>
+                    ]
                   )
                 }}/>
                 <Route exact path='/trending:path(/|/.*)'  component={(props)=> {

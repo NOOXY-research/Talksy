@@ -6,6 +6,10 @@ import Ink from 'react-ink';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import Button from '@material-ui/core/Button';
+
 import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 export class ChannelSettingsPage extends Component {

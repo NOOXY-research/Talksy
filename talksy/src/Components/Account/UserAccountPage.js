@@ -153,11 +153,10 @@ export class UserAccountPage extends Component {
 
   render() {
     return(
-      [
-        this.renderProfile()
-        ,
-        this.renderOptions()
-      ]
+      <div className="Page Page-Root">
+        {this.renderProfile()}
+        {this.renderOptions()}
+      </div>
     )
   }
 }

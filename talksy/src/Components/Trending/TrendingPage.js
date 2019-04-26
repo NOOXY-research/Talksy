@@ -5,7 +5,7 @@ import Ink from 'react-ink';
 export class TrendingPage extends Component {
   render() {
     return(
-      <div className="Page">
+      <div className="Page Page-Root">
         <div className="Page-Block">
           <div className="Page-Row">
           <Ink/>

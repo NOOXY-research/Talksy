@@ -10,7 +10,7 @@
     transform: translate(0, 0);
   }
 }
-.Page {
+.NoService-Page {
   display: inline-block;
   position: relative;
   height: auto;
@@ -20,7 +20,7 @@
   animation: animateright .3s;
 }
 
-.Page-Block {
+.NoService-Page-Block {
   background-color: white;
   position: relative;
   box-sizing: border-box;
@@ -36,15 +36,15 @@
   transition: .3s;
 }
 
-.Page-Block > *:nth-child(even) {
+.NoService-Page-Block > *:nth-child(even) {
   background-color: #FAFAFA;
 }
 
-.Page-Block:hover {
+.NoService-Page-Block:hover {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
 
-.Page-Row {
+.NoService-Page-Row {
   padding: 10px;
   position: relative;
   box-sizing: border-box;
@@ -59,7 +59,7 @@
   background-color: inherit;
 }
 
-.Page-Row-Button {
+.NoService-Page-Row-Button {
   box-sizing: border-box;
   user-select: none;
   cursor: pointer;
@@ -70,20 +70,20 @@
   height: 30px;
   vertical-align: middle;
 }
-.Page-Row:hover {
+.NoService-Page-Row:hover {
   background: #ECEFF1;
 }
-.Page-Row-Text h1 {
+.NoService-Page-Row-Text h1 {
   font-size: 25px;
   margin: 0 0 10px 0;
   font-weight: 600;
 }
-.Page-Row-Text h2 {
+.NoService-Page-Row-Text h2 {
   font-size: 16px;
   margin: 0;
   font-weight: 600;
 }
-.Page-Row-Text input {
+.NoService-Page-Row-Text input {
   outline: none;
   font-size: 16px;
   border: none;
@@ -91,15 +91,15 @@
   padding: 0;
   width: 100%;
 }
-.Page-Row-Text p {
+.NoService-Page-Row-Text p {
   font-size: 14px;
   margin: 0;
 
 }
-.Page-Row-Text {
+.NoService-Page-Row-Text {
   width: 100%;
 }
-.Page-Row-ThumbnailText-Head {
+.NoService-Page-Row-ThumbnailText-Head {
   display: inline-block;
   width: 45px;
   height: 45px;
@@ -111,11 +111,11 @@
   transition: .3s;
 }
 
-.Page-Row-ThumbnailText-Head:hover {
+.NoService-Page-Row-ThumbnailText-Head:hover {
   box-shadow: 3px 3px 0 rgba(38, 50, 56, 0.5), inset 3px 3px 0 rgba(38, 50, 56, 0.3);
 }
 
-.Page-Row-ThumbnailText-Text {
+.NoService-Page-Row-ThumbnailText-Text {
   display: flex;
   flex-grow: 1;
   padding-left: 10px;
@@ -123,7 +123,7 @@
   flex-direction: column;
 }
 
-.Page-Row-ThumbnailText-Text h2 {
+.NoService-Page-Row-ThumbnailText-Text h2 {
   display: flex;
   margin: 0;
   width: 100%;
@@ -131,7 +131,7 @@
   font-size: 20px;
 }
 
-.Page-Row-ThumbnailText-Text p {
+.NoService-Page-Row-ThumbnailText-Text p {
   display: flex;
   margin: 0;
   width: 100%;

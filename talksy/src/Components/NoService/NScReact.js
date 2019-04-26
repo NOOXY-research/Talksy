@@ -83,25 +83,25 @@ export class SigninPage extends Component {
 
   render() {
     return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
+      <div className="NoService-Page">
+        <div className="NoService-Page-Block">
+          <div className="NoService-Page-Row">
+            <div className="NoService-Page-Row-Text">
               <h1>{"Signing in"}</h1>
               <p> {this.state.status}</p>
             </div>
           </div>
         </div>
 
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
+        <div className="NoService-Page-Block">
+          <div className="NoService-Page-Row">
+            <div className="NoService-Page-Row-Text">
               <h2>{"Username"}</h2>
               <input ref={(input) => { this.username = input; }}  onChange={evt => this.updateUsernameInputValue(evt)} placeholder="Enter your NOOXY username" className="ChPage-Sender-Input"></input>
             </div>
           </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
+          <div className="NoService-Page-Row">
+            <div className="NoService-Page-Row-Text">
               <h2>{"Password"}</h2>
               <input type="password" onKeyPress={(event)=> {
                 if(event.key == 'Enter'){
@@ -112,17 +112,17 @@ export class SigninPage extends Component {
           </div>
         </div>
 
-        <div className="Page-Block">
-          <div className="Page-Row"  onClick={this.Signin}>
+        <div className="NoService-Page-Block">
+          <div className="NoService-Page-Row"  onClick={this.Signin}>
 
-            <div className="Page-Row-Text">
+            <div className="NoService-Page-Row-Text">
               <h2>{"Done"}</h2>
               <p> {"sign me in"}</p>
             </div>
           </div>
           <a href={this.props.SignupURL} target="_blank">
-            <div className="Page-Row">
-              <div className="Page-Row-Text">
+            <div className="NoService-Page-Row">
+              <div className="NoService-Page-Row-Text">
                 <h2>{"Siginup"}</h2>
                 <p> {"Signup a NoService account"}</p>
               </div>
@@ -169,25 +169,25 @@ export class PasswordPage extends Component {
 
   render() {
     return(
-      <div className="Page">
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
+      <div className="NoService-Page">
+        <div className="NoService-Page-Block">
+          <div className="NoService-Page-Row">
+            <div className="NoService-Page-Row-Text">
               <h1>{"Enter your Password"}</h1>
               <p> {"In order to access this service. You must enter your password of your account."}</p>
             </div>
           </div>
         </div>
 
-        <div className="Page-Block">
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
+        <div className="NoService-Page-Block">
+          <div className="NoService-Page-Row">
+            <div className="NoService-Page-Row-Text">
               <h2>{"Username"}</h2>
               <p>{this.props.NSc.returnUserName()?this.props.NSc.returnUserName():'null'}</p>
             </div>
           </div>
-          <div className="Page-Row">
-            <div className="Page-Row-Text">
+          <div className="NoService-Page-Row">
+            <div className="NoService-Page-Row-Text">
               <h2>{"Password"}</h2>
               <input ref={(input) => { this.password = input; }} onKeyPress={(event)=> {
                 if(event.key == 'Enter'){
@@ -198,9 +198,9 @@ export class PasswordPage extends Component {
           </div>
         </div>
 
-        <div className="Page-Block">
-          <div className="Page-Row"  onClick={this.Signin}>
-            <div className="Page-Row-Text">
+        <div className="NoService-Page-Block">
+          <div className="NoService-Page-Row"  onClick={this.Signin}>
+            <div className="NoService-Page-Row-Text">
               <h2>{"Done"}</h2>
               <p> {"This is my password."}</p>
             </div>

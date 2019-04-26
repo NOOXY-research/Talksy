@@ -75,7 +75,7 @@ export class NewChannelPage extends Component {
         <Route exact path="/channels/new:path(.*)" render={(props)=>{
           return(
             <div className="ChPage">
-              <div className="Page">
+              <div className="Page Page-Root">
                 <div className="Page-Block">
                   <div className="Page-Row">
                   <Ink/>
