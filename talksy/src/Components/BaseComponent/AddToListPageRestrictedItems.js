@@ -105,13 +105,7 @@ export class AddToListPageRestrictedItems extends Component {
         </div>
 
         <div className="Page-Block">
-          <div className="Page-Row">
-          <Ink/>
-            <div className="Page-Row-Text">
-              <h1>{"Your items"}</h1>
-              <p> {"below are your selected items"}</p>
-            </div>
-          </div>
+
           {this.renderList()}
           {
             this.props.onFinish?<div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
