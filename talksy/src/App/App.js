@@ -16,33 +16,31 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Flux from '../flux';
 
 import Theme from './Theme';
-import { SigninPage, PasswordPage } from "./NScReact.js";
-import DebugPage from './DebugPage';
-import HeaderPage from './HeaderPage';
 import FailedPage from './FailedPage';
 
 import {Box, Split, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../Components/BaseComponent";
 import {ChannelPage, ChannelList, NewChannelPage, ChannelSettingsPage} from "../Components/Channel";
 import {ContactsPage, NewContactsPage} from "../Components/Contact";
 import {MyAccountPage, UserAccountPage} from "../Components/Account";
-import TrendingPage from '../Components/TrendingPage';
+import {DebugPage} from '../Components/Debug';
+import {HeaderPage} from '../Components/Header';
+import {TrendingPage} from '../Components/Trending';
+import {SigninPage, PasswordPage} from '../Components/NoService';
 
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 
 
 import './App.css';
-import './tooltip.css';
 
 const CONSTANTS = require('../constants.json');
 
 const VERSION = CONSTANTS.VERSION;
 const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
 const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
-
+const NOSERVICE_HOST = CONSTANTS.NOSERVICE_HOST;
 
 export class App extends Component {
   constructor (props) {
-
     super(props);
     this.state = {
       localizes: {
@@ -58,12 +56,13 @@ export class App extends Component {
           Description: "Talksy is loading your messages."
         }
       },
+      logs: [],
       contacts: {},
       users:{},
       loading: true
     }
 
-    this.controller = new Flux(this.setState.bind(this));
+    this.controller = new Flux(this.setState.bind(this), this.getState.bind(this));
     this.actions = this.controller.actions;
     this.UserNameToId = {};
 
@@ -81,13 +80,19 @@ export class App extends Component {
     });
   }
 
+  getState(callback) {
+    this.setState((prevState) => {
+      callback(prevState);
+    });
+  }
+
   componentDidMount() {
     this.actions.log('NoService', 'Have set up NOOXY service implementations.');
     this.controller.start(()=> {
       setInterval(()=> {
-        let contacts = this.state.contacts;
-        for(let i in contacts) {
-          this.actions.getUserActivity(contacts[i].ToUserId);
+        let user_ids = Object.keys(this.state.users);
+        for(let i in user_ids) {
+          this.actions.refreshUserActivity(user_ids[i]);
         }
       }, Constants.REFRESH_ACTIVITY_INTERVAL);
     });
@@ -206,7 +211,7 @@ export class App extends Component {
                     </Split>
                   )
                 }}/>
-                <Route exact path='/contacts/:path(.*)' render={(props)=> {
+                <Route exact path='/:contacts_users(contacts|users)/:more(.*)' render={(props)=> {
                   return(
                     <div className="Page">
                       <ContactsPage
@@ -229,31 +234,22 @@ export class App extends Component {
                           </Box>
                         )
                       }}/>
-                    </div>
-                  )
-                }}/>
-                <Route exact path='/users/:user_id(.*)' render={(props)=> {
-                  if(!Object.keys(this.state.users).includes(props.match.params.user_id)) {
-                    this.actions.loadUserMeta(props.match.params.user_id);
-                  }
-                  return(
-                    <div className="Page">
-                      <ContactsPage
-                        {...props}
-                        actions={this.actions}
-                        users={this.state.users}
-                        contacts={this.state.contacts}
-                        localize={this.state.localizes[this.state.lang]}
-                      />
-                      <Box {...props}>
-                        <BackPage {...props} title={this.state.users[props.match.params.user_id]?this.state.users[props.match.params.user_id].username:'User'}>
-                          <UserAccountPage
-                          actions={this.actions}
-                          localize={this.state.localizes[this.state.lang]}
-                          contacts={this.state.contacts}
-                          usermeta={this.state.users[props.match.params.user_id]}/>
-                        </BackPage>
-                      </Box>
+                      <Route exact path='/users/:user_id(.*)' render={(props)=> {
+                        if(!Object.keys(this.state.users).includes(props.match.params.user_id)) {
+                          this.actions.getUserMeta(props.match.params.user_id);
+                        }
+                        return(
+                          <Box {...props}>
+                            <BackPage {...props} title={this.state.users[props.match.params.user_id]?this.state.users[props.match.params.user_id].username:'User'}>
+                              <UserAccountPage
+                              actions={this.actions}
+                              localize={this.state.localizes[this.state.lang]}
+                              contacts={this.state.contacts}
+                              usermeta={this.state.users[props.match.params.user_id]}/>
+                            </BackPage>
+                          </Box>
+                        )
+                      }}/>
                     </div>
                   )
                 }}/>
@@ -275,7 +271,7 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
                   return(
-                    <DebugPage {...props} logs={this.state.debuglogs}/>
+                    <DebugPage {...props} logs={this.state.logs} noservice_host = {NOSERVICE_HOST} debug={this.state.debug}/>
                   );
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{

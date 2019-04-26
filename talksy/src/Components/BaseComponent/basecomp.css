@@ -252,15 +252,20 @@
 
 .BoxComp {
   display: inline-block;
-  top: 0;
+  top: 60px;
   left: 0;
-  position: absolute;
-  height: 100%;
+  position: fixed;
+  height: calc( 100% - 60px);
   width: 100%;
-  z-index: 999;
-  flex-direction: column;
+  z-index: 99999;
   background: rgba(0, 0, 0, 0.75);
   animation: turnblack .2s;
+}
+@media only screen and (max-width: 400px) {
+    .BoxComp {
+      top: 90px;
+      height: calc( 100% - 90px);
+    }
 }
 @keyframes turnblack {
   0% {
@@ -270,26 +275,14 @@
     background: rgba(0, 0, 0, 0.75);
   }
 }
-.BoxComp:before {
-  flex-grow: 1;
-    content: '';
-    display: block;
-    height: 24px;
-}
-.BoxComp:after {
-  flex-grow: 1;
-    content: '';
-    display: block;
-    height: 24px;
-}
 .BoxComp-Box {
-  overflow: hidden;
+  top: 60px;
+  overflow: auto;
   background: white;
   display: inline-block;
   position: relative;
-  height: calc(100% - 50px);
+  height: calc(100% - 120px);
   width: 70%;
-  min-height: 300px;
   max-height: 700px;
   min-width: 300px;
   max-width: 500px;
@@ -333,6 +326,7 @@
   float: left;
   order: 0;
   flex-grow: 1;
+  overflow-y: none;
   box-sizing: border-box;
   max-width: 350px;
   border-right: 1px solid #ECEFF1;

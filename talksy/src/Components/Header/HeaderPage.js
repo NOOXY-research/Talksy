@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import logo from '../pics/logo.png';
+import logo from '../../imgs/logo.png';
 
 import './header.css';
 
-export default class HeaderPage extends Component {
+export class HeaderPage extends Component {
   constructor (props) {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);

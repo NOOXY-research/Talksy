@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Ink from 'react-ink';
 
-export default class TrendingPage extends Component {
+export class TrendingPage extends Component {
   render() {
     return(
       <div className="Page">

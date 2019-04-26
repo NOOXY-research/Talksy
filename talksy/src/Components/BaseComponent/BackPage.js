@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
-import './basecomp.css';
 
 export class BackPage extends Component {
   constructor(props) {
@@ -14,7 +13,13 @@ export class BackPage extends Component {
           <Ink/>
             <div className="BackPage-Back-Button"
             onClick={()=>{
-              this.props.history.goBack()
+              console.log(this.props);
+              if(this.props.onBack) {
+                this.props.onBack();
+              }
+              else {
+                this.props.history.goBack()
+              }
             }}>
             <Ink/>
               <i className="material-icons">arrow_back</i>

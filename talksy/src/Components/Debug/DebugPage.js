@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
 
-import {Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
-const CONSTANTS = require('../constants.json');
-
-const nshost = CONSTANTS.NOSERVICE_HOST;
-const debug = CONSTANTS.DEBUG;
-
-export default class DebugPage extends Component {
+export class DebugPage extends Component {
   constructor(props) {
     super(props);
   }
@@ -44,7 +39,7 @@ export default class DebugPage extends Component {
           <Ink/>
             <div className="Page-Row-Text">
               <h2>{"NoService Daemon"}</h2>
-              <p> {'Host: '+nshost+', Debug: '+debug}</p>
+              <p> {'Host: '+this.props.noservice_host+', Debug: '+this.props.debug}</p>
             </div>
           </div>
           <Link to='/noservice/signin'>

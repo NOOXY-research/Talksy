@@ -9,13 +9,14 @@ const READ_NEW_LINE = Constants.READ_NEW_LINE;
 const RETRY_INTERVAL= Constants.RETRY_INTERVAL;
 const Localizes = require('./data/localizes.json');
 
-function Service(NoService, Dispatcher) {
+function Service(NoService, Dispatcher, getState) {
   let Services = {
     NoTalk: null,
     gotoandplay: null
   };
 
   let UserNameToId = {};
+  let UserMeta = {};
 
   this.actions = {
     importLocalize: (data)=> {
@@ -29,21 +30,20 @@ function Service(NoService, Dispatcher) {
         this.actions.log('updateMyMeta', 'OK');
       })
     },
-    selectCh: (chid)=> {
-      Dispatcher.dispatch({type: 'update-channelnow', data: chid});
-    },
-
+    // selectCh: (chid)=> {
+    //   Dispatcher.dispatch({type: 'update-channelnow', data: chid});
+    // },
     log: (title, contain)=> {
       if(typeof(contain)!== 'string') {
         contain = JSON.stringify(contain);
       }
-      Dispatcher.dispatch({type: 'append-log', data: [title, contain]});
+      Dispatcher.dispatch({type: 'appendLog', data: [title, contain]});
     },
 
     setDebug: (bool)=> {
       console.log('DEBUG MODE ON');
       this.actions.log('DEBUG MODE ON');
-      Dispatcher.dispatch({type: 'update-debug', data: bool});
+      Dispatcher.dispatch({type: 'updateDebug', data: bool});
     },
 
     searchUsers: (username, callback)=> {
@@ -73,13 +73,14 @@ function Service(NoService, Dispatcher) {
         });
     },
 
-    getUserActivity: (user_id, callback)=> {
+    refreshUserActivity: (user_id, callback)=> {
       if(Services.NoTalk)
         Services.NoTalk.call("getUserAct", {i: user_id}, (err, json)=> {
           this.actions.log("getUserAct("+user_id+")", json);
-          Dispatcher.dispatch({type: 'updateUserActivity', data: {user_id: user_id, active: json.r}});
-          if(callback)
-            callback(err, json.r);
+          Dispatcher.dispatch({type: 'updateUserActivity', data: {user_id: user_id, active: json.r}}, ()=> {
+            if(callback)
+              callback(err, json.r);
+          });
         });
     },
 
@@ -136,19 +137,29 @@ function Service(NoService, Dispatcher) {
       return UserNameToId[name];
     },
 
-    loadUserMeta: (user_id, callback)=> {
+    getUserMeta: (user_id, callback)=> {
       if(Services.NoTalk&&user_id) {
         if(user_id!==null) {
-          Services.NoTalk.call("getUserMeta", {i:user_id}, (err, meta)=> {
-            this.actions.log("loadUserMeta", meta);
-            Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:meta}, callback: ()=> {
-              this.actions.setUserNameToId(meta.username, user_id);
-              this.actions.getUserActivity(user_id, ()=> {
-                if(callback)
-                  callback(false);
+          if(UserMeta[user_id]) {
+            if(callback)
+              callback(false, UserMeta[user_id]);
+          }
+          else {
+            UserMeta[user_id] = {};
+            Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:{}}, callback: ()=> {
+              Services.NoTalk.call("getUserMeta", {i:user_id}, (err, meta)=> {
+                this.actions.log("getUserMeta", meta);
+                UserMeta[user_id] = meta;
+                Dispatcher.dispatch({type: 'updateUserMeta', data: {user_id: user_id, meta:meta}, callback: ()=> {
+                  this.actions.setUserNameToId(meta.username, user_id);
+                  this.actions.refreshUserActivity(user_id, ()=> {
+                    if(callback)
+                      callback(false, meta);
+                  });
+                }});
               });
             }});
-          });
+          }
         }
       }
     },
@@ -304,7 +315,7 @@ function Service(NoService, Dispatcher) {
                 // let users = Object.keys(contacts);
                 // let i = 0;
                 // let next_step = ()=> {
-                //   this.actions.loadUserMeta(contacts[users[i]].ToUserId, ()=> {
+                //   this.actions.getUserMeta(contacts[users[i]].ToUserId, ()=> {
                 //     console.log(1);
                 //     if(i<users.length-1) {
                 //       i++

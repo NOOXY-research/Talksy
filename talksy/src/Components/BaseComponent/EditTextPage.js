@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
-import './basecomp.css';
 
 export class EditTextPage extends Component {
   constructor(props) {

@@ -14,14 +14,14 @@ const nsport = null;
 const NoService = new NSClient(nshost);
 NoService.setDebug(debug);
 
-function Flux(setState) {
+function Flux(setState, getState) {
   let Services = {};
 
   this.NoService = NoService;
 
   this.dispatcher = Dispatcher.generateDispatcher(setState);
 
-  this.service = new Service(NoService, this.dispatcher);
+  this.service = new Service(NoService, this.dispatcher, getState);
 
   this.actions = this.service.actions;
 

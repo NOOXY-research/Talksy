@@ -76,7 +76,6 @@
 
 .ChList-Rows {
   height: 100%;
-  overflow-y: auto;
   position: relative;
   min-width: 250px;
 }

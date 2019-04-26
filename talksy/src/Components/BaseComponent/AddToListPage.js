@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
-import './basecomp.css';
 
 export class AddToListPage extends Component {
   constructor(props) {
