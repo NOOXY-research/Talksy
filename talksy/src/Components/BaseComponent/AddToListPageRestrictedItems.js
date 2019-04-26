@@ -57,19 +57,20 @@ export class AddToListPageRestrictedItems extends Component {
   renderRestrictedItems() {
     let index = 0;
     return this.props.restricteditems.map(value=> {
-      return(
-      <div key={index++} className="Page-Row" onClick={
-        ()=> {
-          this.addItem(value);
-        }
-      }>
-        <Ink/>
-        <div className="Page-Row-Text">
-          <h2>{value}</h2>
-          <p >{!this.state.list.includes(value)?"click to add":"the item have been added"}</p>
+      if(!this.state.list.includes(value))
+        return(
+        <div key={index++} className="Page-Row" onClick={
+          ()=> {
+            this.addItem(value);
+          }
+        }>
+          <Ink/>
+          <div className="Page-Row-Text">
+            <h2>{value}</h2>
+            <p >{!this.state.list.includes(value)?"click to add":"the item have been added"}</p>
+          </div>
         </div>
-      </div>
-    )
+      )
     })
   }
 

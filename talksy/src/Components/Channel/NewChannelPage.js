@@ -149,7 +149,7 @@ export class NewChannelPage extends Component {
                       if(meta.s=='OK') {
                         let list=[];
                         for(let i in this.state.userlist) {
-                          list.push(this.props.returnUserNameToId(this.state.userlist[i]));
+                          list.push(this.props.actions.returnUserNameToId(this.state.userlist[i]));
                         }
                         this.props.actions.addUsersToChannel(meta.i, list, ()=>{
                           this.props.history.push('/channels/'+meta.i);
