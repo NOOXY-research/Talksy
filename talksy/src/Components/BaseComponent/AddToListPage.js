@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
 
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+
+
 export class AddToListPage extends Component {
   constructor(props) {
     super(props);
@@ -81,7 +85,7 @@ export class AddToListPage extends Component {
           </div>
           <div className="Page-Row" onClick= {this.addItem}>
             <div className="Page-Row-Button">
-              <span>Add </span><i className="material-icons">add_circle</i>
+              <span>Add </span><AddCircleIcon className="material-icons"/>
             </div>
           </div>
 
@@ -92,7 +96,7 @@ export class AddToListPage extends Component {
           <div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
             <Ink/>
             <div className="Page-Row-Button">
-              <span>Finish </span><i className="material-icons">check_circle</i>
+              <span>Finish </span><CheckCircleIcon className="material-icons"/>
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
 
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+
 export class EditTextPage extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +31,7 @@ export class EditTextPage extends Component {
           <div className="Page-Row" onClick={()=>{this.props.onFinish(this.state.text)}}>
           <Ink/>
             <div className="Page-Row-Button">
-              <span>OK </span><i className="material-icons">check_circle</i>
+              <span>OK </span><AddCircleIcon className="material-icons"/>
             </div>
           </div>
         </div>

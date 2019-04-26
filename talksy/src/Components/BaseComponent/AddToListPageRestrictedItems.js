@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
 
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+
+
 export class AddToListPageRestrictedItems extends Component {
   constructor(props) {
     super(props);
@@ -112,7 +115,7 @@ export class AddToListPageRestrictedItems extends Component {
             this.props.onFinish?<div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
               <Ink/>
               <div className="Page-Row-Button">
-                <span>Finish </span><i className="material-icons">check_circle</i>
+                <span>Finish </span><CheckCircleIcon className="material-icons"/>
               </div>
             </div>:null
           }

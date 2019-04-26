@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import Ink from 'react-ink';
 
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 export class ChannelList extends Component {
   constructor (props) {
@@ -109,7 +110,7 @@ export class ChannelList extends Component {
             <div className="Page-Row">
               <Ink />
               <div className="Page-Row-Button">
-                <span>{this.props.localize.new_channels}</span><i className="material-icons">add_circle</i>
+                <span>{this.props.localize.new_channels}</span><AddCircleIcon className="material-icons"/>
               </div>
             </div>
           </Link>

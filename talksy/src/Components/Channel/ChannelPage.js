@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Ink from 'react-ink';
 
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import PeopleIcon from '@material-ui/icons/People';
+import SettingsIcon from '@material-ui/icons/Settings';
+import SendIcon from '@material-ui/icons/CheckCircle';
+
+
 export class ChannelPage extends Component {
   constructor(props) {
     super(props);
@@ -130,21 +136,21 @@ export class ChannelPage extends Component {
           <Link to={this.props.match.params.channel_root}>
             <div className="ChPage-Header-left-Button">
             <Ink />
-              <i className="material-icons">arrow_back</i>
+              <ArrowBackIcon className="material-icons"/>
             </div>
           </Link >
 
           <Link to={this.props.match.params.channel_root+this.props.match.params.channel_id+'/settings'}>
             <div className="tooltip ChPage-Header-right-Button">
             <Ink/>
-              <i className="material-icons">settings</i>
+              <SettingsIcon className="material-icons"/>
               <span className="tooltiptext tooltip-left">Manage your channel settings</span>
             </div>
           </Link>
 
           <div className="tooltip ChPage-Header-right-Button" onClick={()=>{this.props.onPeopleClick()}}>
           <Ink/>
-            <i className="material-icons">people</i>
+            <PeopleIcon className="material-icons"/>
             <span className="tooltiptext tooltip-left">Manage your channel members</span>
           </div>
           <div className=" ChPage-Header-Title tooltip">
@@ -169,7 +175,7 @@ export class ChannelPage extends Component {
             }
           }></input>
           <div className="ChPage-Sender-Buttons">
-            <div className="ChPage-Sender-Button" onClick={this.sendNewMessage}><Ink/><i className="material-icons">send</i></div>
+            <div className="ChPage-Sender-Button" onClick={this.sendNewMessage}><Ink/><SendIcon className="material-icons"/></div>
           </div>
         </div>
       </div>

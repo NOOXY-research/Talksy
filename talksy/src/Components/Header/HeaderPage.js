@@ -2,6 +2,14 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import logo from '../../imgs/logo.png';
 
+import ChatIcon from '@material-ui/icons/Chat';
+import PeopleIcon from '@material-ui/icons/People';
+import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import BugReportIcon from '@material-ui/icons/BugReport';
+
+
+
 import './header.css';
 
 export class HeaderPage extends Component {
@@ -11,10 +19,10 @@ export class HeaderPage extends Component {
     this.state = {
       headertitle: "Talksy",
       headerbuttons: [
-        ['channels', '/channels/', 'chat'],
-        ['contacts', '/contacts/', 'people'],
-        ['trending', '/trending/', 'trending_up'],
-        ['account', '/account/', 'account_circle'],
+        ['channels', '/channels/', <ChatIcon className="material-icons"/>],
+        ['contacts', '/contacts/', <PeopleIcon className="material-icons"/>],
+        ['trending', '/trending/', <TrendingUpIcon className="material-icons"/>],
+        ['account', '/account/', <AccountCircleIcon className="material-icons"/>],
         // ['debug', '/debug/', 'bug_report']
       ],
       selectedheaderbuttons: regex_result?regex_result[3]:'channels'
@@ -32,7 +40,7 @@ export class HeaderPage extends Component {
                 this.setState({selectedheaderbuttons: button[0]});
               }}
             >
-              <i className="material-icons">{button[2]}</i>
+              {button[2]}
               <span className="tooltiptext tooltip-bottom">{this.props.localize[button[0]]}</span>
             </div>
           </Link>
@@ -51,7 +59,7 @@ export class HeaderPage extends Component {
             this.setState({selectedheaderbuttons: 'debug'});
           }}
           >
-            <i className="material-icons">{'bug_report'}</i>
+            <BugReportIcon className="material-icons"/>
               <span className="tooltiptext tooltip-bottom">{"Debug components"}</span>
           </div>
         </Link>

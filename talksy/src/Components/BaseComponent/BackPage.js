@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Ink from 'react-ink';
 
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
+
 export class BackPage extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +25,7 @@ export class BackPage extends Component {
               }
             }}>
             <Ink/>
-              <i className="material-icons">arrow_back</i>
+              <ArrowBackIcon className="material-icons"/>
             </div>
             {(this.props.title)}
           </div>

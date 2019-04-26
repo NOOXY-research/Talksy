@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { BoxComp, SplitComp, AddToListPageRestrictedItems, BackPage, EditTextPage, EditListPage, AddToListPage, SplitLeft, SplitRight} from "../BaseComponent";
 import Ink from 'react-ink';
 
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+
 export class ContactsPage extends Component {
   constructor(props) {
     super(props);
@@ -115,7 +117,7 @@ export class ContactsPage extends Component {
             }}>
             <Ink />
               <div className="Page-Row-Button">
-                <span>{this.props.localize.new_contacts}</span><i className="material-icons">add_circle</i>
+                <span>{this.props.localize.new_contacts}</span><AddCircleIcon className="material-icons"/>
               </div>
             </div>
           </div>
