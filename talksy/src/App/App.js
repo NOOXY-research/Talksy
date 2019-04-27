@@ -280,7 +280,7 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{
                   return(
-                    <SigninPage SignupURL={NOSERVICE_SIGNUP_URL} NSc={this.controller.NoService} onFinish={window.location.reload}/>
+                    <SigninPage SignupURL={NOSERVICE_SIGNUP_URL} NSc={this.controller.NoService} onFinish={()=>{window.location.replace(ROOT_PATH);}}/>
                   );
                 }}/>
                 <Route exact path='/noservice/password' render={(props)=>{

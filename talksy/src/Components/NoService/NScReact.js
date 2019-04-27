@@ -46,8 +46,7 @@ export class SigninPage extends Component {
             implement_module.setImplement('onToken', (err, token)=>{
               if(token) {
                 setCookie('NSToken', token, 7);
-                window.location.replace('/');
-                setTimeout(()=>{window.location.reload();}, 500);
+                setTimeout(this.props.onFinish, 500);
               }
               else {
                 this.setState({status:'Wrong username or password!'});
