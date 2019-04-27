@@ -35,6 +35,10 @@ export class UserAccountPage extends Component {
       else
         return "0 s"
     }
+
+    this.state = {
+      show_channels: false
+    };
   };
 
   renderProfile() {
@@ -138,7 +142,7 @@ export class UserAccountPage extends Component {
         </div>
       )
       rows.push(
-        <div className="Page-Row">
+        <div className="Page-Row" onClick={()=> {this.setState({show_channels: true});}}>
         <Ink/>
           <div className="Page-Row-Text">
             <h2>{"Add to channel"}</h2>
@@ -148,15 +152,73 @@ export class UserAccountPage extends Component {
       )
     }
 
-    return (<div className="Page-Block">{rows}</div>);
+    return (rows);
+  }
+
+  renderAddUserToChannel() {
+    let rows = [];
+
+    for(let i in this.props.channels) {
+      rows.push(
+        <div className="Page-Row" onClick={()=> {
+          this.props.actions.addUsersToChannel(i, [this.props.usermeta.userid], ()=>{
+            this.setState({show_channels: false});
+          });
+        }}>
+        <Ink/>
+          <div className="Page-Row-Text">
+            <h2>{this.props.channels[i].Displayname}</h2>
+            <p> {this.props.channels[i].Description?this.props.channels[i].Description:'No description'}</p>
+          </div>
+        </div>
+      );
+    }
+    return (rows);
   }
 
   render() {
-    return(
-      <div className="Page Page-Root">
-        {this.renderProfile()}
-        {this.renderOptions()}
-      </div>
-    )
+    if(this.state.show_channels === false) {
+      return(
+        <div className="Page Page-Root">
+          {this.renderProfile()}
+          <div className="Page-Block">
+            {this.renderOptions()}
+          </div>
+        </div>
+      )
+    }
+    else {
+
+      return(
+        <div className="Page Page-Root">
+          <div className="Page-Block">
+            <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h1>{"Add to channel"}</h1>
+                <p> {"Add \""+this.props.usermeta.username+"\" to your existed channel."}</p>
+              </div>
+            </div>
+            <div className="Page-Row" onClick={()=>{this.setState({show_channels: false});}}>
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h2>{"Cancel"}</h2>
+                <p> {"Cancel this operation."}</p>
+              </div>
+            </div>
+          </div>
+          <div className="Page-Block">
+            <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h1>{"Your channels"}</h1>
+                <p> {"Click to add."}</p>
+              </div>
+            </div>
+            {this.renderAddUserToChannel()}
+          </div>
+        </div>
+      )
+    }
   }
 }

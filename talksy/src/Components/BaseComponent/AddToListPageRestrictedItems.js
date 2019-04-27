@@ -36,21 +36,23 @@ export class AddToListPageRestrictedItems extends Component {
     let index = 0;
     return this.state.list.map(value=> {
       return(
-      <div key={index++} className="Page-Row">
-      <Ink/>
+      <div key={index++} className="Page-Row" onClick={
+        ()=> {
+          this.setState(prevState=> {
+            let index = prevState.list.indexOf(value);
+            if (index> -1) {
+              prevState.list.splice(index, 1);
+            }
+            console.log(prevState.list);
+
+            return prevState
+          })
+        }
+      }>
+        <Ink/>
         <div className="Page-Row-Text">
           <h2>{value}</h2>
-          <p onClick={
-            ()=> {
-              this.setState(prevState=> {
-                let index = prevState.list.indexOf(value);
-                if (index> -1) {
-                  prevState.list.splice(index, 1);
-                }
-                return prevState
-              })
-            }
-          }>remove</p>
+          <p >remove</p>
         </div>
       </div>
     )
@@ -115,7 +117,7 @@ export class AddToListPageRestrictedItems extends Component {
             this.props.onFinish?<div className="Page-Row" onClick= {()=> {this.props.onFinish(this.state.list)}}>
               <Ink/>
               <div className="Page-Row-Button">
-                <span>Finish </span><CheckCircleIcon className="material-icons"/>
+                <span>Finish</span><CheckCircleIcon className="material-icons"/>
               </div>
             </div>:null
           }

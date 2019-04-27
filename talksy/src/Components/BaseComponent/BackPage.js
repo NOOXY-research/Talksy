@@ -16,7 +16,6 @@ export class BackPage extends Component {
           <Ink/>
             <div className="BackPage-Back-Button"
             onClick={()=>{
-              console.log(this.props);
               if(this.props.onBack) {
                 this.props.onBack();
               }

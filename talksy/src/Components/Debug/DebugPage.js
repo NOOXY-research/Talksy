@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import Ink from 'react-ink';
 
 import {Link} from "react-router-dom";
+import Dialog from '@material-ui/core/Dialog';
 
 export class DebugPage extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      show_app_state: false
+    };
   }
 
   renderLogs() {
@@ -26,7 +31,27 @@ export class DebugPage extends Component {
 
   render() {
     return(
-      <div className="Page">
+      <div className="Page Page-Root">
+        <Dialog open={this.state.show_app_state} onClose={()=>{this.setState({show_app_state: false})}}>
+          <div className="Page-Block">
+            <div className="Page-Row">
+            <Ink/>
+              <div className="Page-Row-Text">
+                <h1>{"Talksy app state"}</h1>
+                <p>{"View your app's state."}</p>
+              </div>
+            </div>
+          </div>
+          <div className="Page-Block">
+            <div className="Page-Row">
+              <div className="Page-Row-Text">
+                <h2>{"JSON form:"}</h2>
+                <plaintext>{JSON.stringify(this.props.app_state, null, 2)}</plaintext>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+
         <div className="Page-Block">
           <div className="Page-Row">
           <Ink/>
@@ -40,6 +65,13 @@ export class DebugPage extends Component {
             <div className="Page-Row-Text">
               <h2>{"NoService Daemon"}</h2>
               <p> {'Host: '+this.props.noservice_host+', Debug: '+this.props.debug}</p>
+            </div>
+          </div>
+          <div className="Page-Row" onClick={()=>{this.setState({show_app_state: true})}}>
+          <Ink/>
+            <div className="Page-Row-Text">
+              <h2>{"Show app state"}</h2>
+              <p> {"Show App react app state."}</p>
             </div>
           </div>
           <Link to='/noservice/signin'>

@@ -13,7 +13,6 @@ export class Box extends Component {
               this.props.history.goBack()
             }
           }}>
-          <Ink/>
           </div>
           <div className="BoxComp-Box">
             {this.props.children}

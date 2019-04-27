@@ -180,7 +180,7 @@ export class NewChannelPage extends Component {
                   </div>
                 </div>
               </div>
-              {this.state.show_users?<Box history={props.history}>
+              {this.state.show_users?<Box onDistract={()=>{this.setState({show_users: false});}}>
                 <BackPage onBack={()=>{this.setState({show_users: false});}} title="add users">
                   <AddToListPageRestrictedItems title="Add users" onChange={(name, prev)=>{
                     let list = [];

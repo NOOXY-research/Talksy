@@ -5,7 +5,7 @@ import Ink from 'react-ink';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PeopleIcon from '@material-ui/icons/People';
 import SettingsIcon from '@material-ui/icons/Settings';
-import SendIcon from '@material-ui/icons/CheckCircle';
+import SendIcon from '@material-ui/icons/Send';
 
 
 export class ChannelPage extends Component {

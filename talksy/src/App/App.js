@@ -245,6 +245,7 @@ export class App extends Component {
                             <BackPage {...props} title={this.state.users[props.match.params.user_id]?this.state.users[props.match.params.user_id].username:'User'}>
                               <UserAccountPage
                               actions={this.actions}
+                              channels={this.state.channels}
                               localize={this.state.localizes[this.state.lang]}
                               contacts={this.state.contacts}
                               usermeta={this.state.users[props.match.params.user_id]}/>
@@ -273,7 +274,7 @@ export class App extends Component {
                 }}/>
                 <Route exact path='/debug' render={(props)=>{
                   return(
-                    <DebugPage {...props} logs={this.state.logs} noservice_host = {NOSERVICE_HOST} debug={this.state.debug}/>
+                    <DebugPage {...props} app_state={this.state} logs={this.state.logs} noservice_host = {NOSERVICE_HOST} debug={this.state.debug}/>
                   );
                 }}/>
                 <Route exact path='/noservice/signin' render={(props)=>{

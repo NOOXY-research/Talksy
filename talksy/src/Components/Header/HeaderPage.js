@@ -9,7 +9,6 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import BugReportIcon from '@material-ui/icons/BugReport';
 
 
-
 import './header.css';
 
 export class HeaderPage extends Component {
