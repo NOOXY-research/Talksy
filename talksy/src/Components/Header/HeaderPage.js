@@ -10,13 +10,14 @@ import BugReportIcon from '@material-ui/icons/BugReport';
 
 
 import './header.css';
+const CONSTANTS = require('../../constants.json');
 
 export class HeaderPage extends Component {
   constructor (props) {
     super(props);
     let regex_result = /(http[s]?:\/\/)?([^\/\s]+)\/([^\/\s]+)[\/]?(.*)/g.exec(window.location.href);
     this.state = {
-      headertitle: "Talksy",
+      headertitle: CONSTANTS.HEADER_TITLE,
       headerbuttons: [
         ['channels', '/channels/', <ChatIcon className="material-icons"/>],
         ['contacts', '/contacts/', <PeopleIcon className="material-icons"/>],

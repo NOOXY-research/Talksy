@@ -258,7 +258,6 @@ function Service(NoService, Dispatcher, getState) {
         else {
           Services.NoTalk = as1;
           Services.NoUser = as2;
-
           Services.NoTalk.on('close', ()=> {
             this.actions.log('NSActivity onClose', 'Activity closed.');
             Dispatcher.dispatch({type: 'updateConnectionFail', data: true});
@@ -273,14 +272,14 @@ function Service(NoService, Dispatcher, getState) {
           });
 
           this.actions.log('NoService', 'Connected to the Service.');
-
+          
           Services.NoTalk.call('getMyMeta', null, (err, json)=> {
             this.actions.log('getMyMeta', JSON.stringify(json));
             if(json.i) {
               Dispatcher.dispatch({type: 'updateMyUserMeta', data: json})
             }
             else {
-              this.updateMyMeta({a:0});
+              this.actions.updateMyMeta({a:0});
             }
 
             //

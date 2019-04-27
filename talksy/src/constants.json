@@ -1,7 +1,8 @@
 {
   "ROOT_PATH": "/",
-  "VERSION": "alpha 2019.4.27.2",
-  "DEBUG": false,
+  "HEADER_TITLE": "Talksy",
+  "VERSION": "alpha 2019.4.28.1",
+  "DEBUG": true,
   "NOSERVICE_HOST": "nooxy.org",
   "REFRESH_ACTIVITY_INTERVAL": 60000,
   "RETRY_INTERVAL": 3000,
