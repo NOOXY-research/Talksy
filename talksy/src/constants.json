@@ -1,6 +1,6 @@
 {
   "ROOT_PATH": "/",
-  "VERSION": "alpha 2019.4.27.1",
+  "VERSION": "alpha 2019.4.27.2",
   "DEBUG": false,
   "NOSERVICE_HOST": "nooxy.org",
   "REFRESH_ACTIVITY_INTERVAL": 60000,
