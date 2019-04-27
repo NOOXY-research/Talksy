@@ -35,6 +35,7 @@ import './App.css';
 const CONSTANTS = require('../constants.json');
 
 const VERSION = CONSTANTS.VERSION;
+const ROOT_PATH = CONSTANTS.ROOT_PATH;
 const REFRESH_ACTIVITY_INTERVAL= CONSTANTS.REFRESH_ACTIVITY_INTERVAL;
 const NOSERVICE_SIGNUP_URL = CONSTANTS.NOSERVICE_SIGNUP_URL;
 const NOSERVICE_HOST = CONSTANTS.NOSERVICE_HOST;
@@ -160,7 +161,7 @@ export class App extends Component {
     // let ChannelPageReg = '/channels/:id([0-9]+)';
     let HeaderPageReg = ':page(.*)';
     return (
-      <Router basename='/'>
+      <Router basename={ROOT_PATH}>
         <div className="App">
         <MuiThemeProvider theme={Theme}>
           <Route exact path={HeaderPageReg} render={(props)=>{
