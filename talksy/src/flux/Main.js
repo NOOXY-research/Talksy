@@ -8,10 +8,12 @@ import Service from './service';
 import NSClient from './NSc.js';
 
 const nshost = Constants.NOSERVICE_HOST;
+const conn = Constants.NOSERVICE_CONNECT;
+
 const debug = Constants.DEBUG;
 const nsport = null;
 
-const NoService = new NSClient(nshost);
+const NoService = new NSClient(nshost, conn);
 NoService.setDebug(debug);
 
 function Flux(setState, getState) {

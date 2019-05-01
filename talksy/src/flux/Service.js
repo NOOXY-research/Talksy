@@ -114,7 +114,7 @@ function Service(NoService, Dispatcher, getState) {
             this.actions.log('getMsgs ('+chid+')', JSON.stringify(json));
             json.channel_id = chid;
             json.messages = json.r;
-            Dispatcher.dispatch({type: 'appendMesseges', data: json});
+            Dispatcher.dispatch({type: 'appendMessages', data: json});
           });
       }
     },
@@ -206,7 +206,7 @@ function Service(NoService, Dispatcher, getState) {
         this.actions.log('message event', json);
         json.channel_id = json.i;
         json.message = json.r;
-        Dispatcher.dispatch({type: 'appendMessege', data: json});
+        Dispatcher.dispatch({type: 'appendMessage', data: json});
       });
 
       Services.NoTalk.onEvent('AddedContacts', (err, json)=> {
@@ -272,7 +272,7 @@ function Service(NoService, Dispatcher, getState) {
           });
 
           this.actions.log('NoService', 'Connected to the Service.');
-          
+
           Services.NoTalk.call('getMyMeta', null, (err, json)=> {
             this.actions.log('getMyMeta', JSON.stringify(json));
             if(json.i) {
@@ -307,7 +307,7 @@ function Service(NoService, Dispatcher, getState) {
                   json.channel_id = chid;
                   json.latest_read_line = json.l;
                   json.messages = json.r;
-                  Dispatcher.dispatch({type: 'updateMesseges', data: json});
+                  Dispatcher.dispatch({type: 'updateMessages', data: json});
                 });
               }
               this.actions.getMyContacts((err, contacts)=> {

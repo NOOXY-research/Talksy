@@ -66,7 +66,7 @@ export class ContactsPage extends Component {
     for(let key in this.props.contacts) {
       if(this.props.contacts[key].Type == 0) {
         let usermeta = this.props.users[this.props.contacts[key].ToUserId];
-        // console.log(usermeta);
+        console.log(usermeta);
         if(!Object.keys(this.props.users).includes(this.props.contacts[key].ToUserId)) {
           this.props.actions.getUserMeta(this.props.contacts[key].ToUserId);
         }

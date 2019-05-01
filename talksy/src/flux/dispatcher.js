@@ -4,6 +4,21 @@
 // Copyright 2018-2019 NOOXY. All Rights Reserved.
 import Dispatcher from './lib/dispatcher';
 
+let sortOnKeys = (dict)=> {
+
+    let sorted = [];
+    for(let key in dict) {
+        sorted[sorted.length] = key;
+    }
+    sorted.sort();
+
+    let tempDict = {};
+    for(let i = 0; i < sorted.length; i++) {
+        tempDict[sorted[i]] = dict[sorted[i]];
+    }
+    return tempDict;
+}
+
 function generateDispatcher(setState) {
   let _dispatcher = new Dispatcher();
   let id1 = _dispatcher.register((payload)=> {
@@ -80,7 +95,7 @@ function generateDispatcher(setState) {
           return prevState;
         });
       }
-      else if (payload.type === 'updateMesseges') {
+      else if (payload.type === 'updateMessages') {
         setState(prevState=> {
           prevState.channels[payload.data.channel_id]['Messages'] = payload.data.messages;
           prevState.channels[payload.data.channel_id]['LatestReadline'] = payload.data.latest_read_line;
@@ -107,7 +122,7 @@ function generateDispatcher(setState) {
           return prevState;
         }, payload.callback);
       }
-      else if (payload.type === 'appendMessege') {
+      else if (payload.type === 'appendMessage') {
         setState(prevState=> {
           let beadded ={};
           // add to last index
@@ -118,6 +133,12 @@ function generateDispatcher(setState) {
           else {
             prevState.channels[payload.data.channel_id]['Messages'] ={1: payload.data.message};
           }
+          return prevState;
+        }, payload.callback);
+      }
+      else if (payload.type === 'appendMessages') {
+        setState(prevState=> {
+          prevState.channels[payload.data.channel_id]['Messages'] = sortOnKeys(Object.assign(payload.data.messages, prevState.channels[payload.data.channel_id]['Messages']));
           return prevState;
         }, payload.callback);
       }
