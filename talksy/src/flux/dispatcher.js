@@ -138,7 +138,7 @@ function generateDispatcher(setState) {
       }
       else if (payload.type === 'appendMessages') {
         setState(prevState=> {
-          prevState.channels[payload.data.channel_id]['Messages'] = sortOnKeys(Object.assign(payload.data.messages, prevState.channels[payload.data.channel_id]['Messages']));
+          prevState.channels[payload.data.channel_id]['Messages'] = sortOnKeys(Object.assign({}, payload.data.messages, prevState.channels[payload.data.channel_id]['Messages']));
           return prevState;
         }, payload.callback);
       }

@@ -108,8 +108,8 @@ function Service(NoService, Dispatcher, getState) {
     loadMoreMessages: (chid, first_index, callback)=> {
       if(first_index!==1) {
         let begin=(first_index-READ_NEW_LINE)>=0?(first_index-READ_NEW_LINE):0;
-        let rows =READ_NEW_LINE;
-        if(begin)
+        let rows = READ_NEW_LINE;
+        if(first_index!==1)
           Services.NoTalk.call('getMsgs', {i: chid, b:begin, r:rows}, (err, json)=> {
             this.actions.log('getMsgs ('+chid+')', JSON.stringify(json));
             json.channel_id = chid;
