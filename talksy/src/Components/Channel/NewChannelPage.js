@@ -6,6 +6,10 @@ import Ink from 'react-ink';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 
+import Button from '@material-ui/core/Button';
+
+import ImageCropperDiolog from '../commons/ImageCropperDialog';
+
 export class NewChannelPage extends Component {
   constructor(props) {
     super(props);
@@ -28,7 +32,8 @@ export class NewChannelPage extends Component {
       userlist: [],
       channelmeta: {
         t:0,
-        a:1
+        a:1,
+        i: null
       },
       show_users: false
     };
@@ -53,6 +58,7 @@ export class NewChannelPage extends Component {
     );
   }
 
+
   renderLevels() {
     let elems = [];
     let i=0;
@@ -69,6 +75,8 @@ export class NewChannelPage extends Component {
       })
     }}>{elems}</Select>);
   }
+
+
 
   render() {
     return(
@@ -108,7 +116,18 @@ export class NewChannelPage extends Component {
                   <div className="Page-Row">
                     <div className="Page-Row-Text">
                       <h2>{"Channel's photo"}</h2>
-                      <input type="file" name="pic" accept="image/*"/>
+                      <ImageCropperDiolog open={this.state.adding_new_photo} onFinish={(canvas)=> {
+                        this.setState(prevState=> {
+                          prevState.adding_new_photo = false;
+                          if(canvas)
+                            prevState.channelmeta.p = canvas.toDataURL("image/jpeg", 0.5);
+                          console.log(prevState.channelmeta.p);
+                          return prevState;
+                        });
+                      }}></ImageCropperDiolog>
+                      <Button onClick={()=>{this.setState({adding_new_photo: true})}} size="small" variant="contained" color="primary">
+                        {"add an photo"}
+                      </Button>
                     </div>
                   </div>
                   <div className="Page-Row">

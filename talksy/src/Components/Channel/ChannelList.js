@@ -53,6 +53,7 @@ export class ChannelList extends Component {
             <div key={key} className={this.props.selected===key?"ChList-Row-selected":"ChList-Row"}>
               <Ink />
               <figure className="Page-Row-ThumbnailText-Head">
+                <img className="Page-Row-ThumbnailText-Head-img"src={this.props.channels[key].Thumbnail}/>
               </figure>
               <div className="Page-Row-ThumbnailText-Text">
                 <h2>{this.props.channels[key].Displayname}</h2>

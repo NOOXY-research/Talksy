@@ -10,7 +10,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 
+
+import ImageCropperDiolog from '../commons/ImageCropperDialog';
+
 import withMobileDialog from '@material-ui/core/withMobileDialog';
+
 
 export class ChannelSettingsPage extends Component {
   constructor(props) {
@@ -33,7 +37,7 @@ export class ChannelSettingsPage extends Component {
       },
       channelmeta: {
         a: props.channelmeta.AccessLevel?props.channelmeta.AccessLevel:0,
-        t: props.channelmeta.Type?props.channelmeta.Type:1,
+        t: props.channelmeta.Type,
       }
       ,
       userlist: [],
@@ -106,7 +110,18 @@ export class ChannelSettingsPage extends Component {
             <div className="Page-Row">
               <div className="Page-Row-Text">
                 <h2>{"Channel's photo"}</h2>
-                <input type="file" name="pic" accept="image/*"/>
+                <ImageCropperDiolog open={this.state.adding_new_photo} onFinish={(canvas)=> {
+                  this.setState(prevState=> {
+                    prevState.adding_new_photo = false;
+                    if(canvas)
+                      prevState.channelmeta.p = canvas.toDataURL("image/jpeg");
+                    console.log(prevState.channelmeta.p);
+                    return prevState;
+                  });
+                }}></ImageCropperDiolog>
+                <Button onClick={()=>{this.setState({adding_new_photo: true})}} size="small" variant="contained" color="primary">
+                  {"add an photo"}
+                </Button>
               </div>
             </div>
             <div className="Page-Row">
