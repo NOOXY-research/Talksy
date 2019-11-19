@@ -4,7 +4,7 @@
 // Copyright 2018-2019 NOOXY. All Rights Reserved.
 import Constants from '../constants.json';
 import Dispatcher from './dispatcher';
-import Service from './service';
+import Service from './Service';
 import NSClient from './NSc.js';
 
 const nshost = Constants.NOSERVICE_HOST;
