@@ -1,7 +1,9 @@
 # Talksy
-Reactjs frontend for NoService NoTalk service.
 
 https://talk.nooxy.org/
+
+Reactjs frontend for NoService NoTalk service.
+
 ![alt text](/imgs/NoTalkAD.png)
 ![alt text](/imgs/Talksy.png)
 
